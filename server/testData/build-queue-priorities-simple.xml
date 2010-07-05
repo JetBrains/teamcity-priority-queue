@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<priority-classes>
+
+  <priority-class id="pc1" name="Some Name" priority="2" description="">
+    <build-type id="bt2"/>
+  </priority-class>
+
+  <priority-class id="pc2" name="Some other name" priority="1" description="">
+    <build-type id="bt1"/>
+  </priority-class>
+
+</priority-classes>

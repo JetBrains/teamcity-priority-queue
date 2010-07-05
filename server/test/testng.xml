@@ -1,0 +1,10 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Priority Queue test suite">
+  <test name="Priority Queue tests">
+    <classes>
+      <class name="jetbrains.buildServer.serverSide.priority.BuildQueuePriorityOrderingTest"/>
+      <class name="jetbrains.buildServer.serverSide.priority.PriorityClassManagerTest"/>
+      <class name="jetbrains.buildServer.serverSide.priority.ReadConfigFileTest"/>
+    </classes>
+  </test>
+</suite>

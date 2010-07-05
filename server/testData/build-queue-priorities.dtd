@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='ISO-8859-1' ?>
+
+<!ELEMENT priority-classes (priority-class*)>
+
+<!ELEMENT priority-class (build-type*)>
+<!ATTLIST priority-class
+    id          CDATA #REQUIRED
+    name        CDATA #REQUIRED
+    priority    CDATA #REQUIRED
+    description CDATA #IMPLIED>
+
+<!ELEMENT build-type EMPTY>
+<!ATTLIST build-type id CDATA #REQUIRED>

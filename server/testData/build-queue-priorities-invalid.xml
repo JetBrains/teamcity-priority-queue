@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE priority-classes SYSTEM "build-queue-priorities.dtd">
+
+<priority-classes>
+
+  <priority-class id="pc1" name="Inspections" priority="-1"
+                  description="Low priority inspections">
+    <build-type id="bt14"/>
+    <build-type id="bt47"
+  priority-class>
+
+  <priority-class id="pc2" name="Release" priority="5"
+                  description="Soon to be released">
+    <build-type id="bt1"/>
+    <build-type id="bt3"/>
+  </priority-class>
+
+</priority-classes>

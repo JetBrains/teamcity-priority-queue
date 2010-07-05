@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:lang="http://www.springframework.org/schema/lang" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                           http://www.springframework.org/schema/lang
+                           http://www.springframework.org/schema/lang/spring-lang-2.0.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
+       default-autowire="constructor">
+
+  <bean id="priorityOrderingStrategy" class="jetbrains.buildServer.serverSide.priority.BuildQueuePriorityOrdering"/>
+  <bean id="serverListener" class="jetbrains.buildServer.serverSide.priority.ServerListener"/>
+  <bean id="priorityClassManager" class="jetbrains.buildServer.serverSide.priority.PriorityClassManagerImpl">
+    <property name="updateConfigInterval" value="5000"/> <!-- 5 seconds -->    
+  </bean>
+
+  <bean id="authtorizationBean" class="jetbrains.buildServer.serverSide.priority.controllers.AuthorizationBean"/>
+
+  <bean id="priorityClassesController" class="jetbrains.buildServer.serverSide.priority.controllers.PriorityClassListController"/>
+  <bean id="priorityClassController" class="jetbrains.buildServer.serverSide.priority.controllers.EditPriorityClassConfigurationsController"/>
+  <bean id="priorityActionsController" class="jetbrains.buildServer.serverSide.priority.controllers.PriorityClassActionsController"/>
+  <bean id="attachConfigurationsController" class="jetbrains.buildServer.serverSide.priority.controllers.AttachBuildTypesController"/>
+  <bean id="priorityClassConfigurationsPopup" class="jetbrains.buildServer.serverSide.priority.controllers.PriorityClassConfigurationsPopupController"/>
+  <bean id="moveConfigurationsDialogController" class="jetbrains.buildServer.serverSide.priority.controllers.DeletePriorityClassController"/>
+  <bean id="editPriorityClassDialogController" class="jetbrains.buildServer.serverSide.priority.controllers.EditPriorityClassDialogController"/>
+  
+  <bean id="detachBuildTypesAction" class="jetbrains.buildServer.serverSide.priority.controllers.DetachBuildTypesAction"/>
+
+  <bean id="buildQueuePageExtension" class="jetbrains.buildServer.serverSide.priority.controllers.BuildQueuePageExtension"/>
+</beans>
