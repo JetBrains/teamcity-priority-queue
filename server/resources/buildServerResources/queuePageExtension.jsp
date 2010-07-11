@@ -20,6 +20,6 @@
   <c:url var="prioritiesUrl" value="${teamcityPluginResourcesPath}priorityClassList.html"/>
   <script type="text/javascript">
     $('topWrapper').getElementsBySelector('[class="quickLinks"]')[0].innerHTML =
-            '<a href="${prioritiesUrl}">Configure Builds Priorities</a>';
+            '<a href="${prioritiesUrl}">Configure Build Priorities</a>';
   </script>
 </authz:authorize>

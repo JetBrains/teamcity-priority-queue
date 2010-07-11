@@ -15,32 +15,14 @@
 --%>
 <%@ include file="/include.jsp" %>
 
-<c:set var="title" value="Edit Priority Class ${priorityClass.name} configurations" scope="request"/>
-
-<bs:page>
-  <jsp:attribute name="head_include">
-    <bs:linkCSS>
-      /css/forms.css
-      /css/admin/adminMain.css
-      ${teamcityPluginResourcesPath}css/priorityClass.css
-    </bs:linkCSS>
-    <bs:linkScript>
-      /js/bs/adminActions.js
-      /js/bs/queueLikeSorter.js
-      ${teamcityPluginResourcesPath}js/priorityClass.js
-    </bs:linkScript>
-    <script type="text/javascript">
-      BS.Navigation.items = [
-        {title: "Build Queue", url: '<c:url value="/queue.html"/>'},
-        {title: "Priority Classes", url: '<c:url value="${teamcityPluginResourcesPath}priorityClassList.html"/>'},
-        {title: '<c:out value="${priorityClass.name}"/>', selected: true}
-      ];
-    </script>
-  </jsp:attribute>
-
-  <jsp:attribute name="body_include">
-    <c:set var="configurationsNum" value="${fn:length(priorityClass.buildTypes)}"/>
-    <bs:refreshable containerId="pClassBuildTypesContainer" pageUrl="${pageUrl}">
+<c:set var="configurationsNum" value="${fn:length(priorityClass.buildTypes)}"/>
+<bs:refreshable containerId="pClassBuildTypesContainer" pageUrl="${pageUrl}">
+  <a name="configurations"></a><h3 class="title_underlined">Build Configurations</h3>
+  <c:choose>
+    <c:when test="${priorityClass.personal}">
+      <p>This priority class contains all personal builds, they can not be edited</p>
+    </c:when>
+    <c:otherwise>
       <bs:messages key="buildTypesUnassigned"/>
       <bs:messages key="buildTypesAssigned"/>
 
@@ -92,8 +74,6 @@
         </p>
         <jsp:include page="${teamcityPluginResourcesPath}attachConfigurationsDialog.html"/>
       </c:if>
-
-    </bs:refreshable>
-  </jsp:attribute>
-</bs:page>
-
+    </c:otherwise>
+  </c:choose>
+</bs:refreshable>

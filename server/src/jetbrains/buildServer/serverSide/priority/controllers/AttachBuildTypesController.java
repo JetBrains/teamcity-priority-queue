@@ -85,7 +85,7 @@ public class AttachBuildTypesController extends BaseFormXmlController {
 
       ActionErrors errors = new ActionErrors();
       try {
-        if (!selectedConfigurations.isEmpty()) {
+        if (selectedConfigurations != null && !selectedConfigurations.isEmpty()) {
           List<SBuildType> newBuildTypes = new ArrayList<SBuildType>();
           for (String btId: selectedConfigurations) {
             SBuildType configuration = myServer.getProjectManager().findBuildTypeById(btId);

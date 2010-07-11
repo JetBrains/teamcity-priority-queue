@@ -45,13 +45,13 @@
 
   <jsp:attribute name="body_include">
     <bs:refreshable containerId="priorityClassList" pageUrl="${pageUrl}">
-      <p>Higher priority configuration has - higher place it gets when added to Build Queue.</p>
+      <p>The higher priority a configuration has - the higher place it gets when added to the Build Queue.</p>
       <bs:messages key="priorityClassCreated"/>
       <bs:messages key="priorityClassDeleted"/>
       <bs:messages key="priorityClassNotFound"/>
       <bs:messages key="priorityClassUpdated"/>
 
-      <l:tableWithHighlighting highlightImmediately="true" className="priorityClassTable dark sortable borderBottom" mouseovertitle="Click to edit priority class configurations">
+      <l:tableWithHighlighting highlightImmediately="true" className="priorityClassTable dark sortable borderBottom" mouseovertitle="Click to edit Priority Class">
         <tr>
           <th class="priorityClassPriority">Priority</th>
           <th class="priorityClassName">Name</th>
@@ -62,14 +62,10 @@
         </tr>
 
         <c:forEach var="pClass" items="${priorityClasses}" varStatus="pos">
-          <c:url value='${teamcityPluginResourcesPath}priorityClassConfigurations.html?priorityClassId=${pClass.id}' var="editUrl"/>
+          <c:url var="editUrl" value='${teamcityPluginResourcesPath}editPriorityClass.html?priorityClassId=${pClass.id}'/>
 
           <c:choose>
             <c:when test="${pClass.default}">
-              <c:set var="highlight"></c:set>
-              <c:set var="onclick"></c:set>
-            </c:when>
-            <c:when test="${pClass.personal}">
               <c:set var="highlight"></c:set>
               <c:set var="onclick"></c:set>
             </c:when>
@@ -80,50 +76,19 @@
           </c:choose>
 
           <tr>
-            <td class="${highlight}">
-              <c:choose>
-                <c:when test="${pClass.default}">
-                  <c:out value="${pClass.priority}"/>
-                </c:when>
-                <c:when test="${pClass.personal}">
-                  <a href="javascript://" title="Click to edit priority"
-                     onclick="BS.EditPriorityClassDialog.showEditDialog('${pClass.id}', 'priorityClassPriority')">
-                    <c:out value="${pClass.priority}"/>
-                  </a>
-                </c:when>
-                <c:otherwise>
-                  <a href="javascript://" title="Click to edit priority"
-                     onclick="BS.EditPriorityClassDialog.showEditDialog('${pClass.id}', 'priorityClassPriority')">
-                    <c:out value="${pClass.priority}"/>
-                  </a>
-                </c:otherwise>
-              </c:choose>
+            <td class="${highlight}" ${onclick}>
+              <c:out value="${pClass.priority}"/>
             </td>
 
-            <td class="${highlight}">
-              <c:choose>
-                <c:when test="${pClass.default}">
-                  <strong><c:out value="${pClass.name}"/></strong>
-                </c:when>
-                <c:when test="${pClass.personal}">
-                  <strong><c:out value="${pClass.name}"/></strong>
-                </c:when>
-                <c:otherwise>
-                  <strong>                    
-                    <a href="javascript://" title="Click to edit name" 
-                       onclick="BS.EditPriorityClassDialog.showEditDialog('${pClass.id}', 'priorityClassName')">
-                      <c:out value="${pClass.name}"/>
-                    </a>
-                  </strong>
-                </c:otherwise>
-              </c:choose>
+            <td class="${highlight}" ${onclick}>
+              <strong><c:out value="${pClass.name}"/></strong>
             </td>
 
             <td class="${highlight}" ${onclick}>
               <c:out value="${pClass.description}"/>
             </td>
 
-            <td class="${highlight} noTitle">
+            <td class="${highlight} noTitle" ${onclick}>
               <c:choose>
                 <c:when test="${pClass.default}">
                   <span title="This class contains all build configurations not included into any other priority classes, they cannot be edited">N/A</span>
@@ -137,7 +102,7 @@
                                    hidePopupCommand="BS.PriorityClassConfigurationsPopup.hidePopup()"
                                    stopHidingPopupCommand="BS.PriorityClassConfigurationsPopup.stopHidingPopup()"
                                    controlId="priorityClasses:${pClass.id}">
-                    <a href="${editUrl}">
+                    <a href="${editUrl}#configurations">
                       <c:choose>
                         <c:when test="${buildTypeCount > 0}">
                           View configurations (${buildTypeCount})
@@ -152,16 +117,13 @@
               </c:choose>
             </td>
 
-            <td class="editConfigurations">
+            <td class="${highlight}">
               <c:choose>
                 <c:when test="${pClass.default}">
                   <span title="This priority class cannot be changed">N/A</span>
                 </c:when>
-                <c:when test="${pClass.personal}">
-                  <a href="javascript://" onclick="BS.EditPriorityClassDialog.showEditDialog('${pClass.id}', 'priorityClassPriority')">edit</a>
-                </c:when>
                 <c:otherwise>
-                  <a href="javascript://" onclick="BS.EditPriorityClassDialog.showEditDialog('${pClass.id}')">edit</a>
+                  <a href="${editUrl}">edit</a>
                 </c:otherwise>
               </c:choose>
             </td>
@@ -183,7 +145,7 @@
         </c:forEach>
       </l:tableWithHighlighting>
 
-      <p class="addNew"><a href="javascript://" onclick="BS.EditPriorityClassDialog.showCreateDialog()">Create new priority class</a></p>      
+      <p class="addNew"><a href="<c:url value='${teamcityPluginResourcesPath}createPriorityClass.html'/>">Create new priority class</a></p>
     </bs:refreshable>
     
     <jsp:include page="${teamcityPluginResourcesPath}editPriorityClassDialog.html"/>

@@ -55,6 +55,18 @@ table.priorityClassTable {
   border-left: solid 1px #e3e9ef;
 }
 
+.priorityClassGeneralSettings {
+  width: 50%;
+}
+
+.priorityClassSaveButtonsBlock {
+  padding-top:.3em;
+  margin-top:2em;
+  margin-bottom: 4em;
+}
+
+
+
 #pClassBuildTypesContainer {
   width: 50%;
 }
@@ -83,6 +95,10 @@ table.priorityClassBuildTypesTable td {
 
 table.configurationListFilter {
   width: 100%;
+}
+
+table.configurationListFilter td {
+  padding: 5px 5px 5px 5px;
 }
 
 table.configurationListFilter td.label {

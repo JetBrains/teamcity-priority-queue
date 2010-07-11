@@ -20,6 +20,7 @@ import jetbrains.buildServer.serverSide.priority.PriorityClass;
 import jetbrains.buildServer.serverSide.priority.PriorityClassImpl;
 import jetbrains.buildServer.serverSide.priority.exceptions.InvalidPriorityClassPriorityException;
 import jetbrains.buildServer.serverSide.priority.exceptions.PriorityClassException;
+import jetbrains.buildServer.web.util.CameFromSupport;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -33,6 +34,7 @@ public class EditPriorityClassBean {
   private String myPriorityClassId;
   private boolean myPersonal;
   private String myEditAction = "create";
+  private CameFromSupport myCameFromSupport = new CameFromSupport();
 
   EditPriorityClassBean() {
     myPriorityClassName = "";
@@ -118,5 +120,9 @@ public class EditPriorityClassBean {
 
   public void setPersonal(boolean personal) {
     myPersonal = personal;
+  }
+
+  public CameFromSupport getCameFromSupport() {
+    return myCameFromSupport;
   }
 }

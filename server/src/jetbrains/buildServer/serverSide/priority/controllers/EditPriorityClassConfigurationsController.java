@@ -57,7 +57,7 @@ public class EditPriorityClassConfigurationsController extends BaseController {
       getOrCreateMessages(request).addMessage("priorityClassNotFound", "Selected priority class does not exist anymore");
       return new ModelAndView(new RedirectView(myDefaultPriorityClassListUrl, true));
     }
-    if (priorityClass.isDefault() || priorityClass.isPersonal()) {
+    if (priorityClass.isDefault()) {
       return new ModelAndView(new RedirectView(myDefaultPriorityClassListUrl, true));
     }
     ModelAndView mv = new ModelAndView(myPluginDescriptor.getPluginResourcesPath("priorityClassConfigurations.jsp"));

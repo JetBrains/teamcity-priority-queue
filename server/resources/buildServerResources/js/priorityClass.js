@@ -51,6 +51,65 @@ BS.EditPriorityClassDialog = OO.extend(BS.AbstractModalDialog, {
   }
 });
 
+BS.CreatePriorityClassForm = OO.extend(BS.AbstractWebForm, {
+  formElement: function() {
+    return $('createPriorityClass');
+  },
+
+  reset: function() {
+    Form.reset(this.formElement());
+    this.clearErrors();
+  },
+
+  focusFirstElement: function() {
+    Form.focusFirstElement(this.formElement());
+  },
+
+  focusElement: function(elementId) {
+    $(elementId).activate();
+  },
+
+  savingIndicator: function() {
+    return $('createPriorityClassProgress');
+  },
+
+  submit: function() {
+    var that = this;
+    BS.FormSaver.save(this, this.formElement().action, OO.extend(BS.ErrorsAwareListener, {
+      onCreatePriorityClassError: function(elem) {
+        $("error_createError").innerHTML = elem.firstChild.nodeValue;
+      },
+
+      onPriorityClassNameError: function(elem) {
+        $("error_priorityClassName").innerHTML = elem.firstChild.nodeValue;
+        that.highlightErrorField($("priorityClassName"));
+      },
+
+      onPriorityClassDescriptionError: function(elem) {
+        $("error_priorityClassDescription").innerHTML = elem.firstChild.nodeValue;
+        that.highlightErrorField($("priorityClassDescription"));
+      },
+
+      onPriorityClassPriorityError: function(elem) {
+        $("error_priorityClassPriority").innerHTML = elem.firstChild.nodeValue;
+        that.highlightErrorField($("priorityClassPriority"));
+      },
+
+      onCompleteSave: function(form, responseXML, err) {
+        form.setSaving(false);
+        if (err) {
+          form.enable();
+          form.focusFirstErrorField();
+        } else {
+          document.location = $("afterCreateLocation").value + "?priorityClassId=" +
+                              responseXML.documentElement.getElementsByTagName("priorityClass")[0].getAttribute("id");
+        }
+      }
+    }));
+    return false;
+  }
+});
+
 BS.EditPriorityClassForm = OO.extend(BS.AbstractWebForm, {
   formElement: function() {
     return $('editPriorityClass');
@@ -76,14 +135,8 @@ BS.EditPriorityClassForm = OO.extend(BS.AbstractWebForm, {
   submit: function() {
     var that = this;
     BS.FormSaver.save(this, this.formElement().action, OO.extend(BS.ErrorsAwareListener, {
-      onCreatePriorityClassError: function(elem) {
-        $("error_createError").innerHTML = elem.firstChild.nodeValue;
-      },
-
       onPriorityClassNotFound: function() {
-        BS.PriorityClassActions.refreshPriorityClassList();
-        that.enable();
-        BS.EditPriorityClassDialog.close();        
+        window.location.reload(true);
       },
 
       onPriorityClassNameError: function(elem) {
@@ -102,9 +155,7 @@ BS.EditPriorityClassForm = OO.extend(BS.AbstractWebForm, {
       },
 
       onSuccessfulSave: function() {
-        BS.PriorityClassActions.refreshPriorityClassList();
-        that.enable();
-        BS.EditPriorityClassDialog.close();
+        window.location.reload(true);
       }
     }));
     return false;
@@ -157,20 +208,20 @@ BS.DeletePriorityClassForm = OO.extend(BS.AbstractWebForm, {
 
 
 BS.UnassignBuildTypesForm = OO.extend(BS.AbstractWebForm, {
-  getFormElement: function() {
+  formElement: function() {
     return $('unassignBuildTypesForm');
   },
 
   selectAll: function(select) {
     if (select) {
-      BS.Util.selectAll(this.getFormElement(), "unassign");
+      BS.Util.selectAll(this.formElement(), "unassign");
     } else {
-      BS.Util.unselectAll(this.getFormElement(), "unassign");
+      BS.Util.unselectAll(this.formElement(), "unassign");
     }
   },
 
   selected: function() {
-    var checkboxes = Form.getInputs(this.getFormElement(), "checkbox", "unassign");
+    var checkboxes = Form.getInputs(this.formElement(), "checkbox", "unassign");
     for (var i=0; i<checkboxes.length; i++) {
       if (checkboxes[i].checked) {
         return true;

@@ -49,7 +49,9 @@ public class AuthorizationBean {
             "/plugins/priority-queue/editPriorityClassDialog.html",
             "/plugins/priority-queue/action.html",
             "/plugins/priority-queue/priorityClassConfigurationsPopup.html",
-            "/plugins/priority-queue/priorityClassList.html"};
+            "/plugins/priority-queue/priorityClassList.html",
+            "/plugins/priority-queue/createPriorityClass.html",
+            "/plugins/priority-queue/editPriorityClass.html"};
     for (String path : paths) {
       authInterceptor.addPathBasedPermissionsChecker(path, buildQueuePermissionChecker);
     }

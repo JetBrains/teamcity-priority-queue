@@ -24,6 +24,8 @@
   <bean id="priorityClassConfigurationsPopup" class="jetbrains.buildServer.serverSide.priority.controllers.PriorityClassConfigurationsPopupController"/>
   <bean id="moveConfigurationsDialogController" class="jetbrains.buildServer.serverSide.priority.controllers.DeletePriorityClassController"/>
   <bean id="editPriorityClassDialogController" class="jetbrains.buildServer.serverSide.priority.controllers.EditPriorityClassDialogController"/>
+  <bean id="createPriorityClassController" class="jetbrains.buildServer.serverSide.priority.controllers.CreatePriorityClassController"/>
+  <bean id="editPriorityClassController" class="jetbrains.buildServer.serverSide.priority.controllers.EditPriorityClassController"/>
   
   <bean id="detachBuildTypesAction" class="jetbrains.buildServer.serverSide.priority.controllers.DetachBuildTypesAction"/>
 
