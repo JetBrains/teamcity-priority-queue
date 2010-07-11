@@ -70,7 +70,6 @@ public class EditPriorityClassController extends BaseFormXmlController {
         if (myPriorityClassManager.isDefaultPriorityClass(priorityClass)) {
           //do nothing
         } else if (myPriorityClassManager.isPersonalPriorityClass(priorityClass)) {
-          pb.validate();
           PriorityClassImpl updatedPersonal = new PriorityClassImpl(priorityClass.getId(), priorityClass.getName(),
                   priorityClass.getDescription(), pb.getPriorityClassPriorityInt(), priorityClass.getBuildTypes());
           myPriorityClassManager.savePriorityClass(updatedPersonal);
