@@ -16,30 +16,35 @@
 
 package jetbrains.buildServer.serverSide.priority.controllers;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import jetbrains.buildServer.controllers.ActionMessages;
-import jetbrains.buildServer.serverSide.SBuildType;
-import jetbrains.buildServer.serverSide.priority.PriorityClassImpl;
+import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.priority.PriorityClass;
+import jetbrains.buildServer.serverSide.priority.PriorityClassImpl;
 import jetbrains.buildServer.serverSide.priority.PriorityClassManager;
 import jetbrains.buildServer.web.openapi.ControllerAction;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.*;
-
 /**
  * @author dmitry.neverov
  */
 public class DetachBuildTypesAction implements ControllerAction {
 
-  private PriorityClassManager myPriorityClassManager;
+  private final PriorityClassManager myPriorityClassManager;
+  private final ProjectManager myProjectManager;
 
   public DetachBuildTypesAction(@NotNull final PriorityClassManager pClassManager,
+                                @NotNull final ProjectManager projectManager,
                                 @NotNull final PriorityClassActionsController controller) {
     myPriorityClassManager = pClassManager;
+    myProjectManager = projectManager;
     controller.registerAction(this);
   }
 
@@ -51,29 +56,20 @@ public class DetachBuildTypesAction implements ControllerAction {
     String priorityClassId = request.getParameter("pClassId");
     PriorityClass priorityClass = myPriorityClassManager.findPriorityClassById(priorityClassId);
     if (priorityClass != null) {
-      Set<String> buildTypesIds = getBuildTypeIdsForDetach(request);
-      Collection<SBuildType> updatedBuildTypes = priorityClass.getBuildTypes();
-      List<SBuildType> buildTypesToRemove = new ArrayList<SBuildType>();
-      for (SBuildType bt : updatedBuildTypes) {
-        if (buildTypesIds.contains(bt.getBuildTypeId())) {
-          buildTypesToRemove.add(bt);
-        }
-      }
-
-      boolean buildTypesChanged = updatedBuildTypes.removeAll(buildTypesToRemove);
+      Set<String> buildTypesIdsForRemove = getBuildTypeIdsForDetach(request);
+      Set<String> updatedBuildTypeIds = ((PriorityClassImpl) priorityClass).getBuildTypeIds();
+      boolean buildTypesChanged = updatedBuildTypeIds.removeAll(buildTypesIdsForRemove);
 
       if (buildTypesChanged) {
-        PriorityClassImpl updatedPriorityClass = new PriorityClassImpl(priorityClass.getId(), priorityClass.getName(),
-                priorityClass.getDescription(), priorityClass.getPriority(), new HashSet<SBuildType>(updatedBuildTypes));
+        PriorityClassImpl updatedPriorityClass = new PriorityClassImpl(myProjectManager, priorityClass.getId(), priorityClass.getName(),
+                priorityClass.getDescription(), priorityClass.getPriority(), updatedBuildTypeIds);
         myPriorityClassManager.savePriorityClass(updatedPriorityClass);
-      }
 
-      if (buildTypesChanged) {
-        if (buildTypesToRemove.size() == 1) {
+        if (buildTypesIdsForRemove.size() == 1) {
           ActionMessages.getOrCreateMessages(request).addMessage("buildTypesUnassigned", "1 configuration was unassigned from the priority class");
         } else {
           ActionMessages.getOrCreateMessages(request).addMessage("buildTypesUnassigned", "{0} configurations were unassigned from the priority class",
-                  String.valueOf(buildTypesToRemove.size()));
+                  String.valueOf(buildTypesIdsForRemove.size()));
         }
       }      
     }    

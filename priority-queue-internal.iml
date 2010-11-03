@@ -9,7 +9,6 @@
         <sourceRoots>
           <root url="file://$MODULE_DIR$/server/resources" />
         </sourceRoots>
-        <context-artifact name="web-deployment" />
       </configuration>
     </facet>
   </component>

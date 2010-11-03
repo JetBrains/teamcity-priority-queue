@@ -16,8 +16,11 @@
 
 package jetbrains.buildServer.serverSide.priority;
 
+import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SBuildType;
-import jetbrains.buildServer.serverSide.priority.exceptions.*;
+import jetbrains.buildServer.serverSide.priority.exceptions.InvalidPriorityClassDescriptionException;
+import jetbrains.buildServer.serverSide.priority.exceptions.InvalidPriorityClassNameException;
+import jetbrains.buildServer.serverSide.priority.exceptions.InvalidPriorityClassPriorityException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -27,25 +30,28 @@ import java.util.*;
  */
 public class PriorityClassImpl implements PriorityClass, Comparable<PriorityClassImpl> {
 
+  private final ProjectManager myProjectManager;
   private final String myId;
   private final String myName;
   private final String myDescription;
   private final int myPriority;
-  private final Set<SBuildType> myBuildTypes;
+  private final Set<String> myBuildTypeIds;
 
-  public PriorityClassImpl(@NotNull String id,
+  public PriorityClassImpl(@NotNull ProjectManager projectManager,
+                           @NotNull String id,
                            @NotNull String name,
                            @NotNull String description,
                            int priority,
-                           @NotNull Collection<SBuildType> buildTypes) throws InvalidPriorityClassNameException, InvalidPriorityClassDescriptionException {
+                           @NotNull Collection<String> buildTypeIds) throws InvalidPriorityClassNameException, InvalidPriorityClassDescriptionException {
     checkNameIsCorrect(name);
     checkDescriptionIsCorrect(description);
     checkPriorityIsCorrect(priority);
+    myProjectManager = projectManager;
     myId = id;
     myName = name;
     myDescription = description;
     myPriority = priority;
-    myBuildTypes = new HashSet<SBuildType>(buildTypes);
+    myBuildTypeIds = new HashSet<String>(buildTypeIds);
   }
 
   @NotNull
@@ -69,9 +75,11 @@ public class PriorityClassImpl implements PriorityClass, Comparable<PriorityClas
 
   @NotNull
   public List<SBuildType> getBuildTypes() {
-    List<SBuildType> buildTypes = new ArrayList<SBuildType>();
-    buildTypes.addAll(myBuildTypes);
-    return buildTypes;
+    return new ArrayList<SBuildType>(myProjectManager.findBuildTypes(myBuildTypeIds));
+  }
+
+  public Set<String> getBuildTypeIds() {
+    return new HashSet<String>(myBuildTypeIds);
   }
 
   public boolean isDefault() {

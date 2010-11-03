@@ -138,13 +138,13 @@ public class EditPriorityClassDialogController extends BaseFormXmlController {
           //do nothing
         } else if (myPriorityClassManager.isPersonalPriorityClass(priorityClass)) {
           pb.validate();
-          PriorityClassImpl updatedPersonal = new PriorityClassImpl(priorityClass.getId(), priorityClass.getName(),
-                  priorityClass.getDescription(), pb.getPriorityClassPriorityInt(), priorityClass.getBuildTypes());
+          PriorityClassImpl updatedPersonal = new PriorityClassImpl(myServer.getProjectManager(), priorityClass.getId(), priorityClass.getName(),
+                  priorityClass.getDescription(), pb.getPriorityClassPriorityInt(), ((PriorityClassImpl)priorityClass).getBuildTypeIds());
           myPriorityClassManager.savePriorityClass(updatedPersonal);
         } else {
           pb.validate();
-          PriorityClassImpl updatedPriorityClass = new PriorityClassImpl(priorityClass.getId(), pb.getPriorityClassName(),
-                  pb.getPriorityClassDescription(), pb.getPriorityClassPriorityInt(), priorityClass.getBuildTypes());
+          PriorityClassImpl updatedPriorityClass = new PriorityClassImpl(myServer.getProjectManager(), priorityClass.getId(), pb.getPriorityClassName(),
+                  pb.getPriorityClassDescription(), pb.getPriorityClassPriorityInt(), ((PriorityClassImpl)priorityClass).getBuildTypeIds());
           myPriorityClassManager.savePriorityClass(updatedPriorityClass);
         }
       } catch (DuplicatePriorityClassNameException e) {

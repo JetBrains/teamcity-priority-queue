@@ -64,7 +64,7 @@ public class BuildQueuePriorityOrderingTest {
   @BeforeMethod(alwaysRun = true)
   public void setUp() throws IOException {
     new TestLogger().onSuiteStart();
-    
+
     myContext = new Mockery(){{
       setImposteriser(ClassImposteriser.INSTANCE);
     }};
@@ -91,7 +91,7 @@ public class BuildQueuePriorityOrderingTest {
 
     myPriorityClassManager = new PriorityClassManagerImpl(server, serverPaths,
             eventDispatcher, new FileWatcherFactory(serverPaths));
-    myStrategy = new BuildQueuePriorityOrdering(myPriorityClassManager);
+    myStrategy = new BuildQueuePriorityOrdering(server, myPriorityClassManager);
     myListener = new ServerListener(eventDispatcher, server, myStrategy, myPriorityClassManager);
     myListener.serverStartup();
     myCurrentQueueItems = new ArrayList<SQueuedBuild>();
@@ -133,7 +133,7 @@ public class BuildQueuePriorityOrderingTest {
 
   public void test_long_time_wait_item() {
     Map<String, SBuildType> id2buildType = prepareBuildTypes(myContext, myProjectManager, "bt1", "bt2", "bt3");
-    
+
     myPriorityClassManager.createPriorityClass("Zero", "", 0, Collections.singleton(id2buildType.get("bt1")));
     myPriorityClassManager.createPriorityClass("Four", "", 4, Collections.singleton(id2buildType.get("bt2")));
     myPriorityClassManager.createPriorityClass("Six", "", 6, Collections.singleton(id2buildType.get("bt3")));
@@ -295,15 +295,15 @@ public class BuildQueuePriorityOrderingTest {
     assertOrder(myCurrentQueueItems, "bt1", "bt2", "bt3");//by default - default and personal class have same priorities
 
     PriorityClass personalPriorityClass = myPriorityClassManager.getPersonalPriorityClass();
-    PriorityClassImpl updatedPersonalClass = new PriorityClassImpl(personalPriorityClass.getId(), personalPriorityClass.getName(),
-            personalPriorityClass.getDescription(), 1, personalPriorityClass.getBuildTypes());
+    PriorityClassImpl updatedPersonalClass = new PriorityClassImpl(myProjectManager, personalPriorityClass.getId(), personalPriorityClass.getName(),
+            personalPriorityClass.getDescription(), 1, ((PriorityClassImpl)personalPriorityClass).getBuildTypeIds());
     myPriorityClassManager.savePriorityClass(updatedPersonalClass);
 
     myCurrentQueueItems = addBuilds(myCurrentQueueItems, createPersonalQueuedBuild(id2buildType.get("bt4"), 60));
     assertOrder(myCurrentQueueItems, "bt4", "bt1", "bt2", "bt3");
 
-    updatedPersonalClass = new PriorityClassImpl(personalPriorityClass.getId(), personalPriorityClass.getName(),
-            personalPriorityClass.getDescription(), -1, personalPriorityClass.getBuildTypes());
+    updatedPersonalClass = new PriorityClassImpl(myProjectManager, personalPriorityClass.getId(), personalPriorityClass.getName(),
+            personalPriorityClass.getDescription(), -1, ((PriorityClassImpl)personalPriorityClass).getBuildTypeIds());
     myPriorityClassManager.savePriorityClass(updatedPersonalClass);
     myCurrentQueueItems = addBuilds(myCurrentQueueItems, createPersonalQueuedBuild(id2buildType.get("bt5"), 60));
     assertOrder(myCurrentQueueItems, "bt4", "bt1", "bt2", "bt3", "bt5");
@@ -323,7 +323,27 @@ public class BuildQueuePriorityOrderingTest {
             createQueuedBuild(id2buildType.get("bt3"), 60));
     assertOrder(myCurrentQueueItems, "bt0", "bt1", "bt2", "bt3");
   }
-  
+
+
+  /**
+   * Since QueuedBuildImpl does not implement equals() and hashCode(), ordering strategy should not rely on these methods.
+   * Otherwise NPE could be thrown because we cannot find a weight for the queued build.
+   */
+  public void test_TW_13883() {
+    Map<String, SBuildType> id2buildType = prepareBuildTypes(myContext, myProjectManager, "bt2", "bt3");
+    final SQueuedBuild qb1 = createQueuedBuild(id2buildType.get("bt2"), 60);
+
+    myCurrentQueueItems = addBuilds(myCurrentQueueItems, qb1);
+    assertEquals(1, myCurrentQueueItems.size());
+
+    final SQueuedBuild qb1copy = createQueuedBuild(id2buildType.get("bt2"), createBuildEstimates(createTimeInterval(60)), new Date(), false, qb1.getItemId());
+    assertEquals(qb1.getItemId(), qb1copy.getItemId());
+    List<SQueuedBuild> changedCurrentItems = new ArrayList<SQueuedBuild>();
+    changedCurrentItems.add(qb1copy);
+    myCurrentQueueItems = addBuilds(changedCurrentItems, createQueuedBuild(id2buildType.get("bt3"), 60));
+    assertFalse(myCurrentQueueItems.isEmpty()); //it is empty in the case of errors
+  }
+
 
   private void readConfig(String configPath) throws IOException {
     File testConfig = new File(getTestDataDir(), configPath);
@@ -366,7 +386,8 @@ public class BuildQueuePriorityOrderingTest {
   private SQueuedBuild createQueuedBuild(final SBuildType buildType,
                                          final BuildEstimates buildEstimates,
                                          final Date whenQueued,
-                                         final boolean personal) {
+                                         final boolean personal,
+                                         final String... itemId) {
     final SQueuedBuild qb = myContext.mock(SQueuedBuild.class, "SQueuedBuild" + myQueuedBuildSeq++);
     myContext.checking(new Expectations() {{
       allowing(qb).getBuildTypeId(); will(returnValue(buildType.getBuildTypeId()));
@@ -374,6 +395,9 @@ public class BuildQueuePriorityOrderingTest {
       allowing(qb).getWhenQueued(); will(returnValue(whenQueued));
       allowing(qb).isPersonal(); will(returnValue(personal));
       allowing(qb).getBuildType(); will(returnValue(buildType));
+      String queuedBuildItemId = (itemId.length > 0) ? itemId[0] : String.valueOf(myQueuedBuildSeq);
+      allowing(qb).getItemId(); will(returnValue(String.valueOf(queuedBuildItemId)));
+      allowing(myQueue).findQueued(queuedBuildItemId); will(returnValue(qb));
     }});
     return qb;
   }

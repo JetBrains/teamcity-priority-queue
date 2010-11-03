@@ -20,7 +20,6 @@ import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.ActionMessages;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
 import jetbrains.buildServer.serverSide.SBuildServer;
-import jetbrains.buildServer.serverSide.SBuildType;
 import jetbrains.buildServer.serverSide.priority.PriorityClass;
 import jetbrains.buildServer.serverSide.priority.PriorityClassImpl;
 import jetbrains.buildServer.serverSide.priority.PriorityClassManager;
@@ -35,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author dmitry.neverov
@@ -88,10 +88,10 @@ public class DeletePriorityClassController extends BaseFormXmlController {
         if (moveToId != null) {
           PriorityClass moveTo = myPriorityClassManager.findPriorityClassById(moveToId);
           if (moveTo != null) {
-            List<SBuildType> movedBuildTypes = pc.getBuildTypes();
-            List<SBuildType> unionBuildTypes = moveTo.getBuildTypes();
+            Set<String> movedBuildTypes = ((PriorityClassImpl) pc).getBuildTypeIds();
+            Set<String> unionBuildTypes = ((PriorityClassImpl) moveTo).getBuildTypeIds();
             unionBuildTypes.addAll(movedBuildTypes);
-            myPriorityClassManager.savePriorityClass(new PriorityClassImpl(moveTo.getId(), moveTo.getName(), moveTo.getDescription(),
+            myPriorityClassManager.savePriorityClass(new PriorityClassImpl(myServer.getProjectManager(), moveTo.getId(), moveTo.getName(), moveTo.getDescription(),
                     moveTo.getPriority(), unionBuildTypes));            
           } else {
             ActionErrors errors = new ActionErrors();

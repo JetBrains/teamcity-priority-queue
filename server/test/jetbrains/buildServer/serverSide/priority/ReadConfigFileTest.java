@@ -16,6 +16,9 @@
 
 package jetbrains.buildServer.serverSide.priority;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 import jetbrains.buildServer.TestLogger;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.*;
@@ -25,14 +28,12 @@ import jetbrains.buildServer.util.FileUtil;
 import org.apache.log4j.Level;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.jmock.States;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
 
 import static jetbrains.buildServer.serverSide.priority.Util.getTestDataDir;
 import static jetbrains.buildServer.serverSide.priority.Util.prepareBuildTypes;
@@ -44,12 +45,34 @@ import static org.testng.AssertJUnit.*;
 @Test
 public class ReadConfigFileTest {
 
+  private Mockery myContext;
+  private SBuildServer myServer;
+  private ServerPaths myServerPaths;
+  private EventDispatcher<BuildServerListener> myEventDispatcher;
+  private BuildQueueEx myQueue;
+  private ProjectManager myProjectManager;
+
+
+  @BeforeMethod(alwaysRun = true)
+  public void setUp() throws IOException {
+    new TestLogger().onSuiteStart();
+    Loggers.SERVER.setLevel(Level.DEBUG);
+
+    myContext = new Mockery(){{
+      setImposteriser(ClassImposteriser.INSTANCE);
+    }};
+    myServer = myContext.mock(SBuildServer.class);
+    myServerPaths = myContext.mock(ServerPaths.class);
+    myEventDispatcher = (EventDispatcher<BuildServerListener>) myContext.mock(EventDispatcher.class);
+    myQueue = myContext.mock(BuildQueueEx.class);
+    myProjectManager = myContext.mock(ProjectManager.class);
+  }
+
   @AfterMethod(alwaysRun = true)
   public void tearDown() throws InterruptedException {
     FileUtil.delete(new File(getTestDataDir(), PriorityClassManagerImpl.PRIORITY_CLASS_CONFIG_FILENAME));
   }
 
-  @Test
   public void test() throws IOException {
     PriorityClassManager priorityClassManager = createPriorityClassManagerForConfig(new File(getTestDataDir(), "build-queue-priorities-sample.xml"));
     PriorityClass pc1 = priorityClassManager.findPriorityClassById("pc1");
@@ -101,7 +124,6 @@ public class ReadConfigFileTest {
   }
 
 
-  @Test
   public void test_priority_classes_not_deleted_after_read_invalid_config() throws IOException {
     PriorityClassManager priorityClassManager = createPriorityClassManagerForConfig(null);
 
@@ -109,8 +131,8 @@ public class ReadConfigFileTest {
     PriorityClass duplicates = priorityClassManager.createPriorityClass("Duplicates", "", -2);
 
     PriorityClass personals = priorityClassManager.getPersonalPriorityClass();
-    PriorityClassImpl updatePersonals = new PriorityClassImpl(personals.getId(), personals.getName(), personals.getDescription(),
-            5, personals.getBuildTypes());
+    PriorityClassImpl updatePersonals = new PriorityClassImpl(myProjectManager, personals.getId(), personals.getName(), personals.getDescription(),
+            5, ((PriorityClassImpl) personals).getBuildTypeIds());
     priorityClassManager.savePriorityClass(updatePersonals);
 
     //read invalid config
@@ -138,7 +160,7 @@ public class ReadConfigFileTest {
     List<SBuildType> personalBuildTypes = personal.getBuildTypes();
 
     FileUtil.copy(new File(getTestDataDir(), "build-queue-priorities-with-personal.xml"),
-            new File(getTestDataDir(), PriorityClassManagerImpl.PRIORITY_CLASS_CONFIG_FILENAME));
+                  new File(getTestDataDir(), PriorityClassManagerImpl.PRIORITY_CLASS_CONFIG_FILENAME));
     ((PriorityClassManagerImpl)priorityClassManager).loadPriorityClasses();
 
     personal = priorityClassManager.getPersonalPriorityClass();
@@ -149,39 +171,50 @@ public class ReadConfigFileTest {
   }
 
 
+  /** TW-13864 */
+  public void test_removed_build_type() throws IOException {
+    final States buildTypeState = myContext.states("bt6-state").startsAs("removed");
+    final SBuildType bt6 = Util.createBuildType(myContext, "bt6");
+
+    myContext.checking(new Expectations() {{
+      allowing(myProjectManager).findBuildTypeById("bt6"); when(buildTypeState.is("removed")); will(returnValue(null));
+      allowing(myProjectManager).findBuildTypeById("bt6"); when(buildTypeState.is("recovered")); will(returnValue(bt6));
+    }});
+    PriorityClassManager priorityClassManager = createPriorityClassManagerForConfig(new File(getTestDataDir(), "build-queue-priorities-removed-build-type.xml"));
+
+    assertEquals(4, priorityClassManager.getAllPriorityClasses().size()); //no priority class is lost
+
+    buildTypeState.become("recovered");
+
+    assertNotNull(myServer.getProjectManager().findBuildTypeById("bt6"));
+
+    PriorityClass pc = priorityClassManager.getBuildTypePriorityClass(bt6);
+    assertEquals("pc1", pc.getId());
+  }
+
+
   private PriorityClassManager createPriorityClassManagerForConfig(File prioritiesConfig) throws IOException {
     if (prioritiesConfig != null) {
       FileUtil.copy(prioritiesConfig, new File(getTestDataDir(), PriorityClassManagerImpl.PRIORITY_CLASS_CONFIG_FILENAME));
     } else {
       FileUtil.delete(new File(getTestDataDir(), PriorityClassManagerImpl.PRIORITY_CLASS_CONFIG_FILENAME));
     }
-    new TestLogger().onSuiteStart();
 
-    Mockery context = new Mockery(){{
-      setImposteriser(ClassImposteriser.INSTANCE);
-    }};
-    final SBuildServer server = context.mock(SBuildServer.class);
-    final ServerPaths serverPaths = context.mock(ServerPaths.class);
-    final EventDispatcher<BuildServerListener> eventDispatcher = (EventDispatcher<BuildServerListener>) context.mock(EventDispatcher.class);
-    final BuildQueueEx queue = context.mock(BuildQueueEx.class);
-    final ProjectManager projectManager = context.mock(ProjectManager.class);
+    Map<String, SBuildType> id2buildType = prepareBuildTypes(myContext, myProjectManager, "bt14", "bt47", "bt1", "bt3", "bt5");
 
-    Loggers.SERVER.setLevel(Level.DEBUG);
-    Map<String, SBuildType> id2buildType = prepareBuildTypes(context, projectManager, "bt14", "bt47", "bt1", "bt3", "bt5");
-
-    context.checking(new Expectations() {{
-      allowing(server).getQueue(); will(returnValue(queue));
-      allowing(server).getFullServerVersion(); will(returnValue("1.0"));
-      allowing(server).getProjectManager(); will(returnValue(projectManager));
-      allowing(queue).setOrderingStrategy(with(any(BuildQueueOrderingStrategy.class)));
-      allowing(queue).getItems(); will(returnValue(Collections.<Object>emptyList()));
-      allowing(serverPaths).getConfigDir(); will(returnValue(getTestDataDir().getAbsolutePath()));
-      allowing(eventDispatcher).addListener(with(any(BuildServerListener.class)));
+    myContext.checking(new Expectations() {{
+      allowing(myServer).getQueue(); will(returnValue(myQueue));
+      allowing(myServer).getFullServerVersion(); will(returnValue("1.0"));
+      allowing(myServer).getProjectManager(); will(returnValue(myProjectManager));
+      allowing(myQueue).setOrderingStrategy(with(any(BuildQueueOrderingStrategy.class)));
+      allowing(myQueue).getItems(); will(returnValue(Collections.<Object>emptyList()));
+      allowing(myServerPaths).getConfigDir(); will(returnValue(getTestDataDir().getAbsolutePath()));
+      allowing(myEventDispatcher).addListener(with(any(BuildServerListener.class)));
     }});
 
-    PriorityClassManagerImpl priorityClassManager = new PriorityClassManagerImpl(server, serverPaths, eventDispatcher, new FileWatcherFactory(serverPaths));
-    BuildQueuePriorityOrdering strategy = new BuildQueuePriorityOrdering(priorityClassManager);
-    ServerListener listener = new ServerListener(eventDispatcher, server, strategy, priorityClassManager);
+    PriorityClassManagerImpl priorityClassManager = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, new FileWatcherFactory(myServerPaths));
+    BuildQueuePriorityOrdering strategy = new BuildQueuePriorityOrdering(myServer, priorityClassManager);
+    ServerListener listener = new ServerListener(myEventDispatcher, myServer, strategy, priorityClassManager);
     listener.serverStartup();
 
     PriorityClass defaultPriorityClass = priorityClassManager.getDefaultPriorityClass();

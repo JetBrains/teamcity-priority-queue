@@ -27,6 +27,7 @@ import jetbrains.buildServer.serverSide.priority.PriorityClass;
 import jetbrains.buildServer.serverSide.priority.PriorityClassImpl;
 import jetbrains.buildServer.serverSide.priority.PriorityClassManager;
 import jetbrains.buildServer.serverSide.priority.exceptions.PriorityClassException;
+import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.jdom.Element;
@@ -38,6 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -86,24 +88,21 @@ public class AttachBuildTypesController extends BaseFormXmlController {
       ActionErrors errors = new ActionErrors();
       try {
         if (selectedConfigurations != null && !selectedConfigurations.isEmpty()) {
-          List<SBuildType> newBuildTypes = new ArrayList<SBuildType>();
-          for (String btId: selectedConfigurations) {
-            SBuildType configuration = myServer.getProjectManager().findBuildTypeById(btId);
-            if (configuration != null) {
-              newBuildTypes.add(configuration);
-            }
-          }
+          Set<String> newBuildTypeIds = new HashSet<String>(selectedConfigurations);
           PriorityClass oldPriorityClass = bean.getPriorityClass();
-          newBuildTypes.addAll(oldPriorityClass.getBuildTypes());
-          PriorityClassImpl updatedPriorityClass = new PriorityClassImpl(oldPriorityClass.getId(), oldPriorityClass.getName(),
-                  oldPriorityClass.getDescription(), oldPriorityClass.getPriority(), new HashSet<SBuildType>(newBuildTypes));
+          Set<String> oldBuildTypeIds = ((PriorityClassImpl) oldPriorityClass).getBuildTypeIds();
+          newBuildTypeIds.addAll(oldBuildTypeIds);
+
+          PriorityClassImpl updatedPriorityClass = new PriorityClassImpl(myProjectManager, oldPriorityClass.getId(), oldPriorityClass.getName(),
+                  oldPriorityClass.getDescription(), oldPriorityClass.getPriority(), newBuildTypeIds);
           myPriorityClassManager.savePriorityClass(updatedPriorityClass);
 
           ActionMessages messages = ActionMessages.getOrCreateMessages(request);
-          if (newBuildTypes.size() == 1) {
+          int addedCount = newBuildTypeIds.size() - oldBuildTypeIds.size();
+          if (addedCount == 1) {
             messages.addMessage("buildTypesAssigned", "1 configuration was successfully assigned to the priority class");
           } else {
-            messages.addMessage("buildTypesAssigned", "{0} configuration were successfully assigned to the priority class", String.valueOf(newBuildTypes.size()));
+            messages.addMessage("buildTypesAssigned", "{0} configuration were successfully assigned to the priority class", String.valueOf(addedCount));
           }
         }
       } catch (PriorityClassException e) {
@@ -143,6 +142,14 @@ public class AttachBuildTypesController extends BaseFormXmlController {
     String pClassId = request.getParameter("pClassId");
     if (pClassId != null) {
       bean.setPriorityClass(myPriorityClassManager.findPriorityClassById(pClassId));
+    }
+    if ("true".equals(request.getParameter("openDialog"))) {
+      //on dialog open search for configurations only if previous search string was not empty
+      //otherwise dialog could be opened too slow
+      bean.setSearchStringSubmitted(!StringUtil.isEmptyOrSpaces(bean.getSearchString()));
+    } else {
+      bean.setSearchString(request.getParameter("searchString"));
+      bean.setSearchStringSubmitted("true".equals(request.getParameter("searchStringSubmitted")));
     }
     return bean;
   }

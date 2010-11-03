@@ -32,13 +32,11 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static jetbrains.buildServer.serverSide.priority.Util.createBuildType;
 import static jetbrains.buildServer.serverSide.priority.Util.getTestDataDir;
+import static jetbrains.buildServer.serverSide.priority.Util.prepareBuildTypes;
 import static org.testng.AssertJUnit.*;
 import static org.testng.AssertJUnit.assertEquals;
 
@@ -81,10 +79,11 @@ public class PriorityClassManagerTest {
       allowing(serverPaths).getConfigDir(); will(returnValue(getTestDataDir().getAbsolutePath()));
       allowing(eventDispatcher).addListener(with(any(BuildServerListener.class)));
       allowing(myProjectManager).getAllBuildTypes(); will(returnValue(Collections.<SBuildType>emptyList()));
+      allowing(myProjectManager).findBuildTypes(new HashSet<String>()); will(returnValue(Collections.<SBuildType>emptyList()));
     }});
 
     myPriorityClassManager = new PriorityClassManagerImpl(server, serverPaths, eventDispatcher, new FileWatcherFactory(serverPaths));
-    myStrategy = new BuildQueuePriorityOrdering(myPriorityClassManager);
+    myStrategy = new BuildQueuePriorityOrdering(server, myPriorityClassManager);
     myListener = new ServerListener(eventDispatcher, server, myStrategy, myPriorityClassManager);
     myListener.serverStartup();
   }
@@ -104,8 +103,8 @@ public class PriorityClassManagerTest {
     int defaultPriority = defaultPriorityClass.getPriority();
     List<SBuildType> defaultBuildTypes = defaultPriorityClass.getBuildTypes();
 
-    PriorityClassImpl update = new PriorityClassImpl(defaultPriorityClass.getId(), "Usual Priority Class",
-            "New description", 10, Collections.singleton(createBuildType(myContext, "bt1")));
+    PriorityClassImpl update = new PriorityClassImpl(myProjectManager, defaultPriorityClass.getId(), "Usual Priority Class",
+            "New description", 10, Collections.singleton(createBuildType(myContext, "bt1").getBuildTypeId()));
     myPriorityClassManager.savePriorityClass(update);
 
     defaultPriorityClass = myPriorityClassManager.getDefaultPriorityClass();
@@ -122,8 +121,8 @@ public class PriorityClassManagerTest {
     String defaultDescription = personalPriorityClass.getDescription();
     List<SBuildType> defaultBuildTypes = personalPriorityClass.getBuildTypes();
 
-    PriorityClassImpl update = new PriorityClassImpl(personalPriorityClass.getId(), "Usual Priority Class",
-            "New description", 10, Collections.singleton(createBuildType(myContext, "bt1")));
+    PriorityClassImpl update = new PriorityClassImpl(myProjectManager, personalPriorityClass.getId(), "Usual Priority Class",
+            "New description", 10, Collections.singleton(createBuildType(myContext, "bt1").getBuildTypeId()));
     myPriorityClassManager.savePriorityClass(update);
 
     personalPriorityClass = myPriorityClassManager.getPersonalPriorityClass();
@@ -136,8 +135,8 @@ public class PriorityClassManagerTest {
   @Test
   public void test_change_personal_priority_class_priority() {
     PriorityClassImpl personalPriorityClass = (PriorityClassImpl) myPriorityClassManager.getPersonalPriorityClass();
-    PriorityClassImpl updatedPersonalPriorityClass = new PriorityClassImpl(personalPriorityClass.getId(), personalPriorityClass.getName(),
-            personalPriorityClass.getDescription(), 1, personalPriorityClass.getBuildTypes());
+    PriorityClassImpl updatedPersonalPriorityClass = new PriorityClassImpl(myProjectManager, personalPriorityClass.getId(), personalPriorityClass.getName(),
+            personalPriorityClass.getDescription(), 1, personalPriorityClass.getBuildTypeIds());
     myPriorityClassManager.savePriorityClass(updatedPersonalPriorityClass);
     assertEquals(1, myPriorityClassManager.getPersonalPriorityClass().getPriority());
   }
@@ -159,56 +158,50 @@ public class PriorityClassManagerTest {
 
   @Test
   public void test_move_buildTypes_between_priorityClasses() {
-    SBuildType bt1 = createBuildType(myContext, "bt1");
-    SBuildType bt2 = createBuildType(myContext, "bt2");
-    SBuildType bt3 = createBuildType(myContext, "bt3");
+    Map<String, SBuildType> id2bt = prepareBuildTypes(myContext, myProjectManager, "bt1", "bt2", "bt3");
     Set<SBuildType> pc1buildTypes = new HashSet<SBuildType>();
-    pc1buildTypes.add(bt1);
-    pc1buildTypes.add(bt2);
-    pc1buildTypes.add(bt3);
+    pc1buildTypes.addAll(id2bt.values());
     PriorityClass pc1 = myPriorityClassManager.createPriorityClass("pc1", "Priority class one", 5, pc1buildTypes);
     PriorityClass pc2 = myPriorityClassManager.createPriorityClass("pc2", "Priority class two", 0, Collections.<SBuildType>emptySet());
 
-    Set<SBuildType> movedBuildTypes = new HashSet<SBuildType>();
-    movedBuildTypes.add(bt1);
-    movedBuildTypes.add(bt2);
-    PriorityClass updatedPc2 = new PriorityClassImpl(pc2.getId(), pc2.getName(), pc2.getDescription(), pc2.getPriority(), movedBuildTypes);
+    Set<String> movedBuildTypes = new HashSet<String>();
+    movedBuildTypes.add("bt1");
+    movedBuildTypes.add("bt2");
+    PriorityClass updatedPc2 = new PriorityClassImpl(myProjectManager, pc2.getId(), pc2.getName(), pc2.getDescription(), pc2.getPriority(), movedBuildTypes);
     myPriorityClassManager.savePriorityClass(updatedPc2);
 
     PriorityClass updatedPc1 = myPriorityClassManager.findPriorityClassById(pc1.getId());
     assertEquals(1, updatedPc1.getBuildTypes().size());
-    assertEquals(updatedPc2, myPriorityClassManager.getBuildTypePriorityClass(bt1));
-    assertEquals(updatedPc2, myPriorityClassManager.getBuildTypePriorityClass(bt2));
-    assertEquals(updatedPc1, myPriorityClassManager.getBuildTypePriorityClass(bt3));
+    assertEquals(updatedPc2, myPriorityClassManager.getBuildTypePriorityClass(id2bt.get("bt1")));
+    assertEquals(updatedPc2, myPriorityClassManager.getBuildTypePriorityClass(id2bt.get("bt2")));
+    assertEquals(updatedPc1, myPriorityClassManager.getBuildTypePriorityClass(id2bt.get("bt3")));
   }
 
 
   public void test_remove_buildTypes() {
-    SBuildType bt1 = createBuildType(myContext, "bt1");
-    SBuildType bt2 = createBuildType(myContext, "bt2");
-    SBuildType bt3 = createBuildType(myContext, "bt3");
-    Set<SBuildType> pc1buildTypes = new HashSet<SBuildType>();
-    pc1buildTypes.add(bt1);
-    pc1buildTypes.add(bt2);
-    pc1buildTypes.add(bt3);
+    Map<String, SBuildType> id2bt = prepareBuildTypes(myContext, myProjectManager, "bt1", "bt2", "bt3");
+    Set<String> pc1buildTypes = new HashSet<String>();
+    for (SBuildType bt : id2bt.values()) {
+      pc1buildTypes.add(bt.getBuildTypeId());
+    }
     PriorityClass pc1 = myPriorityClassManager.createPriorityClass("pc1", "Priority class one", 5);
 
-    PriorityClass pc1Update1 = new PriorityClassImpl(pc1.getId(), pc1.getName(), pc1.getDescription(), pc1.getPriority(), pc1buildTypes);
+    PriorityClass pc1Update1 = new PriorityClassImpl(myProjectManager, pc1.getId(), pc1.getName(), pc1.getDescription(), pc1.getPriority(), pc1buildTypes);
     myPriorityClassManager.savePriorityClass(pc1Update1);
 
-    assertEquals(pc1Update1, myPriorityClassManager.getBuildTypePriorityClass(bt1));
-    assertEquals(pc1Update1, myPriorityClassManager.getBuildTypePriorityClass(bt2));
-    assertEquals(pc1Update1, myPriorityClassManager.getBuildTypePriorityClass(bt3));
+    assertEquals(pc1Update1, myPriorityClassManager.getBuildTypePriorityClass(id2bt.get("bt1")));
+    assertEquals(pc1Update1, myPriorityClassManager.getBuildTypePriorityClass(id2bt.get("bt2")));
+    assertEquals(pc1Update1, myPriorityClassManager.getBuildTypePriorityClass(id2bt.get("bt3")));
 
-    PriorityClass pc1update2 = new PriorityClassImpl(pc1.getId(), pc1.getName(), pc1.getDescription(), pc1.getPriority(), Collections.singleton(bt3));
+    PriorityClass pc1update2 = new PriorityClassImpl(myProjectManager, pc1.getId(), pc1.getName(), pc1.getDescription(), pc1.getPriority(), Collections.singleton("bt3"));
     myPriorityClassManager.savePriorityClass(pc1update2);
 
     pc1update2 = myPriorityClassManager.findPriorityClassById(pc1.getId());
     assertEquals(1, pc1update2.getBuildTypes().size());
 
     PriorityClass defaultPriorityClass = myPriorityClassManager.getDefaultPriorityClass();
-    assertEquals(defaultPriorityClass, myPriorityClassManager.getBuildTypePriorityClass(bt1));
-    assertEquals(defaultPriorityClass, myPriorityClassManager.getBuildTypePriorityClass(bt2));
-    assertEquals(pc1update2, myPriorityClassManager.getBuildTypePriorityClass(bt3));
+    assertEquals(defaultPriorityClass, myPriorityClassManager.getBuildTypePriorityClass(id2bt.get("bt1")));
+    assertEquals(defaultPriorityClass, myPriorityClassManager.getBuildTypePriorityClass(id2bt.get("bt2")));
+    assertEquals(pc1update2, myPriorityClassManager.getBuildTypePriorityClass(id2bt.get("bt3")));
   }
 }

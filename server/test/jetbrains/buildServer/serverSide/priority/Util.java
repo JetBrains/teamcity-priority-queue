@@ -16,16 +16,14 @@
 
 package jetbrains.buildServer.serverSide.priority;
 
-import java.io.File;
 import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SBuildType;
 import org.jetbrains.annotations.NotNull;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
+import java.util.*;
 
 /**
  * @author dmitry.neverov
@@ -48,11 +46,15 @@ final class Util {
       SBuildType buildType = createBuildType(context, btId);
       id2buildType.put(btId, buildType);
     }
+    final Set<Set<String>> combinations = allCombinationsOf(Arrays.asList(btIds));
     context.checking(new Expectations() {{
       for (Map.Entry<String, SBuildType> btEntry : id2buildType.entrySet()) {
         allowing(projectManager).findBuildTypeById(btEntry.getKey()); will(returnValue(btEntry.getValue()));
       }
       allowing(projectManager).getAllBuildTypes(); will(returnValue(new ArrayList<SBuildType>(id2buildType.values())));
+      for (Set<String> comb : combinations) {
+        allowing(projectManager).findBuildTypes(comb); will(returnValue(getValuesForKeys(id2buildType, comb)));
+      }
     }});
     return id2buildType;
   }
@@ -63,5 +65,39 @@ final class Util {
       return f;
     }
     return new File("server/testData");
+  }
+
+  private static List<SBuildType> getValuesForKeys(Map<String, SBuildType> map, Set<String> keys) {
+    List<SBuildType> result = new ArrayList<SBuildType>();
+    for (String key : keys) {
+      result.add(map.get(key));
+    }
+    return result;
+  }
+
+  private static Set<Set<String>> allCombinationsOf(List<String> l) {
+    if (l.isEmpty()) {
+      Set<Set<String>> result = new HashSet<Set<String>>();
+      result.add(new HashSet<String>());
+      return result;
+    } else {
+      String head = head(l);
+      Set<Set<String>> result = allCombinationsOf(tail(l));
+      Set<Set<String>> resultCopy = new HashSet<Set<String>>(result);
+      for (Set<String> s : resultCopy) {
+        Set<String> copy = new HashSet<String>(s);
+        copy.add(head);
+        result.add(copy);
+      }
+      return result;
+    }
+  }
+
+  private static <T> T head(List<T> l) {
+    return l.get(0);
+  }
+
+  private static <T> List<T> tail(List<T> l) {
+    return l.subList(1, l.size());
   }
 }

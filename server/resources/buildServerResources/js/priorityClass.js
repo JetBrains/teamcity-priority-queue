@@ -285,7 +285,7 @@ BS.AttachConfigurationsToClassDialog = OO.extend(BS.AbstractWebForm, OO.extend(B
   showAttachDialog: function(pClassId) {
     var that = BS.AttachConfigurationsToClassDialog;
     this.pClassId = pClassId;
-    $('attachConfigurationsToClassContainer').refresh(null, "pClassId=" + encodeURIComponent(pClassId), function() {
+    $('attachConfigurationsToClassContainer').refresh(null, "pClassId=" + encodeURIComponent(pClassId) + "&openDialog=true", function() {
       that.showCentered();
       that.focusFirstElement();
     });
@@ -297,16 +297,11 @@ BS.AttachConfigurationsToClassDialog = OO.extend(BS.AbstractWebForm, OO.extend(B
     Element.show($('findProgress'));
     var pClassId = this.pClassId;
     var form = this.formElement();
-
-    BS.ajaxRequest(form.action, {
-      parameters: "pClassId=" + encodeURIComponent(pClassId) + "&searchString=" + encodeURIComponent(form.searchString.value) + "&searchStringSubmitted=true",
-      onSuccess: function() {
-        $('configurationListRefreshable').refresh(null, "pClassId=" + encodeURIComponent(pClassId), function() {
-          Element.hide($('findProgress'));
-          that.updateDialog();
-          that.focusFirstElement();
-        });
-      }
+    var parameters = "pClassId=" + encodeURIComponent(pClassId) + "&searchString=" + encodeURIComponent(form.searchString.value) + "&searchStringSubmitted=true";
+    $('configurationListRefreshable').refresh(null, parameters, function() {
+      Element.hide($('findProgress'));
+      that.updateDialog();
+      that.focusFirstElement();
     });
     return false;
   },

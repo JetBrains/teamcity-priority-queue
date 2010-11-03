@@ -1,7 +1,5 @@
 package jetbrains.buildServer.serverSide.priority.controllers;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.ActionMessages;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
@@ -16,6 +14,9 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author dmitry.neverov
@@ -70,13 +71,14 @@ public class EditPriorityClassController extends BaseFormXmlController {
         if (myPriorityClassManager.isDefaultPriorityClass(priorityClass)) {
           //do nothing
         } else if (myPriorityClassManager.isPersonalPriorityClass(priorityClass)) {
-          PriorityClassImpl updatedPersonal = new PriorityClassImpl(priorityClass.getId(), priorityClass.getName(),
-                  priorityClass.getDescription(), pb.getPriorityClassPriorityInt(), priorityClass.getBuildTypes());
+          pb.validate();
+          PriorityClassImpl updatedPersonal = new PriorityClassImpl(myServer.getProjectManager(), priorityClass.getId(), priorityClass.getName(),
+                  priorityClass.getDescription(), pb.getPriorityClassPriorityInt(), ((PriorityClassImpl) priorityClass).getBuildTypeIds());
           myPriorityClassManager.savePriorityClass(updatedPersonal);
         } else {
           pb.validate();
-          PriorityClassImpl updatedPriorityClass = new PriorityClassImpl(priorityClass.getId(), pb.getPriorityClassName(),
-                  pb.getPriorityClassDescription(), pb.getPriorityClassPriorityInt(), priorityClass.getBuildTypes());
+          PriorityClassImpl updatedPriorityClass = new PriorityClassImpl(myServer.getProjectManager(), priorityClass.getId(), pb.getPriorityClassName(),
+                  pb.getPriorityClassDescription(), pb.getPriorityClassPriorityInt(), ((PriorityClassImpl) priorityClass).getBuildTypeIds());
           myPriorityClassManager.savePriorityClass(updatedPriorityClass);
         }
       } catch (DuplicatePriorityClassNameException e) {

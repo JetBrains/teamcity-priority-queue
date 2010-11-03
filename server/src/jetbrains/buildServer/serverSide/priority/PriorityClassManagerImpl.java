@@ -20,7 +20,12 @@ import jetbrains.buildServer.configuration.ChangeListener;
 import jetbrains.buildServer.configuration.FileWatcher;
 import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.serverSide.impl.FileWatcherFactory;
-import jetbrains.buildServer.serverSide.priority.exceptions.*;
+import jetbrains.buildServer.serverSide.priority.exceptions.DuplicatePriorityClassNameException;
+import jetbrains.buildServer.serverSide.priority.exceptions.InvalidPriorityClassDescriptionException;
+import jetbrains.buildServer.serverSide.priority.exceptions.InvalidPriorityClassNameException;
+import jetbrains.buildServer.serverSide.priority.exceptions.PriorityClassException;
+import jetbrains.buildServer.util.CollectionsUtil;
+import jetbrains.buildServer.util.Converter;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.FileUtil;
 import org.apache.log4j.Logger;
@@ -55,13 +60,13 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
   private final static String DEFAULT_PRIORITY_CLASS_ID = "DEFAULT";
   private final static String PERSONAL_PRIORITY_CLASS_ID = "PERSONAL";
 
-  private final static PriorityClassImpl PREDEFINED_PERSONAL_PRIORITY_CLASS = new PersonalPriorityClass(0);
+  private final PriorityClassImpl myPersonalPriorityClass;
 
   private final File myConfigFile;
   private final Logger myLogger = Logger.getLogger(PriorityClassManagerImpl.class.getName());
 
   private final Map<String, PriorityClassImpl> myPriorityClasses = new HashMap<String, PriorityClassImpl>();
-  private final Map<SBuildType, String> myBuildTypePriorityClasses = new HashMap<SBuildType, String>();
+  private final Map<String, String> myBuildTypePriorityClasses = new HashMap<String, String>();//buildType id -> priorityClass id
   private final AtomicInteger myPriorityClassIdSequence = new AtomicInteger(1);
   private final SBuildServer myServer;
   private FileWatcherFactory myFileWatcherFactory;
@@ -78,6 +83,7 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
     myConfigFile = new File(serverPaths.getConfigDir(), PRIORITY_CLASS_CONFIG_FILENAME);
     myServerDispatcher = serverDispatcher;
     myFileWatcherFactory = fileWatcherFactory;
+    myPersonalPriorityClass = new PersonalPriorityClass(0);
   }
 
   public void setUpdateConfigInterval(int seconds) {
@@ -133,7 +139,7 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
   public PriorityClass getBuildTypePriorityClass(@NotNull SBuildType buildType) {
     myLock.readLock().lock();
     try {
-      PriorityClass priorityClass = findBuildTypePriorityClass(buildType);
+      PriorityClass priorityClass = findBuildTypePriorityClass(buildType.getBuildTypeId());
       if (priorityClass != null) {
         return priorityClass;
       } else {
@@ -163,10 +169,10 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
       if (sameNamePriorityClass != null) {
         throw new DuplicatePriorityClassNameException("The priority class name '" + name + "' already exists");
       }
-      priorityClass = new PriorityClassImpl(id, name, description, priority, buildTypes);
+      priorityClass = new PriorityClassImpl(myServer.getProjectManager(), id, name, description, priority, getBuildTypeIds(buildTypes));
       myPriorityClasses.put(priorityClass.getId(), priorityClass);
       for (SBuildType bt : priorityClass.getBuildTypes()) {
-        myBuildTypePriorityClasses.put(bt, priorityClass.getId());
+        myBuildTypePriorityClasses.put(bt.getBuildTypeId(), priorityClass.getId());
       }
     } finally {
       myLock.writeLock().unlock();
@@ -189,22 +195,23 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
         }
         PriorityClassImpl oldPc = myPriorityClasses.get(priorityClass.getId());
         if (oldPc != null) {
-          List<SBuildType> oldBuildTypes = oldPc.getBuildTypes();
-          oldBuildTypes.removeAll(priorityClass.getBuildTypes());
-          for (SBuildType bt : oldBuildTypes) {
-            myBuildTypePriorityClasses.remove(bt);
+          Set<String> oldBuildTypeIds = oldPc.getBuildTypeIds();
+          oldBuildTypeIds.removeAll(((PriorityClassImpl) priorityClass).getBuildTypeIds());
+          for (String btId : oldBuildTypeIds) {
+            myBuildTypePriorityClasses.remove(btId);
           }
         }
-        for (SBuildType bt : priorityClass.getBuildTypes()) {
-          PriorityClass oldPriorityClass = findBuildTypePriorityClass(bt);
+        for (String btId : ((PriorityClassImpl)priorityClass).getBuildTypeIds()) {
+          PriorityClass oldPriorityClass = findBuildTypePriorityClass(btId);
           if (oldPriorityClass != null) {
-            List<SBuildType> builtTypes = oldPriorityClass.getBuildTypes();
-            builtTypes.remove(bt);
-            PriorityClassImpl updatedOldPriorityClass = new PriorityClassImpl(oldPriorityClass.getId(), oldPriorityClass.getName(),
-                    oldPriorityClass.getDescription(), oldPriorityClass.getPriority(), builtTypes);
+            Set<String> builtTypeIds = ((PriorityClassImpl) oldPriorityClass).getBuildTypeIds();
+            builtTypeIds.remove(btId);
+            PriorityClassImpl updatedOldPriorityClass = new PriorityClassImpl(myServer.getProjectManager(), oldPriorityClass.getId(),
+                                                                              oldPriorityClass.getName(), oldPriorityClass.getDescription(),
+                                                                              oldPriorityClass.getPriority(), builtTypeIds);
             myPriorityClasses.put(updatedOldPriorityClass.getId(), updatedOldPriorityClass);
           }
-          myBuildTypePriorityClasses.put(bt, priorityClass.getId());
+          myBuildTypePriorityClasses.put(btId, priorityClass.getId());
         }
         myPriorityClasses.put(priorityClass.getId(), (PriorityClassImpl) priorityClass);
       }
@@ -221,7 +228,7 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
         PriorityClass removed = myPriorityClasses.remove(priorityClassId);
         if (removed != null) {
           for (SBuildType bt : removed.getBuildTypes()) {
-            myBuildTypePriorityClasses.remove(bt);
+            myBuildTypePriorityClasses.remove(bt.getBuildTypeId());
           }          
         }
       } finally {
@@ -285,6 +292,11 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
       public void serverShutdown() {
         myConfigFileWatcher.stop();
       }
+
+      @Override
+      public void beforeBuildTypeDeleted(@NotNull final String buildTypeId) {
+        savePriorityClasses();
+      }
     });
     myConfigFileWatcher.start();
   }
@@ -326,9 +338,9 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
             }
 
             int priority = parsePriorityString(priorityClassElem.getAttributeValue(PRIORITY_ATTRIBUTE), id);
-            PriorityClassImpl priorityClass = new PriorityClassImpl(id, priorityClassElem.getAttributeValue(NAME_ATTRIBUTE),
+            PriorityClassImpl priorityClass = new PriorityClassImpl(myServer.getProjectManager(), id, priorityClassElem.getAttributeValue(NAME_ATTRIBUTE),
                     priorityClassElem.getAttributeValue(DESCRIPTION_ATTRIBUTE), priority,
-                    new BuildTypeElementVisitor(priorityClassElem).getBuildTypes());
+                    new BuildTypeElementVisitor(priorityClassElem).getBuildTypeIds());
             priorityClassMap.put(id, priorityClass);            
           }
         }
@@ -355,8 +367,8 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
       myPriorityClasses.clear();
       for (PriorityClassImpl priorityClass : priorityClassMap.values()) {
         myPriorityClasses.put(priorityClass.getId(), priorityClass);
-        for (SBuildType bt : priorityClass.getBuildTypes()) {
-          myBuildTypePriorityClasses.put(bt, priorityClass.getId());
+        for (String btId : priorityClass.getBuildTypeIds()) {
+          myBuildTypePriorityClasses.put(btId, priorityClass.getId());
         }
       }
       for (PriorityClassImpl predefinedPriorityClass : getPredefinedPriorityClasses()) {
@@ -392,7 +404,7 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
   private List<PriorityClassImpl> getPredefinedPriorityClasses() {
     List<PriorityClassImpl> result = new ArrayList<PriorityClassImpl>();
     result.add(new DefaultPriorityClass());
-    result.add(PREDEFINED_PERSONAL_PRIORITY_CLASS);
+    result.add(myPersonalPriorityClass);
     return result;
   }
 
@@ -437,8 +449,8 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
 
   private final class DefaultPriorityClass extends PriorityClassImpl {
     private DefaultPriorityClass() throws PriorityClassException {
-      super(DEFAULT_PRIORITY_CLASS_ID, "Default", "Contains all build configurations not included into other priority classes", 0,
-              Collections.<SBuildType>emptySet());
+      super(myServer.getProjectManager(), DEFAULT_PRIORITY_CLASS_ID, "Default", "Contains all build configurations not included into other priority classes", 0,
+              Collections.<String>emptySet());
     }
     @NotNull
     public List<SBuildType> getBuildTypes() {
@@ -449,8 +461,8 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
     }
   }
 
-  private PriorityClass findBuildTypePriorityClass(SBuildType bt) {
-    String priorityClassId = myBuildTypePriorityClasses.get(bt);
+  private PriorityClass findBuildTypePriorityClass(String btId) {
+    String priorityClassId = myBuildTypePriorityClasses.get(btId);
     if (priorityClassId != null) {
       return myPriorityClasses.get(priorityClassId);      
     } else {
@@ -458,9 +470,9 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
     }
   }
 
-  private final static class PersonalPriorityClass extends PriorityClassImpl {
+  private final class PersonalPriorityClass extends PriorityClassImpl {
     private PersonalPriorityClass(int priority) throws InvalidPriorityClassNameException, InvalidPriorityClassDescriptionException {
-      super(PERSONAL_PRIORITY_CLASS_ID, "Personal", "Contains all personal builds", priority, Collections.<SBuildType>emptySet());
+      super(myServer.getProjectManager(), PERSONAL_PRIORITY_CLASS_ID, "Personal", "Contains all personal builds", priority, Collections.<String>emptySet());
     }
     public boolean isPersonal() {
       return true;
@@ -495,7 +507,7 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
   }
 
   private class BuildTypeElementVisitor extends JDOMElementVisitor {
-    private Map<String, SBuildType> myBuildTypes;
+    private Set<String> myBuildTypeIds; // do not init it here, because processElement is invoked from constructor
     private BuildTypeElementVisitor(Element e) {
       super(e);
     }
@@ -504,25 +516,22 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
     public boolean processElement(Element e) {
       if (e.getName().equals(BUILD_TYPE_ELEMENT)) {
         String buildTypeId = e.getAttributeValue(BUILD_TYPE_ID_ATTRIBUTE);
-        SBuildType bt = myServer.getProjectManager().findBuildTypeById(buildTypeId);
-        if (bt == null) {
-          //maybe warn?
-          throw new RuntimeException("Failed to load build configuration " + buildTypeId + ". Unknown configuration id.");          
+        if (buildTypeId != null && !"".equals(buildTypeId)) {
+          if (myBuildTypeIds == null) {
+            myBuildTypeIds = new HashSet<String>();
+          }
+          myBuildTypeIds.add(buildTypeId);
         }
-        if (myBuildTypes == null) {
-          myBuildTypes = new HashMap<String, SBuildType>();
-        }
-        myBuildTypes.put(bt.getBuildTypeId(), bt);
         return false;
       }
       return true;
     }
 
-    Set<SBuildType> getBuildTypes() {
-      if (myBuildTypes != null) {
-        return new HashSet<SBuildType>(myBuildTypes.values());
+    Set<String> getBuildTypeIds() {
+      if (myBuildTypeIds != null) {
+        return myBuildTypeIds;
       } else {
-        return new HashSet<SBuildType>();
+        return new HashSet<String>();
       }
     }
   }
@@ -547,5 +556,13 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
      * @param e element to process
      * */
     public abstract boolean processElement(Element e);
-  }  
+  }
+
+  private static Collection<String> getBuildTypeIds(Collection<SBuildType> buildTypes) {
+    return CollectionsUtil.convertCollection(buildTypes, new Converter<String, SBuildType>() {
+      public String createFrom(@NotNull final SBuildType source) {
+        return source.getBuildTypeId();
+      }
+    });
+  }
 }
