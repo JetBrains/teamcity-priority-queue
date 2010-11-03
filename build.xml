@@ -7,6 +7,16 @@
   <import file="teamcity-common.xml"/>
   <import file="priority-queue.xml"/>
 
+  <property name="build.number" value=""/>
+  <tstamp>
+    <format property="timestamp" pattern="yyyyMMddhhmmss"/>
+  </tstamp>
+  <property name="snapshot.build.number" value="SNAPSHOT-${timestamp}"/>
+
+  <condition property="plugin.version" value="${snapshot.build.number}" else="${build.number}">
+    <matches pattern="snapshot-.*" string="${build.number}" casesensitive="false"/>
+  </condition>
+
   <target name="package" depends="define.version">
       <package.teamcity.plugin name="${plugin.name}"
                                server.output="${priority-queue-server.output.dir}"
