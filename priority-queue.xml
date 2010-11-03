@@ -60,29 +60,6 @@
     <include name="**/?*.css"/>
   </patternset>
   
-  <!-- JDK definitions -->
-  
-  <property name="jdk.bin.1.5" value="${jdk.home.1.5}/bin"/>
-  <path id="jdk.classpath.1.5">
-    <fileset dir="${jdk.home.1.5}">
-      <include name="jre/lib/rt.jar"/>
-      <include name="jre/lib/jce.jar"/>
-      <include name="jre/lib/deploy.jar"/>
-      <include name="jre/lib/javaws.jar"/>
-      <include name="jre/lib/jsse.jar"/>
-      <include name="jre/lib/charsets.jar"/>
-      <include name="jre/lib/plugin.jar"/>
-      <include name="jre/lib/ext/localedata.jar"/>
-      <include name="jre/lib/ext/sunpkcs11.jar"/>
-      <include name="jre/lib/ext/sunjce_provider.jar"/>
-      <include name="jre/lib/ext/dnsns.jar"/>
-    </fileset>
-  </path>
-  
-  <property name="project.jdk.home" value="${jdk.home.1.5}"/>
-  <property name="project.jdk.bin" value="${jdk.bin.1.5}"/>
-  <property name="project.jdk.classpath" value="jdk.classpath.1.5"/>
-  
   
   <!-- Project Libraries -->
   
@@ -172,9 +149,6 @@
   <dirname property="module.priority-queue-server.basedir" file="${ant.file}"/>
   
   
-  <property name="module.jdk.home.priority-queue-server" value="${project.jdk.home}"/>
-  <property name="module.jdk.bin.priority-queue-server" value="${project.jdk.bin}"/>
-  <property name="module.jdk.classpath.priority-queue-server" value="${project.jdk.classpath}"/>
   
   <property name="compiler.args.priority-queue-server" value="${compiler.args}"/>
   
@@ -186,7 +160,6 @@
   </path>
   
   <path id="priority-queue-server.module.production.classpath">
-    <path refid="${module.jdk.classpath.priority-queue-server}"/>
     <path refid="library.tomcat.classpath"/>
     <path refid="library.teamcity_open_api_server.classpath"/>
     <path refid="library.teamcity_open_api_common.classpath"/>
@@ -218,7 +191,6 @@
   </path>
   
   <path id="priority-queue-server.module.classpath">
-    <path refid="${module.jdk.classpath.priority-queue-server}"/>
     <pathelement location="${priority-queue-server.output.dir}"/>
     <path refid="library.tomcat.classpath"/>
     <path refid="library.teamcity_open_api_server.classpath"/>
@@ -278,7 +250,7 @@
   
   <target name="compile.module.priority-queue-server.production" depends="register.custom.compilers" description="Compile module priority-queue-server; production classes">
     <mkdir dir="${priority-queue-server.output.dir}"/>
-    <javac2 destdir="${priority-queue-server.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.priority-queue-server}/javac">
+    <javac2 destdir="${priority-queue-server.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
       <compilerarg line="${compiler.args.priority-queue-server}"/>
       <bootclasspath refid="priority-queue-server.module.bootclasspath"/>
       <classpath refid="priority-queue-server.module.production.classpath"/>
@@ -300,7 +272,7 @@
   
   <target name="compile.module.priority-queue-server.tests" depends="register.custom.compilers,compile.module.priority-queue-server.production" description="compile module priority-queue-server; test classes" unless="skip.tests">
     <mkdir dir="${priority-queue-server.testoutput.dir}"/>
-    <javac2 destdir="${priority-queue-server.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.priority-queue-server}/javac">
+    <javac2 destdir="${priority-queue-server.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
       <compilerarg line="${compiler.args.priority-queue-server}"/>
       <bootclasspath refid="priority-queue-server.module.bootclasspath"/>
       <classpath refid="priority-queue-server.module.classpath"/>
