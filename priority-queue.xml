@@ -7,15 +7,6 @@
   <!-- 
   <property name="skip.tests" value="true"/>
    -->
-  <property name="javac2.home" value="${idea.home}/lib"/>
-  <path id="javac2.classpath">
-    <pathelement location="${javac2.home}/javac2.jar"/>
-    <pathelement location="${javac2.home}/jdom.jar"/>
-    <pathelement location="${javac2.home}/asm.jar"/>
-    <pathelement location="${javac2.home}/asm-commons.jar"/>
-  </path>
-  <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="javac2.classpath"/>
-  <taskdef name="instrumentIdeaExtensions" classname="com.intellij.ant.InstrumentIdeaExtensions" classpathref="javac2.classpath"/>
   
   <!-- Compiler options -->
   
@@ -42,6 +33,7 @@
     <exclude name="**/.IJI.*/**"/>
     <exclude name="**/vssver.scc/**"/>
     <exclude name="**/vssver2.scc/**"/>
+    <exclude name="**/*.orig/**"/>
   </patternset>
   <patternset id="library.patterns">
     <include name="*.zip"/>
@@ -67,6 +59,29 @@
     <include name="**/?*.js"/>
     <include name="**/?*.css"/>
   </patternset>
+  
+  <!-- JDK definitions -->
+  
+  <property name="jdk.bin.1.5" value="${jdk.home.1.5}/bin"/>
+  <path id="jdk.classpath.1.5">
+    <fileset dir="${jdk.home.1.5}">
+      <include name="jre/lib/rt.jar"/>
+      <include name="jre/lib/jce.jar"/>
+      <include name="jre/lib/deploy.jar"/>
+      <include name="jre/lib/javaws.jar"/>
+      <include name="jre/lib/jsse.jar"/>
+      <include name="jre/lib/charsets.jar"/>
+      <include name="jre/lib/plugin.jar"/>
+      <include name="jre/lib/ext/localedata.jar"/>
+      <include name="jre/lib/ext/sunpkcs11.jar"/>
+      <include name="jre/lib/ext/sunjce_provider.jar"/>
+      <include name="jre/lib/ext/dnsns.jar"/>
+    </fileset>
+  </path>
+  
+  <property name="project.jdk.home" value="${jdk.home.1.5}"/>
+  <property name="project.jdk.bin" value="${jdk.bin.1.5}"/>
+  <property name="project.jdk.classpath" value="jdk.classpath.1.5"/>
   
   
   <!-- Project Libraries -->
@@ -134,133 +149,24 @@
   </path>
   
   
-  <!-- Global Libraries -->
-  
-  
   <!-- Application Server Libraries -->
+  <!-- Register Custom Compiler Taskdefs -->
+  <property name="javac2.home" value="${idea.home}/lib"/>
+  <path id="javac2.classpath">
+    <pathelement location="${javac2.home}/javac2.jar"/>
+    <pathelement location="${javac2.home}/jdom.jar"/>
+    <pathelement location="${javac2.home}/asm.jar"/>
+    <pathelement location="${javac2.home}/asm-commons.jar"/>
+    <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
+  </path>
+  <target name="register.custom.compilers">
+    <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="javac2.classpath"/>
+    <taskdef name="instrumentIdeaExtensions" classname="com.intellij.ant.InstrumentIdeaExtensions" classpathref="javac2.classpath"/>
+  </target>
   
   <!-- Modules -->
   
-  
-  <!-- Module priority-queue-server -->
-  
-  <dirname property="module.priority-queue-server.basedir" file="${ant.file}"/>
-  
-  
-  
-  <property name="compiler.args.priority-queue-server" value="${compiler.args}"/>
-  
-  <property name="priority-queue-server.output.dir" value="${module.priority-queue-server.basedir}/out/production/priority-queue-server"/>
-  <property name="priority-queue-server.testoutput.dir" value="${module.priority-queue-server.basedir}/out/test/priority-queue-server"/>
-  
-  <path id="priority-queue-server.module.bootclasspath">
-    <!-- Paths to be included in compilation bootclasspath -->
-  </path>
-  
-  <path id="priority-queue-server.module.classpath">
-    <path refid="library.tomcat.classpath"/>
-    <path refid="library.teamcity_open_api_server.classpath"/>
-    <path refid="library.teamcity_open_api_common.classpath"/>
-    <path refid="library.teamcity_third-party_common.classpath"/>
-    <path refid="library.teamcity_third-party_server.classpath"/>
-    <path refid="library.teamcity_closed_api_common.classpath"/>
-    <path refid="library.teamcity_closed_api_server.classpath"/>
-    <path refid="library.jmock.classpath"/>
-    <path refid="library.testng.classpath"/>
-    <path refid="library.trove4j.classpath"/>
-    <path refid="library.log4j.classpath"/>
-    <path refid="library.jdom.classpath"/>
-  </path>
-  
-  <path id="priority-queue-server.runtime.module.classpath">
-    <pathelement location="${priority-queue-server.output.dir}"/>
-    <pathelement location="${priority-queue-server.testoutput.dir}"/>
-    <path refid="library.tomcat.classpath"/>
-    <path refid="library.teamcity_open_api_server.classpath"/>
-    <path refid="library.teamcity_open_api_common.classpath"/>
-    <path refid="library.teamcity_third-party_common.classpath"/>
-    <path refid="library.teamcity_third-party_server.classpath"/>
-    <path refid="library.teamcity_closed_api_common.classpath"/>
-    <path refid="library.teamcity_closed_api_server.classpath"/>
-    <path refid="library.jmock.classpath"/>
-    <path refid="library.testng.classpath"/>
-    <path refid="library.trove4j.classpath"/>
-    <path refid="library.log4j.classpath"/>
-    <path refid="library.jdom.classpath"/>
-  </path>
-  
-  
-  <patternset id="excluded.from.module.priority-queue-server">
-    <patternset refid="ignored.files"/>
-  </patternset>
-  
-  <patternset id="excluded.from.compilation.priority-queue-server">
-    <patternset refid="excluded.from.module.priority-queue-server"/>
-  </patternset>
-  
-  <path id="priority-queue-server.module.sourcepath">
-    <dirset dir="${module.priority-queue-server.basedir}/server">
-      <include name="src"/>
-      <include name="resources"/>
-    </dirset>
-  </path>
-  
-  <path id="priority-queue-server.module.test.sourcepath">
-    <dirset dir="${module.priority-queue-server.basedir}/server">
-      <include name="test"/>
-    </dirset>
-  </path>
-  
-  
-  <target name="compile.module.priority-queue-server" depends="compile.module.priority-queue-server.production,compile.module.priority-queue-server.tests" description="Compile module priority-queue-server"/>
-  
-  <target name="compile.module.priority-queue-server.production" description="Compile module priority-queue-server; production classes">
-    <mkdir dir="${priority-queue-server.output.dir}"/>
-    <javac2 destdir="${priority-queue-server.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
-      <compilerarg line="${compiler.args.priority-queue-server}"/>
-      <bootclasspath refid="priority-queue-server.module.bootclasspath"/>
-      <classpath refid="priority-queue-server.module.classpath"/>
-      <src refid="priority-queue-server.module.sourcepath"/>
-      <patternset refid="excluded.from.compilation.priority-queue-server"/>
-    </javac2>
-    
-    <copy todir="${priority-queue-server.output.dir}">
-      <fileset dir="${module.priority-queue-server.basedir}/server/src">
-        <patternset refid="compiler.resources"/>
-        <type type="file"/>
-      </fileset>
-      <fileset dir="${module.priority-queue-server.basedir}/server/resources">
-        <patternset refid="compiler.resources"/>
-        <type type="file"/>
-      </fileset>
-    </copy>
-  </target>
-  
-  <target name="compile.module.priority-queue-server.tests" depends="compile.module.priority-queue-server.production" description="compile module priority-queue-server; test classes" unless="skip.tests">
-    <mkdir dir="${priority-queue-server.testoutput.dir}"/>
-    <javac2 destdir="${priority-queue-server.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
-      <compilerarg line="${compiler.args.priority-queue-server}"/>
-      <classpath refid="priority-queue-server.module.classpath"/>
-      <classpath>
-        <path refid="priority-queue-server.module.classpath"/>
-        <pathelement location="${priority-queue-server.output.dir}"/>
-      </classpath>
-      <src refid="priority-queue-server.module.test.sourcepath"/>
-      <patternset refid="excluded.from.compilation.priority-queue-server"/>
-    </javac2>
-    
-    <copy todir="${priority-queue-server.testoutput.dir}">
-      <fileset dir="${module.priority-queue-server.basedir}/server/test">
-        <patternset refid="compiler.resources"/>
-        <type type="file"/>
-      </fileset>
-    </copy>
-  </target>
-  
-  <target name="clean.module.priority-queue-server" description="cleanup module">
-    <delete dir="${priority-queue-server.output.dir}"/>
-    <delete dir="${priority-queue-server.testoutput.dir}"/>
-  </target>
+  <import file="${basedir}/server/module_priority-queue-server.xml"/>
   
   <target name="init" description="Build initialization">
     <!-- Perform any build initialization in this target -->
