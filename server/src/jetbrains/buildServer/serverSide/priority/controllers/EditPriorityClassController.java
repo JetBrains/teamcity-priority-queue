@@ -1,9 +1,12 @@
 package jetbrains.buildServer.serverSide.priority.controllers;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.ActionMessages;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
 import jetbrains.buildServer.controllers.FormUtil;
+import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.priority.PriorityClass;
 import jetbrains.buildServer.serverSide.priority.PriorityClassImpl;
 import jetbrains.buildServer.serverSide.priority.PriorityClassManager;
@@ -15,9 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 /**
  * @author dmitry.neverov
  */
@@ -27,9 +27,11 @@ public class EditPriorityClassController extends BaseFormXmlController {
   private final PriorityClassManager myPriorityClassManager;
   private final String myDefaultPriorityClassListUrl;
 
-  public EditPriorityClassController(@NotNull final PluginDescriptor pluginDescriptor,
+  public EditPriorityClassController(@NotNull final SBuildServer buildServer,
+                                     @NotNull final PluginDescriptor pluginDescriptor,
                                      @NotNull final WebControllerManager manager,
                                      @NotNull final PriorityClassManager priorityClassManager) {
+    super(buildServer);
     myPluginDescriptor = pluginDescriptor;
     myPriorityClassManager = priorityClassManager;
     myDefaultPriorityClassListUrl = myPluginDescriptor.getPluginResourcesPath() + "priorityClassList.html";
