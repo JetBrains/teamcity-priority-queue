@@ -148,7 +148,6 @@
       <p class="addNew"><a href="<c:url value='${teamcityPluginResourcesPath}createPriorityClass.html'/>">Create new priority class</a></p>
     </bs:refreshable>
     
-    <jsp:include page="${teamcityPluginResourcesPath}editPriorityClassDialog.html"/>
     <jsp:include page="${teamcityPluginResourcesPath}deletePriorityClassDialog.html"/>
   </jsp:attribute>
 </bs:page>

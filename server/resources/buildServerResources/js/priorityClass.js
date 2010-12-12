@@ -21,36 +21,6 @@ BS.PriorityClassActions = {
 }
 
 
-
-BS.EditPriorityClassDialog = OO.extend(BS.AbstractModalDialog, {
-  getContainer: function() {
-    return $('editPriorityClassDialog');
-  },
-
-  getRefreshableContainer: function() {
-    return $('editPriorityClassRefreshableContainer');
-  },
-
-  showEditDialog: function(priorityClassId, elementToFocus) {
-    var that = BS.EditPriorityClassDialog;
-    that.elementToFocus = elementToFocus;
-    this.getRefreshableContainer().refresh(null, "editAction=update&priorityClassId=" + encodeURIComponent(priorityClassId), function() {
-      that.updateDialog();
-      that.showCentered();
-      BS.EditPriorityClassForm.focusElement(elementToFocus);
-    });
-  },
-
-  showCreateDialog: function() {
-    var that = BS.EditPriorityClassDialog;
-    this.getRefreshableContainer().refresh(null, "editAction=create", function() {
-      that.updateDialog();
-      that.showCentered();
-      BS.EditPriorityClassForm.focusFirstElement();
-    });
-  }
-});
-
 BS.CreatePriorityClassForm = OO.extend(BS.AbstractWebForm, {
   formElement: function() {
     return $('createPriorityClass');
