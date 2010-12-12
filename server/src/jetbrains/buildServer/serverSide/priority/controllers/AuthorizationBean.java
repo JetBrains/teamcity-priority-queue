@@ -45,7 +45,6 @@ public class AuthorizationBean {
             "/plugins/priority-queue/attachConfigurationsDialog.html",
             "/plugins/priority-queue/deletePriorityClassDialog.html",
             "/plugins/priority-queue/priorityClassList.html",
-            "/plugins/priority-queue/priorityClassConfigurations.html",
             "/plugins/priority-queue/action.html",
             "/plugins/priority-queue/priorityClassConfigurationsPopup.html",
             "/plugins/priority-queue/priorityClassList.html",

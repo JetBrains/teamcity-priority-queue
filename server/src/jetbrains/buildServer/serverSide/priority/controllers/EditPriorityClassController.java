@@ -1,5 +1,7 @@
 package jetbrains.buildServer.serverSide.priority.controllers;
 
+import java.util.Collections;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import jetbrains.buildServer.controllers.ActionErrors;
@@ -7,6 +9,7 @@ import jetbrains.buildServer.controllers.ActionMessages;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
 import jetbrains.buildServer.controllers.FormUtil;
 import jetbrains.buildServer.serverSide.SBuildServer;
+import jetbrains.buildServer.serverSide.SBuildType;
 import jetbrains.buildServer.serverSide.priority.PriorityClass;
 import jetbrains.buildServer.serverSide.priority.PriorityClassImpl;
 import jetbrains.buildServer.serverSide.priority.PriorityClassManager;
@@ -15,6 +18,7 @@ import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -53,6 +57,10 @@ public class EditPriorityClassController extends BaseFormXmlController {
     bean.getCameFromSupport().setUrlFromRequest(request, myDefaultPriorityClassListUrl);
     bean.getCameFromSupport().setTitleFromRequest(request, "Priority Classes");
     mv.getModel().put("priorityClassBean", bean);
+    mv.getModel().put("priorityClass", priorityClass);
+    List<SBuildType> sortedBuildTypes = priorityClass.getBuildTypes();
+    Collections.sort(sortedBuildTypes);
+    mv.getModel().put("sortedBuildTypes", sortedBuildTypes);
 
     return mv;
   }
@@ -73,7 +81,6 @@ public class EditPriorityClassController extends BaseFormXmlController {
         if (myPriorityClassManager.isDefaultPriorityClass(priorityClass)) {
           //do nothing
         } else if (myPriorityClassManager.isPersonalPriorityClass(priorityClass)) {
-          pb.validate();
           PriorityClassImpl updatedPersonal = new PriorityClassImpl(myServer.getProjectManager(), priorityClass.getId(), priorityClass.getName(),
                   priorityClass.getDescription(), pb.getPriorityClassPriorityInt(), ((PriorityClassImpl) priorityClass).getBuildTypeIds());
           myPriorityClassManager.savePriorityClass(updatedPersonal);
@@ -103,6 +110,7 @@ public class EditPriorityClassController extends BaseFormXmlController {
     }
   }
 
+  @Nullable
   private PriorityClass getPriorityClass(final HttpServletRequest request) {
     String priorityClassId = request.getParameter("priorityClassId");
     if (priorityClassId != null) {
@@ -110,5 +118,5 @@ public class EditPriorityClassController extends BaseFormXmlController {
     } else {
       return null;
     }
-  }  
+  }
 }

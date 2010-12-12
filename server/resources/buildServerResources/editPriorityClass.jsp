@@ -97,7 +97,7 @@
 
     </form>
 
-    <jsp:include page="${teamcityPluginResourcesPath}priorityClassConfigurations.html?priorityClassId=${priorityClassBean.priorityClassId}"/>
+    <%@ include file="priorityClassConfigurations.jsp" %>
 
   </jsp:attribute>
 </bs:page>

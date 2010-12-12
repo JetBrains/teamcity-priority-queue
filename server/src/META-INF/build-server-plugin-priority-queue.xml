@@ -18,7 +18,6 @@
   <bean id="authtorizationBean" class="jetbrains.buildServer.serverSide.priority.controllers.AuthorizationBean"/>
 
   <bean id="priorityClassesController" class="jetbrains.buildServer.serverSide.priority.controllers.PriorityClassListController"/>
-  <bean id="priorityClassController" class="jetbrains.buildServer.serverSide.priority.controllers.EditPriorityClassConfigurationsController"/>
   <bean id="priorityActionsController" class="jetbrains.buildServer.serverSide.priority.controllers.PriorityClassActionsController"/>
   <bean id="attachConfigurationsController" class="jetbrains.buildServer.serverSide.priority.controllers.AttachBuildTypesController"/>
   <bean id="priorityClassConfigurationsPopup" class="jetbrains.buildServer.serverSide.priority.controllers.PriorityClassConfigurationsPopupController"/>
