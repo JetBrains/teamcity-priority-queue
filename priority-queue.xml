@@ -114,7 +114,7 @@
   </path>
   
   <path id="library.testng.classpath">
-    <pathelement location="${basedir}/lib/testng-5.11-jdk15.jar"/>
+    <pathelement location="${basedir}/lib/testng-5.14.10.jar"/>
   </path>
   
   <path id="library.tomcat.classpath">
