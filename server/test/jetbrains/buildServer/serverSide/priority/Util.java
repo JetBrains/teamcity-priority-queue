@@ -16,14 +16,19 @@
 
 package jetbrains.buildServer.serverSide.priority;
 
-import jetbrains.buildServer.serverSide.ProjectManager;
-import jetbrains.buildServer.serverSide.SBuildType;
-import org.jetbrains.annotations.NotNull;
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-
 import java.io.File;
 import java.util.*;
+import jetbrains.buildServer.buildTriggers.scheduler.Time;
+import jetbrains.buildServer.serverSide.ProjectManager;
+import jetbrains.buildServer.serverSide.SBuildType;
+import jetbrains.buildServer.serverSide.ServerPaths;
+import jetbrains.buildServer.serverSide.cleanup.CleanupCannotBeStartedException;
+import jetbrains.buildServer.serverSide.cleanup.ServerCleanupManager;
+import jetbrains.buildServer.serverSide.impl.cleanup.DefaultCleanupSettings;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
 
 /**
  * @author dmitry.neverov
@@ -99,5 +104,25 @@ final class Util {
 
   private static <T> List<T> tail(List<T> l) {
     return l.subList(1, l.size());
+  }
+
+  static ServerPaths getServerPaths(File rootDir) {
+    File systemDir = new File(rootDir, "system");
+    File backupDir = new File(rootDir, "backup");
+    return new ServerPaths(systemDir.getAbsolutePath(), getTestDataDir().getAbsolutePath(), backupDir.getAbsolutePath());
+  }
+
+  static class MockServerCleanupManager implements ServerCleanupManager {
+    @NotNull
+    public DefaultCleanupSettings getDefaultCleanupSettings() {throw new UnsupportedOperationException();}
+    public void setCleanupStartTime(@Nullable final Time time) {throw new UnsupportedOperationException();}
+    public Time getCleanupStartTime() {throw new UnsupportedOperationException();}
+    public long getLastCleanupElapsedTime() {throw new UnsupportedOperationException();}
+    public void startCleanup() throws CleanupCannotBeStartedException {throw new UnsupportedOperationException();}
+    public boolean isCleanupCanBeStarted() {throw new UnsupportedOperationException();}
+    public boolean executeWithInactiveCleanup(@NotNull final Runnable runnable, final boolean waitTillCleanupFinished) {
+      runnable.run();
+      return true;
+    }
   }
 }

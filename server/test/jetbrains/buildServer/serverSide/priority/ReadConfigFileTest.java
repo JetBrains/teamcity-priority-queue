@@ -19,6 +19,7 @@ package jetbrains.buildServer.serverSide.priority;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import jetbrains.buildServer.TempFiles;
 import jetbrains.buildServer.TestLogger;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.*;
@@ -45,6 +46,7 @@ import static org.testng.AssertJUnit.*;
 @Test
 public class ReadConfigFileTest {
 
+  private TempFiles myTempFiles = new TempFiles();
   private Mockery myContext;
   private SBuildServer myServer;
   private ServerPaths myServerPaths;
@@ -62,7 +64,7 @@ public class ReadConfigFileTest {
       setImposteriser(ClassImposteriser.INSTANCE);
     }};
     myServer = myContext.mock(SBuildServer.class);
-    myServerPaths = myContext.mock(ServerPaths.class);
+    myServerPaths = Util.getServerPaths(myTempFiles.createTempDir());
     myEventDispatcher = (EventDispatcher<BuildServerListener>) myContext.mock(EventDispatcher.class);
     myQueue = myContext.mock(BuildQueueEx.class);
     myProjectManager = myContext.mock(ProjectManager.class);
@@ -71,6 +73,7 @@ public class ReadConfigFileTest {
   @AfterMethod(alwaysRun = true)
   public void tearDown() throws InterruptedException {
     FileUtil.delete(new File(getTestDataDir(), PriorityClassManagerImpl.PRIORITY_CLASS_CONFIG_FILENAME));
+    myTempFiles.cleanup();
   }
 
   public void test() throws IOException {
@@ -208,11 +211,12 @@ public class ReadConfigFileTest {
       allowing(myServer).getProjectManager(); will(returnValue(myProjectManager));
       allowing(myQueue).setOrderingStrategy(with(any(BuildQueueOrderingStrategy.class)));
       allowing(myQueue).getItems(); will(returnValue(Collections.<Object>emptyList()));
-      allowing(myServerPaths).getConfigDir(); will(returnValue(getTestDataDir().getAbsolutePath()));
       allowing(myEventDispatcher).addListener(with(any(BuildServerListener.class)));
     }});
 
-    PriorityClassManagerImpl priorityClassManager = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, new FileWatcherFactory(myServerPaths));
+    FileWatcherFactory fwf = new FileWatcherFactory(myServerPaths);
+    fwf.setCleanupManager(new Util.MockServerCleanupManager());
+    PriorityClassManagerImpl priorityClassManager = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf);
     BuildQueuePriorityOrdering strategy = new BuildQueuePriorityOrdering(myServer, priorityClassManager);
     ServerListener listener = new ServerListener(myEventDispatcher, myServer, strategy, priorityClassManager);
     listener.serverStartup();

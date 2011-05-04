@@ -16,6 +16,10 @@
 
 package jetbrains.buildServer.serverSide.priority;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import jetbrains.buildServer.TempFiles;
 import jetbrains.buildServer.TestLogger;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.*;
@@ -30,10 +34,6 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
 import static jetbrains.buildServer.serverSide.priority.Util.getTestDataDir;
 import static jetbrains.buildServer.serverSide.priority.Util.prepareBuildTypes;
 import static org.testng.AssertJUnit.assertEquals;
@@ -47,6 +47,7 @@ public class BuildQueuePriorityOrderingTest {
 
   private static final File PLUGIN_CONFIG_FILE = new File(getTestDataDir(), PriorityClassManagerImpl.PRIORITY_CLASS_CONFIG_FILENAME);
 
+  private TempFiles myTempFiles = new TempFiles();
   private Mockery myContext;
   private BuildQueueEx myQueue;
   private BuildQueuePriorityOrdering myStrategy;
@@ -69,7 +70,7 @@ public class BuildQueuePriorityOrderingTest {
       setImposteriser(ClassImposteriser.INSTANCE);
     }};
     final SBuildServer server = myContext.mock(SBuildServer.class);
-    final ServerPaths serverPaths = myContext.mock(ServerPaths.class);
+    final ServerPaths serverPaths = Util.getServerPaths(myTempFiles.createTempDir());
     final EventDispatcher<BuildServerListener> eventDispatcher =
             (EventDispatcher<BuildServerListener>) myContext.mock(EventDispatcher.class);
     myQueue = myContext.mock(BuildQueueEx.class);
@@ -85,12 +86,12 @@ public class BuildQueuePriorityOrderingTest {
       allowing(server).getProjectManager(); will(returnValue(myProjectManager));
       allowing(myQueue).setOrderingStrategy(with(any(BuildQueueOrderingStrategy.class)));
       allowing(myQueue).getItems(); will(returnValue(Collections.singletonList(myBt0)));
-      allowing(serverPaths).getConfigDir(); will(returnValue(getTestDataDir().getAbsolutePath()));
       allowing(eventDispatcher).addListener(with(any(BuildServerListener.class)));
     }});
 
-    myPriorityClassManager = new PriorityClassManagerImpl(server, serverPaths,
-            eventDispatcher, new FileWatcherFactory(serverPaths));
+    FileWatcherFactory fwf = new FileWatcherFactory(serverPaths);
+    fwf.setCleanupManager(new Util.MockServerCleanupManager());
+    myPriorityClassManager = new PriorityClassManagerImpl(server, serverPaths, eventDispatcher, fwf);
     myStrategy = new BuildQueuePriorityOrdering(server, myPriorityClassManager);
     myListener = new ServerListener(eventDispatcher, server, myStrategy, myPriorityClassManager);
     myListener.serverStartup();
@@ -101,6 +102,7 @@ public class BuildQueuePriorityOrderingTest {
   @AfterMethod(alwaysRun = true)
   public void tearDown() throws InterruptedException {
     FileUtil.delete(PLUGIN_CONFIG_FILE);
+    myTempFiles.cleanup();
   }
 
 
