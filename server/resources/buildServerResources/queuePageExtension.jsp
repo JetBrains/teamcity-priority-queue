@@ -19,11 +19,8 @@
 <authz:authorize allPermissions="REORDER_BUILD_QUEUE">
   <c:url var="prioritiesUrl" value="${teamcityPluginResourcesPath}priorityClassList.html"/>
   <script type="text/javascript">
-    Behaviour.addLoadEvent(function() {
-      var quickLinks = document.getElementsBySelector('[class="quickLinks"]')[0];
-      if (quickLinks) {
-        quickLinks.innerHTML = '<a href="${prioritiesUrl}">Configure Build Priorities</a>';
-      }
+    $j(document).ready(function() {
+      $j('.quickLinks').append('<a href="${prioritiesUrl}">Configure Build Priorities</a>');
     });
   </script>
 </authz:authorize>
