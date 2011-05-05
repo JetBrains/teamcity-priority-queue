@@ -63,6 +63,10 @@
   
   <!-- Project Libraries -->
   
+  <path id="library.acegi.classpath">
+    <pathelement location="${basedir}/lib/acegi-security-tiger-1.0.4.jar"/>
+  </path>
+
   <path id="library.jdom.classpath">
     <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/jdom.jar"/>
   </path>
@@ -204,6 +208,7 @@
     <path refid="library.trove4j.classpath"/>
     <path refid="library.log4j.classpath"/>
     <path refid="library.jdom.classpath"/>
+    <path refid="library.acegi.classpath"/>
   </path>
   
   <path id="priority-queue-server.runtime.module.classpath">
