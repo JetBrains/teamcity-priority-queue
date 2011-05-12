@@ -53,7 +53,7 @@
                 <c:out value="${priorityClassBean.priorityClassName}"/>
               </c:when>
               <c:otherwise>
-                <forms:textField name="priorityClassName" id="priorityClassName" value="${priorityClassBean.priorityClassName}" style="width:31em"
+                <forms:textField name="priorityClassName" id="priorityClassName" value="${priorityClassBean.priorityClassName}" className="longField"
                                  maxlength="255"/>
                 <span class="error" id="error_priorityClassName"></span>
               </c:otherwise>
@@ -78,7 +78,7 @@
                 <c:out value="${priorityClassBean.priorityClassDescription}"/>
               </c:when>
               <c:otherwise>
-                <forms:textField name="priorityClassDescription" value="${priorityClassBean.priorityClassDescription}" style="width:31em"
+                <forms:textField name="priorityClassDescription" value="${priorityClassBean.priorityClassDescription}" className="longField"
                                  maxlength="2000"/>
                 <span class="error" id="error_priorityClassDescription"></span>
               </c:otherwise>

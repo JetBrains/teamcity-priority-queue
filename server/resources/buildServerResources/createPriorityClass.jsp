@@ -46,7 +46,7 @@
         <tr>
           <th><label for="priorityClassName">Name: <l:star/></label></th>
           <td>
-            <forms:textField name="priorityClassName" id="priorityClassName" value="${priorityClassBean.priorityClassName}" style="width:31em"
+            <forms:textField name="priorityClassName" id="priorityClassName" value="${priorityClassBean.priorityClassName}" className="longField"
                              maxlength="255"/>
             <span class="error" id="error_priorityClassName"></span>
           </td>
@@ -64,7 +64,7 @@
         <tr>
           <th><label for="priorityClassDescription">Description:</label></th>
           <td>
-            <forms:textField name="priorityClassDescription" value="${priorityClassBean.priorityClassDescription}" style="width:31em"
+            <forms:textField name="priorityClassDescription" value="${priorityClassBean.priorityClassDescription}" className="longField"
                              maxlength="2000"/>
             <span class="error" id="error_priorityClassDescription"></span>
           </td>
