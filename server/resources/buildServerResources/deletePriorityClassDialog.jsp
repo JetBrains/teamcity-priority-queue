@@ -33,7 +33,7 @@
           <label for="moveToPriorityClassSelect" style="width:9em">Priority Class:</label>
           <select name="moveTo" class="priorityClassDropDown" id="moveToPriorityClassSelect">
             <c:forEach items="${otherPriorityClasses}" var="pc">
-              <forms:option value="${pc.id}" selected="${pc.default}"><c:out value='${pc.name}'/></forms:option>
+              <forms:option value="${pc.id}" selected="${pc.defaultPriorityClass}"><c:out value='${pc.name}'/></forms:option>
             </c:forEach>
           </select>
         </div>

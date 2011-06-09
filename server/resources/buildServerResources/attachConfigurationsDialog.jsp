@@ -69,7 +69,7 @@
                 <tr>
                   <td class="checkbox">
                     <forms:checkbox name="configurationId" value="${configuration.buildType.id}"
-                                    onclick="BS.AttachConfigurationsToClassDialog.selectConfiguration(this, ${configuration.priorityClass.default})"/>
+                                    onclick="BS.AttachConfigurationsToClassDialog.selectConfiguration(this, ${configuration.priorityClass.defaultPriorityClass})"/>
                   </td>
                   <td><bs:buildTypeLinkFull buildType="${configuration.buildType}"/></td>
                   <td><c:out value="${configuration.priorityClass.name}"/></td>

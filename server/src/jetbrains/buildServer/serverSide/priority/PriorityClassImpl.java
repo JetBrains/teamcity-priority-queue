@@ -82,7 +82,7 @@ public class PriorityClassImpl implements PriorityClass, Comparable<PriorityClas
     return new HashSet<String>(myBuildTypeIds);
   }
 
-  public boolean isDefault() {
+  public boolean isDefaultPriorityClass() {
     return false;
   }
 

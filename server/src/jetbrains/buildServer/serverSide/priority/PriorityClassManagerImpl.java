@@ -456,7 +456,7 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
     public List<SBuildType> getBuildTypes() {
       return getAllUnassignedBuildTypes();
     }
-    public boolean isDefault() {
+    public boolean isDefaultPriorityClass() {
       return true;
     }
   }

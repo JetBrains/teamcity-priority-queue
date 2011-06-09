@@ -65,7 +65,7 @@ public interface PriorityClass {
    * Check if this priority class is default priority class
    * @return true if this priority class is default priority class
    */
-  boolean isDefault();
+  boolean isDefaultPriorityClass();
 
   /**
    * Check if this priority class is priority class for personal builds

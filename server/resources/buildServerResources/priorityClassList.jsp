@@ -65,7 +65,7 @@
           <c:url var="editUrl" value='${teamcityPluginResourcesPath}editPriorityClass.html?priorityClassId=${pClass.id}'/>
 
           <c:choose>
-            <c:when test="${pClass.default}">
+            <c:when test="${pClass.defaultPriorityClass}">
               <c:set var="highlight"></c:set>
               <c:set var="onclick"></c:set>
             </c:when>
@@ -90,7 +90,7 @@
 
             <td class="${highlight} noTitle" ${onclick}>
               <c:choose>
-                <c:when test="${pClass.default}">
+                <c:when test="${pClass.defaultPriorityClass}">
                   <span title="This class contains all build configurations not included into any other priority classes, they cannot be edited">N/A</span>
                 </c:when>
                 <c:when test="${pClass.personal}">
@@ -119,7 +119,7 @@
 
             <td class="${highlight}">
               <c:choose>
-                <c:when test="${pClass.default}">
+                <c:when test="${pClass.defaultPriorityClass}">
                   <span title="This priority class cannot be changed">N/A</span>
                 </c:when>
                 <c:otherwise>
@@ -130,7 +130,7 @@
 
             <td class="editConfigurations">
               <c:choose>
-                <c:when test="${pClass.default}">
+                <c:when test="${pClass.defaultPriorityClass}">
                   <span title="This priority class cannot be deleted">N/A</span>
                 </c:when>
                 <c:when test="${pClass.personal}">

@@ -49,7 +49,7 @@ public class EditPriorityClassController extends BaseFormXmlController {
       getOrCreateMessages(request).addMessage("priorityClassNotFound", "Selected priority class does not exist anymore");
       return new ModelAndView(new RedirectView(myDefaultPriorityClassListUrl, true));
     }
-    if (priorityClass.isDefault()) {
+    if (priorityClass.isDefaultPriorityClass()) {
       return new ModelAndView(new RedirectView(myDefaultPriorityClassListUrl, true));
     }
     ModelAndView mv = new ModelAndView(myPluginDescriptor.getPluginResourcesPath("editPriorityClass.jsp"));
