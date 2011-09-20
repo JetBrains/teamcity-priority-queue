@@ -48,7 +48,7 @@ public class DetachBuildTypesAction implements ControllerAction {
     controller.registerAction(this);
   }
 
-  public boolean canProcess(HttpServletRequest request) {
+  public boolean canProcess(@NotNull HttpServletRequest request) {
     return request.getParameter("detachBuildTypes") != null;
   }
 
