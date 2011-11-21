@@ -46,7 +46,7 @@ public class BuildQueuePageExtension extends SimplePageExtension {
   @Override
   public boolean isAvailable(@NotNull HttpServletRequest request) {
     SUser authority = (SUser) mySecurityContext.getAuthorityHolder().getAssociatedUser();
-    return WebUtil.getPathWithoutAuthenticationType(request).startsWith("/queue.html") && authority.isSystemAdministratorRoleGranted();
+    return WebUtil.getPathWithoutAuthenticationType(request).startsWith("/queue.html") && authority != null && authority.isSystemAdministratorRoleGranted();
   }
 
   @Override
