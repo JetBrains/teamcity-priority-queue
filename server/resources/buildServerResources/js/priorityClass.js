@@ -319,7 +319,7 @@ BS.AttachConfigurationsToClassDialog = OO.extend(BS.AbstractWebForm, OO.extend(B
 
 BS.PriorityClassConfigurationsPopup = {};
 BS.PriorityClassConfigurationsPopup = new BS.Popup("priorityClassConfigurationsPopup", {
-  url: base_uri+"/plugins/priority-queue/priorityClassConfigurationsPopup.html",
+  url: window['base_uri'] + "/plugins/priority-queue/priorityClassConfigurationsPopup.html",
   method: "get"
 });
 

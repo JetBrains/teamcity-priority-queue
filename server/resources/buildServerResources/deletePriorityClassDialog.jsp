@@ -48,17 +48,16 @@
     <input type="hidden" name="priorityClassId" value="<c:out value='${priorityClassId}'/>"/>
 
     <div class="popupSaveButtonsBlock">
-      <a href="javascript://" onclick="BS.DeletePriorityClassDialog.close()" class="cancel">Cancel</a>
+      <forms:cancel onclick="BS.DeletePriorityClassDialog.close()"/>
       <c:choose>
         <c:when test="${showList}">
-          <input class="submitButton" type="submit" value="Apply"/>
+          <forms:submit label="Apply"/>
         </c:when>
         <c:otherwise>
-          <input class="submitButton" type="submit" value="Delete"/>
+          <forms:submit label="Delete"/>
         </c:otherwise>
       </c:choose>
       <forms:saving id="deletePriorityClassProgress"/>
     </div>
-    <br clear="all"/>
   </bs:modalDialog>
 </bs:refreshable>

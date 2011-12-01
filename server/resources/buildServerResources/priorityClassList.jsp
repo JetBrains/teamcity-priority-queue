@@ -137,7 +137,7 @@
                   <span title="This priority class cannot be deleted">N/A</span>
                 </c:when>
                 <c:otherwise>
-                  <a href="javascript://" onclick="BS.DeletePriorityClassDialog.showDeleteDialog('${pClass.id}', function() {BS.PriorityClassActions.refreshPriorityClassList()})">delete</a>
+                  <a href="#" onclick="BS.DeletePriorityClassDialog.showDeleteDialog('${pClass.id}', function() {BS.PriorityClassActions.refreshPriorityClassList()}); return false">delete</a>
                 </c:otherwise>
               </c:choose>
             </td>
