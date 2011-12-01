@@ -75,7 +75,7 @@
 
       <div class="priorityClassSaveButtonsBlock">
         <forms:cancel cameFromSupport="${priorityClassBean.cameFromSupport}"/>
-        <input class="submitButton" type="submit" value="Create"/>
+        <forms:submit label="Create"/>
         <forms:saving id="createPriorityClassProgress"/>
       </div>
 

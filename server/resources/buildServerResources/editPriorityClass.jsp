@@ -91,7 +91,7 @@
 
       <div class="priorityClassSaveButtonsBlock">
         <forms:cancel cameFromSupport="${priorityClassBean.cameFromSupport}"/>
-        <input class="submitButton" type="submit" value="Save"/>
+        <forms:submit type="submit" label="Save"/>
         <forms:saving id="editPriorityClassProgress"/>
       </div>
 
