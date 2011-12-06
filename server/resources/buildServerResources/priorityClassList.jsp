@@ -145,7 +145,7 @@
         </c:forEach>
       </l:tableWithHighlighting>
 
-      <p class="addNew"><a href="<c:url value='${teamcityPluginResourcesPath}createPriorityClass.html'/>">Create new priority class</a></p>
+      <p><a class="btn" href="<c:url value='${teamcityPluginResourcesPath}createPriorityClass.html'/>"><span class="addNew">Create new priority class</span></a></p>
     </bs:refreshable>
     
     <jsp:include page="${teamcityPluginResourcesPath}deletePriorityClassDialog.html"/>
