@@ -33,7 +33,7 @@
       </c:if>
       <c:if test="${configurationsNum > 0}">
         <c:url var="action" value="${teamcityPluginResourcesPath}action.html?detachBuildTypes=true"/>
-        <form id="unassignBuildTypesForm" action="${action}" style="margin: 0; padding: 0;" onsubmit="return BS.UnassignBuildTypesForm.submit()">
+        <form id="unassignBuildTypesForm" action="${action}" onsubmit="return BS.UnassignBuildTypesForm.submit()">
           <p class="note"><strong>${configurationsNum}</strong> configuration<bs:s val="${configurationsNum}"/> added to this priority class.</p>
           <table class="settings priorityClassBuildTypesTable">
             <tr>
