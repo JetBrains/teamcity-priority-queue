@@ -201,7 +201,7 @@ BS.UnassignBuildTypesForm = OO.extend(BS.AbstractWebForm, {
     return false;
   },
 
-  setSaving : function(saving) {
+  setSaving: function(saving) {
     if (saving) {
       BS.Util.show($('unassignInProgress'));
     } else {
@@ -218,7 +218,7 @@ BS.UnassignBuildTypesForm = OO.extend(BS.AbstractWebForm, {
     if (!confirm("Are you sure you want to unassign selected configurations?")) return false;
 
     BS.FormSaver.save(this, this.formElement().action, OO.extend(BS.ErrorsAwareListener, {
-      onCompleteSave : function(form, responseXML, errStatus) {
+      onCompleteSave: function(form, responseXML, errStatus) {
         $('pClassBuildTypesContainer').refresh();
       }
     }));
