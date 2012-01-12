@@ -263,13 +263,14 @@ BS.AttachConfigurationsToClassDialog = OO.extend(BS.AbstractWebForm, OO.extend(B
 
   findConfigurations: function() {
     var that = BS.AttachConfigurationsToClassDialog;
-
-    Element.show($('findProgress'));
+    var findProgress = $('findProgress');
     var pClassId = this.pClassId;
     var form = this.formElement();
     var parameters = "pClassId=" + encodeURIComponent(pClassId) + "&searchString=" + encodeURIComponent(form.searchString.value) + "&searchStringSubmitted=true";
+
+    findProgress.show();
     $('configurationListRefreshable').refresh(null, parameters, function() {
-      Element.hide($('findProgress'));
+      findProgress.hide();
       that.updateDialog();
       that.focusFirstElement();
     });
