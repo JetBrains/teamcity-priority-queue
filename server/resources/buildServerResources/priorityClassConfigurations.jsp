@@ -70,7 +70,7 @@
 
       <c:if test="${canAddRemoveConfigurations}">
         <p>
-          <a class="btn" href="#" onclick="BS.AttachConfigurationsToClassDialog.showAttachDialog('${priorityClass.id}'); return false"><span class="addNew">Add configurations</span></a>
+          <forms:addButton onclick="BS.AttachConfigurationsToClassDialog.showAttachDialog('${priorityClass.id}'); return false">Add configurations</forms:addButton>
         </p>
         <jsp:include page="${teamcityPluginResourcesPath}attachConfigurationsDialog.html"/>
       </c:if>
