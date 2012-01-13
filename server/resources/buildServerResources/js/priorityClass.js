@@ -203,9 +203,9 @@ BS.UnassignBuildTypesForm = OO.extend(BS.AbstractWebForm, {
 
   setSaving: function(saving) {
     if (saving) {
-      BS.Util.show($('unassignInProgress'));
+      BS.Util.show('unassignInProgress');
     } else {
-      BS.Util.hide($('unassignInProgress'));
+      BS.Util.hide('unassignInProgress');
     }
   },
 
