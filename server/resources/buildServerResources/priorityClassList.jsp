@@ -22,12 +22,10 @@
 <bs:page>
   <jsp:attribute name="head_include">
     <bs:linkCSS>
-      /css/forms.css
       /css/admin/adminMain.css
       ${teamcityPluginResourcesPath}css/priorityClass.css
     </bs:linkCSS>
     <bs:linkScript>
-      /js/bs/adminActions.js
       /js/bs/queueLikeSorter.js
     </bs:linkScript>
     <script type="text/javascript">
