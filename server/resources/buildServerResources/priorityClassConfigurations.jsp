@@ -58,7 +58,7 @@
           </table>
 
           <c:if test="${canAddRemoveConfigurations}">
-            <div style="float: right; margin-top: 0.5em;">
+            <div style="float: right; margin-top: 1em;">
               <forms:saving id="unassignInProgress" style="float: none;"/>
               <input type="submit" name="detachBuildTypes" value="Remove from priority class"/>
             </div>
