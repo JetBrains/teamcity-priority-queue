@@ -38,7 +38,8 @@ public final class BuildQueuePriorityOrdering implements BuildQueueOrderingStrat
   private final Map<String, Integer> myMovedItemsPriorities = new HashMap<String, Integer>();
   private final Map<String, Integer> myPrioritiesOnTheInsertMoment = new HashMap<String, Integer>();
   private List<SQueuedBuild> myLastResult = new ArrayList<SQueuedBuild>();
-  private double myPriorityCoefficient;
+  private final double myPriorityCoefficient;
+  private final double myWaitCoefficient;
   private final PriorityClassManager myPriorityClassManager;
   private final BuildQueue myBuildQueue;
 
@@ -47,6 +48,7 @@ public final class BuildQueuePriorityOrdering implements BuildQueueOrderingStrat
     myBuildQueue = server.getQueue();
     myPriorityClassManager = priorityClassManager;
     myPriorityCoefficient = parseDouble(TeamCityProperties.getProperty("teamcity.buildqueue.priorityWeight", "1.0"));
+    myWaitCoefficient = parseDouble(TeamCityProperties.getProperty("teamcity.buildqueue.waitWeight", "1.0"));
   }
 
   /*
@@ -203,9 +205,9 @@ public final class BuildQueuePriorityOrdering implements BuildQueueOrderingStrat
    * @return weight for item at the moment
    */
   private double getItemWeightAtTheMoment(SQueuedBuild item, Date moment) {
-    long durationSeconds = getDurationSeconds(item);
-    long waitMilliseconds = moment.getTime() - item.getWhenQueued().getTime();
-    return waitMilliseconds / (durationSeconds * 1000.0) + myPriorityCoefficient * getEffectiveBuildTypePriority(item);
+    double durationMillis = getDurationSeconds(item) * 1000.0;
+    long waitMillis = moment.getTime() - item.getWhenQueued().getTime();
+    return myWaitCoefficient * waitMillis / durationMillis + myPriorityCoefficient * getEffectiveBuildTypePriority(item);
   }
 
   /**
