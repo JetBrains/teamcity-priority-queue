@@ -57,7 +57,7 @@ public final class BuildQueuePriorityOrdering implements BuildQueueOrderingStrat
                                       @NotNull final List<SQueuedBuild> currentQueueItems) {
     try {
       clearDataOfRemovedItems(currentQueueItems);
-      checkHaveRequiredDataOnCurrentItems(currentQueueItems);
+      ensureHaveDataOnCurrentItems(currentQueueItems);
       updateWeights(currentQueueItems);
       addNewItems(itemsToAdd, currentQueueItems);
       myLastResult = new ArrayList<SQueuedBuild>(currentQueueItems);
@@ -142,16 +142,22 @@ public final class BuildQueuePriorityOrdering implements BuildQueueOrderingStrat
     myPrioritiesOnTheInsertMoment.keySet().retainAll(currentItemIds);
   }
 
-  /**
-   * Should be called after clearDataOfRemovedItems()
-   */
-  private void checkHaveRequiredDataOnCurrentItems(List<SQueuedBuild> currentQueueItems) {
-    int currentQueueSize = currentQueueItems.size();
-    //it is enough to check size because these maps contains only elements from currentQueueItems
-    //after a call to clearDataOfRemovedItems()
-    if (myItemWeights.size() != currentQueueSize || myPrioritiesOnTheInsertMoment.size() != currentQueueSize) {
-      myLogger.error(String.format("Priority ordering plugin do not have a data on some items in build queue. " +
-                                   this.toString() + " Current queue items=%s.", currentQueueItems));
+  //Should be called after clearDataOfRemovedItems()
+  private void ensureHaveDataOnCurrentItems(List<SQueuedBuild> items) {
+    for (SQueuedBuild item : items) {
+      String itemId = item.getItemId();
+      Integer priority = myPrioritiesOnTheInsertMoment.get(itemId);
+      if (priority == null) {
+        priority = getCurrentBuildTypePriority(item);
+        myLogger.warn("Cannot find priority of the item " + item + ", use default = " + priority);
+        myPrioritiesOnTheInsertMoment.put(itemId, priority);
+      }
+      Double weight = myItemWeights.get(itemId);
+      if (weight == null) {
+        weight = myPriorityCoefficient * priority;
+        myLogger.warn("Cannot find weight of the item " + item + ", use default = " + weight);
+        myItemWeights.put(itemId, weight);
+      }
     }
   }
 
