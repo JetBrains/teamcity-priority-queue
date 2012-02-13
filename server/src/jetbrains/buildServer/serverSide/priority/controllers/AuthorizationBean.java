@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2011 JetBrains s.r.o.
+ * Copyright 2000-2012 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,13 @@
 
 package jetbrains.buildServer.serverSide.priority.controllers;
 
+import javax.servlet.http.HttpServletRequest;
 import jetbrains.buildServer.controllers.AuthorizationInterceptor;
 import jetbrains.buildServer.controllers.RequestPermissionsChecker;
 import jetbrains.buildServer.serverSide.auth.AccessDeniedException;
 import jetbrains.buildServer.serverSide.auth.AuthorityHolder;
 import jetbrains.buildServer.users.SUser;
 import org.jetbrains.annotations.NotNull;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author dmitry.neverov

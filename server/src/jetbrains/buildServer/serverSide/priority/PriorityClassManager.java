@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2011 JetBrains s.r.o.
+ * Copyright 2000-2012 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,14 @@
 
 package jetbrains.buildServer.serverSide.priority;
 
+import java.util.List;
+import java.util.Set;
 import jetbrains.buildServer.serverSide.SBuildType;
 import jetbrains.buildServer.serverSide.priority.exceptions.DuplicatePriorityClassNameException;
 import jetbrains.buildServer.serverSide.priority.exceptions.InvalidPriorityClassDescriptionException;
 import jetbrains.buildServer.serverSide.priority.exceptions.InvalidPriorityClassNameException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * Maintains priority classes 
