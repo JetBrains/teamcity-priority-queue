@@ -32,7 +32,7 @@
     <orderEntry type="library" scope="TEST" name="jmock-2.5.1" level="project" />
     <orderEntry type="library" scope="TEST" name="testng" level="project" />
     <orderEntry type="library" name="Spring-Framework-3.0-web" level="project" />
-    <orderEntry type="library" name="Spring-Framework-3.0-core" level="project" />
+    <orderEntry type="library" name="Spring-Framework-3.0" level="project" />
     <orderEntry type="module" module-name="web-openapi" />
     <orderEntry type="module" module-name="test-api" scope="TEST" />
   </component>
