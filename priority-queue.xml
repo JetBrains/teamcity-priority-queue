@@ -29,14 +29,16 @@
     <exclude name="**/*.hprof/**"/>
     <exclude name="**/_svn/**"/>
     <exclude name="**/.hg/**"/>
-    <exclude name="**/.sbas/**"/>
-    <exclude name="**/.IJI.*/**"/>
-    <exclude name="**/vssver.scc/**"/>
-    <exclude name="**/vssver2.scc/**"/>
+    <exclude name="**/*.lib/**"/>
+    <exclude name="**/*~/**"/>
+    <exclude name="**/__pycache__/**"/>
+    <exclude name="**/.bundle/**"/>
+    <exclude name="**/*.rbc/**"/>
     <exclude name="**/*.orig/**"/>
   </patternset>
   <patternset id="library.patterns">
     <include name="*.zip"/>
+    <include name="*.apk"/>
     <include name="*.war"/>
     <include name="*.egg"/>
     <include name="*.ear"/>
@@ -60,13 +62,36 @@
     <include name="**/?*.css"/>
   </patternset>
   
+  <!-- JDK definitions -->
+  
+  <property name="jdk.bin.1.5" value="${jdk.home.1.5}/bin"/>
+  <path id="jdk.classpath.1.5">
+    <fileset dir="${jdk.home.1.5}">
+      <include name="jre/lib/javaws.jar"/>
+      <include name="jre/lib/deploy.jar"/>
+      <include name="jre/lib/jsse.jar"/>
+      <include name="jre/lib/charsets.jar"/>
+      <include name="jre/lib/plugin.jar"/>
+      <include name="jre/lib/resources.jar"/>
+      <include name="jre/lib/alt-string.jar"/>
+      <include name="jre/lib/alt-rt.jar"/>
+      <include name="jre/lib/management-agent.jar"/>
+      <include name="jre/lib/jce.jar"/>
+      <include name="jre/lib/rt.jar"/>
+      <include name="jre/lib/ext/dnsns.jar"/>
+      <include name="jre/lib/ext/sunpkcs11.jar"/>
+      <include name="jre/lib/ext/sunjce_provider.jar"/>
+      <include name="jre/lib/ext/localedata.jar"/>
+    </fileset>
+  </path>
+  
+  <property name="project.jdk.home" value="${jdk.home.1.5}"/>
+  <property name="project.jdk.bin" value="${jdk.bin.1.5}"/>
+  <property name="project.jdk.classpath" value="jdk.classpath.1.5"/>
+  
   
   <!-- Project Libraries -->
   
-  <path id="library.acegi.classpath">
-    <pathelement location="${basedir}/lib/acegi-security-tiger-1.0.4.jar"/>
-  </path>
-
   <path id="library.jdom.classpath">
     <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/jdom.jar"/>
   </path>
@@ -99,22 +124,27 @@
   
   <path id="library.teamcity_open_api_common.classpath">
     <pathelement location="${path.variable.teamcitydistribution}/devPackage/common-api.jar"/>
-    <pathelement location="${path.variable.teamcitydistribution}/devPackage/runtime-util.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/devPackage/runtime/runtime-util.jar"/>
   </path>
   
   <path id="library.teamcity_open_api_server.classpath">
     <pathelement location="${path.variable.teamcitydistribution}/devPackage/server-api.jar"/>
   </path>
   
+  <path id="library.teamcity_tests_support.classpath">
+    <pathelement location="${path.variable.teamcitydistribution}/devPackage/tests/tests-support.jar"/>
+  </path>
+  
   <path id="library.teamcity_third-party_common.classpath">
     <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/annotations.jar"/>
     <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/openapi.jar"/>
-    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/spring.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/org.springframework.core-3.0.5.RELEASE.jar"/>
     <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/util.jar"/>
   </path>
   
   <path id="library.teamcity_third-party_server.classpath">
-    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/spring-webmvc.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/org.springframework.web-3.0.5.RELEASE.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/org.springframework.web.servlet-3.0.5.RELEASE.jar"/>
   </path>
   
   <path id="library.testng.classpath">
@@ -128,9 +158,6 @@
   <path id="library.trove4j.classpath">
     <pathelement location="${basedir}/lib/trove4j.jar"/>
   </path>
-  
-  
-  <!-- Application Server Libraries -->
   <!-- Register Custom Compiler Taskdefs -->
   <property name="javac2.home" value="${idea.home}/lib"/>
   <path id="javac2.classpath">
@@ -153,6 +180,9 @@
   <dirname property="module.priority-queue-server.basedir" file="${ant.file}"/>
   
   
+  <property name="module.jdk.home.priority-queue-server" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.priority-queue-server" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.priority-queue-server" value="${project.jdk.classpath}"/>
   
   <property name="compiler.args.priority-queue-server" value="${compiler.args}"/>
   
@@ -164,6 +194,7 @@
   </path>
   
   <path id="priority-queue-server.module.production.classpath">
+    <path refid="${module.jdk.classpath.priority-queue-server}"/>
     <path refid="library.tomcat.classpath"/>
     <path refid="library.teamcity_open_api_server.classpath"/>
     <path refid="library.teamcity_open_api_common.classpath"/>
@@ -195,6 +226,7 @@
   </path>
   
   <path id="priority-queue-server.module.classpath">
+    <path refid="${module.jdk.classpath.priority-queue-server}"/>
     <pathelement location="${priority-queue-server.output.dir}"/>
     <path refid="library.tomcat.classpath"/>
     <path refid="library.teamcity_open_api_server.classpath"/>
@@ -208,7 +240,7 @@
     <path refid="library.trove4j.classpath"/>
     <path refid="library.log4j.classpath"/>
     <path refid="library.jdom.classpath"/>
-    <path refid="library.acegi.classpath"/>
+    <path refid="library.teamcity_tests_support.classpath"/>
   </path>
   
   <path id="priority-queue-server.runtime.module.classpath">
@@ -226,6 +258,7 @@
     <path refid="library.trove4j.classpath"/>
     <path refid="library.log4j.classpath"/>
     <path refid="library.jdom.classpath"/>
+    <path refid="library.teamcity_tests_support.classpath"/>
   </path>
   
   
@@ -255,7 +288,7 @@
   
   <target name="compile.module.priority-queue-server.production" depends="register.custom.compilers" description="Compile module priority-queue-server; production classes">
     <mkdir dir="${priority-queue-server.output.dir}"/>
-    <javac2 destdir="${priority-queue-server.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
+    <javac2 destdir="${priority-queue-server.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.priority-queue-server}/javac">
       <compilerarg line="${compiler.args.priority-queue-server}"/>
       <bootclasspath refid="priority-queue-server.module.bootclasspath"/>
       <classpath refid="priority-queue-server.module.production.classpath"/>
@@ -277,7 +310,7 @@
   
   <target name="compile.module.priority-queue-server.tests" depends="register.custom.compilers,compile.module.priority-queue-server.production" description="compile module priority-queue-server; test classes" unless="skip.tests">
     <mkdir dir="${priority-queue-server.testoutput.dir}"/>
-    <javac2 destdir="${priority-queue-server.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
+    <javac2 destdir="${priority-queue-server.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.priority-queue-server}/javac">
       <compilerarg line="${compiler.args.priority-queue-server}"/>
       <bootclasspath refid="priority-queue-server.module.bootclasspath"/>
       <classpath refid="priority-queue-server.module.classpath"/>
