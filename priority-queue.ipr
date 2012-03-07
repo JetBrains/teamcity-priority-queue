@@ -390,6 +390,13 @@
         <root url="jar://$TeamCityDistribution$/devPackage/src/openApi-source.jar!/" />
       </SOURCES>
     </library>
+    <library name="TeamCity tests support">
+      <CLASSES>
+        <root url="jar://$TeamCityDistribution$/devPackage/tests/tests-support.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
     <library name="TeamCity Third-Party common">
       <CLASSES>
         <root url="jar://$TeamCityDistribution$/webapps/ROOT/WEB-INF/lib/annotations.jar!/" />

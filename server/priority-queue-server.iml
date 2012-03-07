@@ -30,6 +30,7 @@
     <orderEntry type="library" name="trove4j" level="project" />
     <orderEntry type="library" name="log4j" level="project" />
     <orderEntry type="library" name="jdom" level="project" />
+    <orderEntry type="library" scope="TEST" name="TeamCity tests support" level="project" />
   </component>
 </module>
 
