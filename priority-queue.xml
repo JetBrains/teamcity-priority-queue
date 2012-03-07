@@ -135,16 +135,23 @@
     <pathelement location="${path.variable.teamcitydistribution}/devPackage/tests/tests-support.jar"/>
   </path>
   
-  <path id="library.teamcity_third-party_common.classpath">
+  <path id="library.teamcity_third-party.classpath">
     <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/annotations.jar"/>
     <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/openapi.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/org.springframework.aop-3.0.5.RELEASE.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/org.springframework.asm-3.0.5.RELEASE.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/org.springframework.aspects-3.0.5.RELEASE.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/org.springframework.beans-3.0.5.RELEASE.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/org.springframework.context-3.0.5.RELEASE.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/org.springframework.context.support-3.0.5.RELEASE.jar"/>
     <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/org.springframework.core-3.0.5.RELEASE.jar"/>
-    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/util.jar"/>
-  </path>
-  
-  <path id="library.teamcity_third-party_server.classpath">
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/org.springframework.expression-3.0.5.RELEASE.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/org.springframework.instrument-3.0.5.RELEASE.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/org.springframework.jdbc-3.0.5.RELEASE.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/org.springframework.transaction-3.0.5.RELEASE.jar"/>
     <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/org.springframework.web-3.0.5.RELEASE.jar"/>
     <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/org.springframework.web.servlet-3.0.5.RELEASE.jar"/>
+    <pathelement location="${path.variable.teamcitydistribution}/webapps/ROOT/WEB-INF/lib/util.jar"/>
   </path>
   
   <path id="library.testng.classpath">
@@ -198,8 +205,7 @@
     <path refid="library.tomcat.classpath"/>
     <path refid="library.teamcity_open_api_server.classpath"/>
     <path refid="library.teamcity_open_api_common.classpath"/>
-    <path refid="library.teamcity_third-party_common.classpath"/>
-    <path refid="library.teamcity_third-party_server.classpath"/>
+    <path refid="library.teamcity_third-party.classpath"/>
     <path refid="library.teamcity_closed_api_common.classpath"/>
     <path refid="library.teamcity_closed_api_server.classpath"/>
     <path refid="library.jmock.classpath"/>
@@ -214,8 +220,7 @@
     <path refid="library.tomcat.classpath"/>
     <path refid="library.teamcity_open_api_server.classpath"/>
     <path refid="library.teamcity_open_api_common.classpath"/>
-    <path refid="library.teamcity_third-party_common.classpath"/>
-    <path refid="library.teamcity_third-party_server.classpath"/>
+    <path refid="library.teamcity_third-party.classpath"/>
     <path refid="library.teamcity_closed_api_common.classpath"/>
     <path refid="library.teamcity_closed_api_server.classpath"/>
     <path refid="library.jmock.classpath"/>
@@ -231,8 +236,7 @@
     <path refid="library.tomcat.classpath"/>
     <path refid="library.teamcity_open_api_server.classpath"/>
     <path refid="library.teamcity_open_api_common.classpath"/>
-    <path refid="library.teamcity_third-party_common.classpath"/>
-    <path refid="library.teamcity_third-party_server.classpath"/>
+    <path refid="library.teamcity_third-party.classpath"/>
     <path refid="library.teamcity_closed_api_common.classpath"/>
     <path refid="library.teamcity_closed_api_server.classpath"/>
     <path refid="library.jmock.classpath"/>
@@ -249,8 +253,7 @@
     <path refid="library.tomcat.classpath"/>
     <path refid="library.teamcity_open_api_server.classpath"/>
     <path refid="library.teamcity_open_api_common.classpath"/>
-    <path refid="library.teamcity_third-party_common.classpath"/>
-    <path refid="library.teamcity_third-party_server.classpath"/>
+    <path refid="library.teamcity_third-party.classpath"/>
     <path refid="library.teamcity_closed_api_common.classpath"/>
     <path refid="library.teamcity_closed_api_server.classpath"/>
     <path refid="library.jmock.classpath"/>
