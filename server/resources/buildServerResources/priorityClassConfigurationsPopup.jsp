@@ -27,9 +27,7 @@
 
 <ul class="menuList">
   <c:forEach items="${buildTypeList}" var="buildType">
-    <c:set var="menuItem">class="menuItem" onmouseover="this.className = 'menuItemSelected'" onmouseout="this.className = 'menuItem'"</c:set>
-    <c:url value="/viewType.html?buildTypeId=${buildType.id}&tab=buildTypeStatusDiv" var="btUrl"/>
-    <li self_element="true" ${menuItem} onclick="document.location.href='${btUrl}'">
+    <li class="menuItem" self_element="true">
       <bs:buildTypeLinkFull buildType="${buildType}"/>
     </li>
   </c:forEach>
