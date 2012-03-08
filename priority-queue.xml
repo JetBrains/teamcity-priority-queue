@@ -281,7 +281,7 @@
   
   <target name="compile.module.priority-queue-server.production" depends="register.custom.compilers" description="Compile module priority-queue-server; production classes">
     <mkdir dir="${priority-queue-server.output.dir}"/>
-    <javac2 destdir="${priority-queue-server.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.priority-queue-server}/javac">
+    <javac2 destdir="${priority-queue-server.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.priority-queue-server}/javac" target="1.5">
       <compilerarg line="${compiler.args.priority-queue-server}"/>
       <bootclasspath refid="priority-queue-server.module.bootclasspath"/>
       <classpath refid="priority-queue-server.module.production.classpath"/>
@@ -303,7 +303,7 @@
   
   <target name="compile.module.priority-queue-server.tests" depends="register.custom.compilers,compile.module.priority-queue-server.production" description="compile module priority-queue-server; test classes" unless="skip.tests">
     <mkdir dir="${priority-queue-server.testoutput.dir}"/>
-    <javac2 destdir="${priority-queue-server.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.priority-queue-server}/javac">
+    <javac2 destdir="${priority-queue-server.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.priority-queue-server}/javac" target="1.5">
       <compilerarg line="${compiler.args.priority-queue-server}"/>
       <bootclasspath refid="priority-queue-server.module.bootclasspath"/>
       <classpath refid="priority-queue-server.module.classpath"/>
