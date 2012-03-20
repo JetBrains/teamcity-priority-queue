@@ -17,7 +17,7 @@
 <%@ include file="/include.jsp" %>
 
 <jsp:useBean id="pageUrl" type="java.lang.String" scope="request"/>
-<c:set var="title" value="Build queue priorities" scope="request"/>
+<c:set var="pageTitle" value="Build queue priorities" scope="request"/>
 
 <bs:page>
   <jsp:attribute name="head_include">

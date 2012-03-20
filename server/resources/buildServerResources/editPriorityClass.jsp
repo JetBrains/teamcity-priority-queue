@@ -15,7 +15,7 @@
 --%>
 <%@ include file="/include.jsp" %>
 
-<c:set var="title" value="Edit Priority Class ${priorityClass.name}" scope="request"/>
+<c:set var="pageTitle" value="Edit Priority Class ${priorityClass.name}" scope="request"/>
 
 <bs:page>
   <jsp:attribute name="head_include">
