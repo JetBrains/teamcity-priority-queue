@@ -52,7 +52,7 @@
           Found <strong>${foundConfigurationsNum}</strong> configuration<bs:s val="${foundConfigurationsNum}"/>.
           <c:if test="${attachConfigurationsBean.showFoundConfigurationsNote}">Configurations already included int this class are not shown.</c:if>
         </p>
-        <div class="configurationListContainer">
+        <div class="configurationListContainer custom-scroll">
           <c:if test="${foundConfigurationsNum > 0}">
             <table class="configurationList">
               <tr>
