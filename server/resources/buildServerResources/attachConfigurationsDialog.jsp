@@ -25,7 +25,7 @@
                   saveCommand="BS.AttachConfigurationsToClassDialog.findConfigurations()">
     <div class="clr"></div>
 
-    <table class="configurationListFilter">
+    <table class="actionBar configurationListFilter">
       <tr>
         <td class="label">
           <label for="searchString" style="width: auto;">Find:</label>

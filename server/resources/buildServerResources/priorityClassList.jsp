@@ -49,14 +49,12 @@
       <bs:messages key="priorityClassNotFound"/>
       <bs:messages key="priorityClassUpdated"/>
 
-      <l:tableWithHighlighting highlightImmediately="true" className="priorityClassTable dark sortable borderBottom" mouseovertitle="Click to edit Priority Class">
+      <l:tableWithHighlighting highlightImmediately="true" className="settings priorityClassTable" mouseovertitle="Click to edit Priority Class">
         <tr>
-          <th class="priorityClassPriority">Priority</th>
-          <th class="priorityClassName">Name</th>
-          <th class="priorityClassDescription">Description</th>
-          <th class="priorityClassConfigurations">Build Configurations</th>
-          <th class="actions"></th>
-          <th class="actions"></th>
+          <th class="name priorityClassPriority">Priority</th>
+          <th class="name priorityClassName">Name</th>
+          <th class="name priorityClassDescription">Description</th>
+          <th class="name priorityClassConfigurations" colspan="3">Build Configurations</th>
         </tr>
 
         <c:forEach var="pClass" items="${priorityClasses}" varStatus="pos">
