@@ -257,6 +257,7 @@ BS.AttachConfigurationsToClassDialog = OO.extend(BS.AbstractWebForm, OO.extend(B
     this.pClassId = pClassId;
     $('attachConfigurationsToClassContainer').refresh(null, "pClassId=" + encodeURIComponent(pClassId) + "&openDialog=true", function() {
       that.showCentered();
+      that.bindCtrlEnterHandler(that.submit.bind(that));
       that.focusFirstElement();
     });
   },
