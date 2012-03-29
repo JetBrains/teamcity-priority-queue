@@ -272,6 +272,7 @@ BS.AttachConfigurationsToClassDialog = OO.extend(BS.AbstractWebForm, OO.extend(B
     findProgress.show();
     $('configurationListRefreshable').refresh(null, parameters, function() {
       findProgress.hide();
+      that.recenterDialog();
       that.updateDialog();
       that.focusFirstElement();
     });
