@@ -106,7 +106,7 @@ BS.EditPriorityClassForm = OO.extend(BS.AbstractWebForm, {
     var that = this;
     BS.FormSaver.save(this, this.formElement().action, OO.extend(BS.ErrorsAwareListener, {
       onPriorityClassNotFound: function() {
-        window.location.reload(true);
+        BS.reload(true);
       },
 
       onPriorityClassNameError: function(elem) {
@@ -125,7 +125,7 @@ BS.EditPriorityClassForm = OO.extend(BS.AbstractWebForm, {
       },
 
       onSuccessfulSave: function() {
-        window.location.reload(true);
+        BS.reload(true);
       }
     }));
     return false;
