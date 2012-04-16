@@ -101,7 +101,7 @@ public class AttachBuildTypesController extends BaseFormXmlController {
           if (addedCount == 1) {
             messages.addMessage("buildTypesAssigned", "1 configuration was successfully assigned to the priority class");
           } else {
-            messages.addMessage("buildTypesAssigned", "{0} configuration were successfully assigned to the priority class", String.valueOf(addedCount));
+            messages.addMessage("buildTypesAssigned", "{0} configurations were successfully assigned to the priority class", String.valueOf(addedCount));
           }
         }
       } catch (PriorityClassException e) {

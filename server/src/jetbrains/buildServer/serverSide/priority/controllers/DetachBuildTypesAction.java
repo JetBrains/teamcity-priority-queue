@@ -69,7 +69,7 @@ public class DetachBuildTypesAction implements ControllerAction {
           ActionMessages.getOrCreateMessages(request).addMessage("buildTypesUnassigned", "1 configuration was unassigned from the priority class");
         } else {
           ActionMessages.getOrCreateMessages(request).addMessage("buildTypesUnassigned", "{0} configurations were unassigned from the priority class",
-                  String.valueOf(buildTypesIdsForRemove.size()));
+                                                                 String.valueOf(buildTypesIdsForRemove.size()));
         }
       }      
     }    
