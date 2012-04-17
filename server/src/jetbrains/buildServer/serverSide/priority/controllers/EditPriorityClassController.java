@@ -43,7 +43,7 @@ public class EditPriorityClassController extends BaseFormXmlController {
   }
 
   @Override
-  protected ModelAndView doGet(final HttpServletRequest request, final HttpServletResponse response) {
+  protected ModelAndView doGet(@NotNull final HttpServletRequest request, @NotNull final HttpServletResponse response) {
     PriorityClass priorityClass = getPriorityClass(request);
     if (priorityClass == null) {
       getOrCreateMessages(request).addMessage("priorityClassNotFound", "Selected priority class does not exist anymore");
@@ -66,7 +66,7 @@ public class EditPriorityClassController extends BaseFormXmlController {
   }
 
   @Override
-  protected void doPost(final HttpServletRequest request, final HttpServletResponse response, final Element xmlResponse) {
+  protected void doPost(@NotNull final HttpServletRequest request, @NotNull final HttpServletResponse response, @NotNull final Element xmlResponse) {
     PriorityClass priorityClass = getPriorityClass(request);
     ActionErrors errors = new ActionErrors();
     if (priorityClass == null) {

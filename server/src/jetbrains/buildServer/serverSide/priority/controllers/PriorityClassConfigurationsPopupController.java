@@ -34,7 +34,6 @@ import org.springframework.web.servlet.ModelAndView;
  * @author dmitry.neverov
  */
 public class PriorityClassConfigurationsPopupController extends BasePopupController {
-
   private final PriorityClassManager myPriorityClassManager;
   private final PluginDescriptor myPluginDescriptor;
   private static final int MAX_CONFIGURATIONS_TO_SHOW = 30;
@@ -48,7 +47,7 @@ public class PriorityClassConfigurationsPopupController extends BasePopupControl
   }
 
   @Override
-  protected ModelAndView processRequest(HttpServletRequest request, HttpServletResponse response) {
+  protected ModelAndView processRequest(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) {
     String priorityClassId = request.getParameter("priorityClassId");
     if (priorityClassId != null) {
       PriorityClass priorityClass = myPriorityClassManager.findPriorityClassById(priorityClassId);

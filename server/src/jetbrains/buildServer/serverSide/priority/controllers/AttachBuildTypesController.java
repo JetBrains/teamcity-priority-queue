@@ -63,7 +63,7 @@ public class AttachBuildTypesController extends BaseFormXmlController {
   }
 
   @Override
-  protected ModelAndView doGet(final HttpServletRequest request, final HttpServletResponse response) {
+  protected ModelAndView doGet(@NotNull final HttpServletRequest request, @NotNull final HttpServletResponse response) {
     AttachConfigurationsBean bean = getBean(request);
 
     if (bean.isSearchStringSubmitted()) {
@@ -77,7 +77,7 @@ public class AttachBuildTypesController extends BaseFormXmlController {
   }
 
   @Override
-  protected void doPost(final HttpServletRequest request, final HttpServletResponse response, final Element xmlResponse) {
+  protected void doPost(@NotNull final HttpServletRequest request, @NotNull final HttpServletResponse response, @NotNull final Element xmlResponse) {
     AttachConfigurationsBean bean = getBean(request);
     bindFromRequest(request, bean);
 

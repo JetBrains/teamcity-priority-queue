@@ -55,7 +55,7 @@ public class DeletePriorityClassController extends BaseFormXmlController {
   }
 
   @Override
-  protected ModelAndView doGet(HttpServletRequest request, HttpServletResponse response) {
+  protected ModelAndView doGet(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) {
     String priorityClassId = request.getParameter("priorityClassId");
     ModelAndView mv = new ModelAndView(myPluginDescriptor.getPluginResourcesPath("deletePriorityClassDialog.jsp"));
     mv.getModel().put("title", "Remove Priority Class");
@@ -78,7 +78,7 @@ public class DeletePriorityClassController extends BaseFormXmlController {
   }
 
   @Override
-  protected void doPost(HttpServletRequest request, HttpServletResponse response, Element xmlResponse) {
+  protected void doPost(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Element xmlResponse) {
     String priorityClassId = request.getParameter("priorityClassId");
     String moveToId = request.getParameter("moveTo");
     if (priorityClassId != null) {

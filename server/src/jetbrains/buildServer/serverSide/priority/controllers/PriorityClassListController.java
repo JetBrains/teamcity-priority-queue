@@ -44,7 +44,7 @@ public class PriorityClassListController extends BaseController {
   }
 
   @Override
-  protected ModelAndView doHandle(final HttpServletRequest request, final HttpServletResponse response) throws Exception {
+  protected ModelAndView doHandle(@NotNull final HttpServletRequest request, @NotNull final HttpServletResponse response) throws Exception {
     ModelAndView view = new ModelAndView(myPluginDescriptor.getPluginResourcesPath("priorityClassList.jsp"));
     final Map model = view.getModel();
     model.put("priorityClasses", getPriorityClasses());

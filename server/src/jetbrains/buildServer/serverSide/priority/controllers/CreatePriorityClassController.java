@@ -11,7 +11,6 @@ import jetbrains.buildServer.serverSide.priority.PriorityClassManager;
 import jetbrains.buildServer.serverSide.priority.exceptions.*;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
-import org.jdom.Content;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.ModelAndView;
@@ -35,7 +34,7 @@ public class CreatePriorityClassController extends BaseFormXmlController {
   }
 
   @Override
-  protected ModelAndView doGet(final HttpServletRequest request, final HttpServletResponse response) {
+  protected ModelAndView doGet(@NotNull final HttpServletRequest request, @NotNull final HttpServletResponse response) {
     ModelAndView mv = new ModelAndView(myPluginDescriptor.getPluginResourcesPath("createPriorityClass.jsp"));
     EditPriorityClassBean bean = new EditPriorityClassBean();
     bean.getCameFromSupport().setUrlFromRequest(request, myDefaultPriorityClassListUrl);
@@ -45,7 +44,7 @@ public class CreatePriorityClassController extends BaseFormXmlController {
   }
 
   @Override
-  protected void doPost(final HttpServletRequest request, final HttpServletResponse response, final Element xmlResponse) {
+  protected void doPost(@NotNull final HttpServletRequest request, @NotNull final HttpServletResponse response, @NotNull final Element xmlResponse) {
     //create and redirect to editPriorityClass page with message 'created, now you can add configurations'
     ActionErrors errors = new ActionErrors();
     EditPriorityClassBean pcBean = new EditPriorityClassBean();
