@@ -27,7 +27,7 @@
 
 <ul class="menuList">
   <c:forEach items="${buildTypeList}" var="buildType">
-    <li class="menuItem" self_element="true">
+    <li class="menuItem" data-self="true">
       <bs:buildTypeLinkFull buildType="${buildType}"/>
     </li>
   </c:forEach>
