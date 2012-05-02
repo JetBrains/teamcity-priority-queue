@@ -88,30 +88,6 @@ table.priorityClassBuildTypesTable td {
   text-align: center;
 }
 
-table.configurationListFilter {
-  width: 100%;
-}
-
-table.configurationListFilter td {
-  padding: 5px;
-}
-
-table.configurationListFilter td.label {
-  width: 10%;
-}
-
-table.configurationListFilter td.button {
-  width: 20%;
-}
-
-table.configurationListFilter td.searchStringField {
-  width: 70%;
-}
-
-table.configurationListFilter td.searchStringField input {
-  width: 100%;
-}
-
 .configurationListContainer {
   overflow: auto;
   height: auto;
