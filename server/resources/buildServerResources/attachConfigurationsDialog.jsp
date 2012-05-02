@@ -25,20 +25,12 @@
                   saveCommand="BS.AttachConfigurationsToClassDialog.findConfigurations()">
     <div class="clr"></div>
 
-    <table class="actionBar configurationListFilter">
-      <tr>
-        <td class="label">
-          <label for="searchString" style="width: auto;">Find:</label>
-        </td>
-        <td class="searchStringField">
-          <forms:textField name="searchString" size="20" maxlength="1024" value="${attachConfigurationsBean.searchString}"/>
-        </td>
-        <td class="button">
-          <input type="submit" name="submitFilter" value="Filter"/>
-          <forms:saving id="findProgress" style="float: none"/>
-        </td>
-      </tr>
-    </table>
+    <div class="actionBar">
+      <label for="searchString">Find:</label>
+      <forms:textField name="searchString" size="20" maxlength="1024" value="${attachConfigurationsBean.searchString}"/>
+      <input class="btn btn_mini" type="submit" name="submitFilter" value="Filter"/>
+      <forms:saving id="findProgress" style="float: none"/>
+    </div>
 
     <bs:refreshable containerId="configurationListRefreshable" pageUrl="${actionUrl}">
       <c:set var="foundConfigurations" value="${attachConfigurationsBean.foundConfigurations}"/>
