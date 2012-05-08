@@ -17,10 +17,6 @@
   width: 33em;
 }
 
-#editPriorityClass label {
-  width: 8em;
-}
-
 #editPriorityClass .error {
   margin-left: 8em;
 }
