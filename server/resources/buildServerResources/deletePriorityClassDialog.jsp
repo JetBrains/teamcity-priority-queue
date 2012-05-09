@@ -20,7 +20,6 @@
 <bs:refreshable containerId="deletePriorityClassRefreshableContainer" pageUrl="${action}">
   <bs:modalDialog formId="deletePriorityClass" title="${title}" action="${action}"
                   closeCommand="BS.DeletePriorityClassDialog.close()" saveCommand="BS.DeletePriorityClassForm.submit()">
-    <div class="clr"></div>
     <span class="error" id="error_moveConfigurations"></span>
     <c:choose>
       <c:when test="${showList}">

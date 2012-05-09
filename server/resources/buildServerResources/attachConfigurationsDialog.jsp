@@ -23,8 +23,6 @@
   <bs:modalDialog formId="attachConfigurationsToClass" title="Assign Build Configurations to Priority Class"
                   action="${actionUrl}" closeCommand="BS.AttachConfigurationsToClassDialog.close()"
                   saveCommand="BS.AttachConfigurationsToClassDialog.findConfigurations()">
-    <div class="clr"></div>
-
     <div class="actionBar">
       <label for="searchString">Find:</label>
       <forms:textField name="searchString" size="20" maxlength="1024" value="${attachConfigurationsBean.searchString}"/>
