@@ -24,7 +24,7 @@
                   action="${actionUrl}" closeCommand="BS.AttachConfigurationsToClassDialog.close()"
                   saveCommand="BS.AttachConfigurationsToClassDialog.findConfigurations()">
     <div class="actionBar">
-      <label for="searchString">Find:</label>
+      <label class="firstLabel" for="searchString">Find:</label>
       <forms:textField name="searchString" size="20" maxlength="1024" value="${attachConfigurationsBean.searchString}"/>
       <input class="btn btn_mini" type="submit" name="submitFilter" value="Filter"/>
       <forms:saving id="findProgress" className="progressRingInline"/>
