@@ -26,6 +26,7 @@ import jetbrains.buildServer.serverSide.cleanup.CleanupCannotBeStartedException;
 import jetbrains.buildServer.serverSide.cleanup.ServerCleanupManager;
 import jetbrains.buildServer.serverSide.impl.cleanup.DefaultCleanupSettings;
 import jetbrains.buildServer.serverSide.impl.cleanup.ServerCleanupDetails;
+import jetbrains.buildServer.users.SUser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jmock.Expectations;
@@ -124,8 +125,11 @@ final class Util {
 
     public Time getCleanupStartTime() {throw new UnsupportedOperationException();}
     @NotNull
-    public ServerCleanupDetails getServerCleanupDetails() {throw new UnsupportedOperationException();}
+    public ServerCleanupDetails getServerCleanupProgress() {throw new UnsupportedOperationException();}
     public void startCleanup() throws CleanupCannotBeStartedException {throw new UnsupportedOperationException();}
+
+    public void stopCleanup(@Nullable final SUser userPerformingAction) {}
+
     public boolean isCleanupCanBeStarted() {throw new UnsupportedOperationException();}
     public boolean executeWithInactiveCleanup(@NotNull final Runnable runnable, final boolean waitTillCleanupFinished) {
       runnable.run();
