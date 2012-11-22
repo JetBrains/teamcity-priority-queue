@@ -18,7 +18,7 @@ BS.PriorityClassActions = {
   refreshPriorityClassList: function() {
     $('priorityClassList').refresh();
   }
-}
+};
 
 
 BS.CreatePriorityClassForm = OO.extend(BS.AbstractWebForm, {
@@ -218,7 +218,7 @@ BS.UnassignBuildTypesForm = OO.extend(BS.AbstractWebForm, {
     if (!confirm("Are you sure you want to unassign selected configurations?")) return false;
 
     BS.FormSaver.save(this, this.formElement().action, OO.extend(BS.ErrorsAwareListener, {
-      onCompleteSave: function(form, responseXML, errStatus) {
+      onCompleteSave: function() {
         $('pClassBuildTypesContainer').refresh();
       }
     }));
@@ -262,6 +262,12 @@ BS.AttachConfigurationsToClassDialog = OO.extend(BS.AbstractWebForm, OO.extend(B
     });
   },
 
+  resetFilter: function() {
+    $j('#searchString').val('');
+    this.findConfigurations();
+    return false;
+  },
+
   findConfigurations: function() {
     var that = BS.AttachConfigurationsToClassDialog;
     var findProgress = $('findProgress');
@@ -301,8 +307,9 @@ BS.AttachConfigurationsToClassDialog = OO.extend(BS.AbstractWebForm, OO.extend(B
   submit: function() {
     this.formElement().submitAction.value='assignConfigurations';
     if (this.nonDefaultMovedCount != 0) {
-      var msg = "You select " + this.nonDefaultMovedCount + " configuration(s) from non-default priority class, are you sure you want to move them in current priority class?" 
-      if (!confirm(msg)) return;      
+      var msg = "You select " + this.nonDefaultMovedCount + " configuration(s) from non-default priority class, " +
+                "are you sure you want to move them in current priority class?";
+      if (!confirm(msg)) return false;
     }
     var that = this;
     BS.FormSaver.save(this, this.formElement().action, OO.extend(BS.ErrorsAwareListener, {
@@ -329,5 +336,4 @@ BS.PriorityClassConfigurationsPopup = new BS.Popup("priorityClassConfigurationsP
 BS.PriorityClassConfigurationsPopup.showPopup = function(nearestElement, priorityClassId) {
   this.options.parameters = "priorityClassId=" + encodeURIComponent(priorityClassId);
   this.showPopupNearElement(nearestElement);
-}
-
+};

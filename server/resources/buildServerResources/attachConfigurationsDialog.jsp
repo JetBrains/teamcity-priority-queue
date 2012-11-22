@@ -23,14 +23,15 @@
   <bs:modalDialog formId="attachConfigurationsToClass" title="Assign Build Configurations to Priority Class"
                   action="${actionUrl}" closeCommand="BS.AttachConfigurationsToClassDialog.close()"
                   saveCommand="BS.AttachConfigurationsToClassDialog.findConfigurations()">
-    <div class="actionBar">
-      <label class="firstLabel" for="searchString">Find:</label>
-      <forms:textField name="searchString" size="20" maxlength="1024" value="${attachConfigurationsBean.searchString}"/>
-      <input class="btn btn_mini" type="submit" name="submitFilter" value="Filter"/>
-      <forms:saving id="findProgress" className="progressRingInline"/>
-    </div>
-
     <bs:refreshable containerId="configurationListRefreshable" pageUrl="${actionUrl}">
+      <div class="actionBar">
+        <label class="firstLabel" for="searchString">Find:</label>
+        <forms:textField name="searchString" size="20" maxlength="1024" value="${attachConfigurationsBean.searchString}"/>
+        <forms:filterButton/>
+        <c:if test="${not empty attachConfigurationsBean.searchString}"><forms:resetFilter resetHandler="return BS.AttachConfigurationsToClassDialog.resetFilter();"/></c:if>
+        <forms:saving id="findProgress" className="progressRingInline"/>
+      </div>
+
       <c:set var="foundConfigurations" value="${attachConfigurationsBean.foundConfigurations}"/>
       <c:set var="foundConfigurationsNum" value="${fn:length(foundConfigurations)}"/>
 
@@ -79,7 +80,6 @@
             <forms:saving id="attachProgress"/>
           </div>
         </c:if>
-
       </c:if>
     </bs:refreshable>
   </bs:modalDialog>

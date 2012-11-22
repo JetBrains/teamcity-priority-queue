@@ -92,7 +92,6 @@ table.priorityClassBuildTypesTable td {
 }
 
 .configurationListContainer table.configurationList {
-  border-bottom: 2px solid #E3E9EF;
   border-collapse: collapse;
   width: 100%;
 }
