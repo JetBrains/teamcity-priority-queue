@@ -20,7 +20,7 @@
   <c:url var="prioritiesUrl" value="${teamcityPluginResourcesPath}priorityClassList.html"/>
   <script type="text/javascript">
     $j(document).ready(function() {
-      $j('.quickLinks').append('<a href="${prioritiesUrl}">Configure Build Priorities</a>');
+      $j('.quickLinks').append('<a class="quickLinksControlLink" href="${prioritiesUrl}">Configure Build Priorities</a>');
     });
   </script>
 </authz:authorize>
