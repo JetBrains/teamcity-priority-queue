@@ -49,7 +49,7 @@
       <bs:messages key="priorityClassNotFound"/>
       <bs:messages key="priorityClassUpdated"/>
 
-      <l:tableWithHighlighting highlightImmediately="true" className="settings priorityClassTable" mouseovertitle="Click to edit Priority Class">
+      <l:tableWithHighlighting highlightImmediately="true" className="settings priorityClassTable">
         <tr>
           <th class="name priorityClassPriority">Priority</th>
           <th class="name priorityClassName">Name</th>
@@ -84,7 +84,7 @@
               <c:out value="${pClass.description}"/>
             </td>
 
-            <td class="${highlight} noTitle" ${onclick}>
+            <td class="${highlight}" ${onclick}>
               <c:choose>
                 <c:when test="${pClass.defaultPriorityClass}">
                   <span title="This class contains all build configurations not included into any other priority classes, they cannot be edited">N/A</span>
