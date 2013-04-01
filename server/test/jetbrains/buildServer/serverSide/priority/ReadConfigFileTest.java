@@ -217,8 +217,8 @@ public class ReadConfigFileTest {
     FileWatcherFactory fwf = new FileWatcherFactory(myServerPaths);
     fwf.setCleanupManager(new Util.MockServerCleanupManager());
     PriorityClassManagerImpl priorityClassManager = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf);
-    BuildQueuePriorityOrdering strategy = new BuildQueuePriorityOrdering(myServer, priorityClassManager);
-    ServerListener listener = new ServerListener(myEventDispatcher, myServer, strategy, priorityClassManager);
+    BuildQueuePriorityOrdering strategy = new BuildQueuePriorityOrdering(myQueue, priorityClassManager);
+    ServerListener listener = new ServerListener(myEventDispatcher, myQueue, strategy, priorityClassManager);
     listener.serverStartup();
 
     PriorityClass defaultPriorityClass = priorityClassManager.getDefaultPriorityClass();

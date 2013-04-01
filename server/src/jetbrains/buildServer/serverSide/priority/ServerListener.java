@@ -26,25 +26,25 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ServerListener extends BuildServerAdapter {
 
-  private SBuildServer myServer;
-  private BuildQueuePriorityOrdering myStrategy;
-  private PriorityClassManagerImpl myPriorityClassManager;
+  private final BuildQueueEx myQueue;
+  private final BuildQueuePriorityOrdering myStrategy;
+  private final PriorityClassManagerImpl myPriorityClassManager;
 
   public ServerListener(@NotNull final EventDispatcher<BuildServerListener> dispatcher,
-                        @NotNull final SBuildServer server,
+                        @NotNull final BuildQueueEx queue,
                         @NotNull final BuildQueuePriorityOrdering strategy,
                         @NotNull final PriorityClassManagerImpl priorityClassManager) {
-    dispatcher.addListener(this);
-    myServer = server;
+    myQueue = queue;
     myStrategy = strategy;
     myPriorityClassManager = priorityClassManager;
+    dispatcher.addListener(this);
   }
 
   @Override
   public void serverStartup() {
     myPriorityClassManager.init();
-    myStrategy.addBuilds(myServer.getQueue().getItems(), new ArrayList<SQueuedBuild>());
-    ((BuildQueueEx) myServer.getQueue()).setOrderingStrategy(myStrategy);
+    myStrategy.addBuilds(myQueue.getItems(), new ArrayList<SQueuedBuild>());
+    myQueue.setOrderingStrategy(myStrategy);
   }
 
 }

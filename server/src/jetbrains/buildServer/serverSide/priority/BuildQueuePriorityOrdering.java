@@ -42,9 +42,9 @@ public final class BuildQueuePriorityOrdering implements BuildQueueOrderingStrat
   private final PriorityClassManager myPriorityClassManager;
   private final BuildQueue myBuildQueue;
 
-  public BuildQueuePriorityOrdering(@NotNull final SBuildServer server,
+  public BuildQueuePriorityOrdering(@NotNull final BuildQueue queue,
                                     @NotNull final PriorityClassManager priorityClassManager) {
-    myBuildQueue = server.getQueue();
+    myBuildQueue = queue;
     myPriorityClassManager = priorityClassManager;
     myPriorityCoefficient = parseDouble(TeamCityProperties.getProperty("teamcity.buildqueue.priorityWeight", "1.0"));
     myWaitCoefficient = parseDouble(TeamCityProperties.getProperty("teamcity.buildqueue.waitWeight", "1.0"));
