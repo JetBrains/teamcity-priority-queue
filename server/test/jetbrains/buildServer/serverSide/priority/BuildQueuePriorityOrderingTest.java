@@ -49,9 +49,8 @@ public class BuildQueuePriorityOrderingTest {
 
   private TempFiles myTempFiles = new TempFiles();
   private Mockery myContext;
-  private BuildQueueEx myQueue;
+  private BuildQueue myQueue;
   private BuildQueuePriorityOrdering myStrategy;
-  private ServerListener myListener;
   private List<SQueuedBuild> myCurrentQueueItems;
   private ProjectManager myProjectManager;
   private PriorityClassManagerImpl myPriorityClassManager;
@@ -84,7 +83,6 @@ public class BuildQueuePriorityOrderingTest {
       allowing(server).getQueue(); will(returnValue(myQueue));
       allowing(server).getFullServerVersion(); will(returnValue("1.0"));
       allowing(server).getProjectManager(); will(returnValue(myProjectManager));
-      allowing(myQueue).setOrderingStrategy(with(any(BuildQueueOrderingStrategy.class)));
       allowing(myQueue).getItems(); will(returnValue(Collections.singletonList(myBt0)));
       allowing(eventDispatcher).addListener(with(any(BuildServerListener.class)));
     }});
@@ -93,8 +91,7 @@ public class BuildQueuePriorityOrderingTest {
     fwf.setCleanupManager(new Util.MockServerCleanupManager());
     myPriorityClassManager = new PriorityClassManagerImpl(server, serverPaths, eventDispatcher, fwf);
     myStrategy = new BuildQueuePriorityOrdering(server, myPriorityClassManager);
-    myListener = new ServerListener(eventDispatcher, server, myStrategy, myPriorityClassManager);
-    myListener.serverStartup();
+    myPriorityClassManager.init();
     myCurrentQueueItems = new ArrayList<SQueuedBuild>();
   }
 
