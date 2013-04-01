@@ -426,9 +426,9 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
               priorityClassElement.setAttribute(PRIORITY_ATTRIBUTE, String.valueOf(priorityClass.getPriority()));
               priorityClassElement.setAttribute(DESCRIPTION_ATTRIBUTE, priorityClass.getDescription());
 
-              for (SBuildType bt : priorityClass.getBuildTypes()) {
+              for (String btId : priorityClass.getBuildTypeIds()) {
                 final Element buildTypeElement = new Element(BUILD_TYPE_ELEMENT);
-                buildTypeElement.setAttribute(BUILD_TYPE_ID_ATTRIBUTE, bt.getBuildTypeId());
+                buildTypeElement.setAttribute(BUILD_TYPE_ID_ATTRIBUTE, btId);
                 priorityClassElement.addContent(buildTypeElement);
               }
               rootElement.addContent(priorityClassElement);

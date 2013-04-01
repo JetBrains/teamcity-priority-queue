@@ -36,8 +36,11 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static jetbrains.buildServer.serverSide.priority.Util.getTestDataDir;
 import static jetbrains.buildServer.serverSide.priority.Util.prepareBuildTypes;
+import static jetbrains.buildServer.util.CollectionsUtil.setOf;
 import static org.testng.AssertJUnit.*;
 
 /**
@@ -181,17 +184,28 @@ public class ReadConfigFileTest {
     myContext.checking(new Expectations() {{
       allowing(myProjectManager).findBuildTypeById("bt6"); when(buildTypeState.is("removed")); will(returnValue(null));
       allowing(myProjectManager).findBuildTypeById("bt6"); when(buildTypeState.is("recovered")); will(returnValue(bt6));
+      allowing(myProjectManager).findBuildTypes(setOf(bt6.getBuildTypeId())); when(buildTypeState.is("removed")); will(returnValue(emptyList()));
+      allowing(myProjectManager).findBuildTypes(setOf(bt6.getBuildTypeId())); when(buildTypeState.is("recovered")); will(returnValue(asList(bt6)));
     }});
     PriorityClassManager priorityClassManager = createPriorityClassManagerForConfig(new File(getTestDataDir(), "build-queue-priorities-removed-build-type.xml"));
 
-    assertEquals(4, priorityClassManager.getAllPriorityClasses().size()); //no priority class is lost
+    assertEquals(3, priorityClassManager.getAllPriorityClasses().size()); //no priority class is lost
+
+    priorityClassManager.createPriorityClass("New priority class", "description", 10);//this makes priority class manager to persist config
+
+    //emulate server restart (reread config):
+    FileWatcherFactory fwf = new FileWatcherFactory(myServerPaths);
+    fwf.setCleanupManager(new Util.MockServerCleanupManager());
+    priorityClassManager = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf);
+    ((PriorityClassManagerImpl) priorityClassManager).init();
 
     buildTypeState.become("recovered");
 
-    assertNotNull(myServer.getProjectManager().findBuildTypeById("bt6"));
-
     PriorityClass pc = priorityClassManager.getBuildTypePriorityClass(bt6);
     assertEquals("pc1", pc.getId());
+    PriorityClass pc1 = priorityClassManager.findPriorityClassById("pc1");
+    assertEquals(1, pc1.getBuildTypes().size());
+    assertEquals(bt6, pc1.getBuildTypes().get(0));
   }
 
 

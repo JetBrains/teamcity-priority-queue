@@ -31,7 +31,6 @@ import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SBuildType;
 import jetbrains.buildServer.serverSide.priority.PriorityClass;
-import jetbrains.buildServer.serverSide.priority.PriorityClassImpl;
 import jetbrains.buildServer.serverSide.priority.PriorityClassManager;
 import jetbrains.buildServer.serverSide.priority.exceptions.PriorityClassException;
 import jetbrains.buildServer.util.StringUtil;
@@ -40,6 +39,8 @@ import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.ModelAndView;
+
+import static jetbrains.buildServer.serverSide.priority.controllers.Util.getBuildTypeIds;
 
 /**
  * @author dmitry.neverov
@@ -89,7 +90,7 @@ public class AttachBuildTypesController extends BaseFormXmlController {
         if (selectedConfigurations != null && !selectedConfigurations.isEmpty()) {
           Set<String> newBuildTypeIds = new HashSet<String>(selectedConfigurations);
           PriorityClass oldPriorityClass = bean.getPriorityClass();
-          Set<String> oldBuildTypeIds = ((PriorityClassImpl) oldPriorityClass).getBuildTypeIds();
+          Set<String> oldBuildTypeIds = getBuildTypeIds(oldPriorityClass);
           newBuildTypeIds.addAll(oldBuildTypeIds);
 
           PriorityClass updatedPriorityClass = oldPriorityClass.addBuildTypes(selectedConfigurations);

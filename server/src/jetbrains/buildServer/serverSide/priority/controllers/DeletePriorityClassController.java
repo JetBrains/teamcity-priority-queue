@@ -27,13 +27,14 @@ import jetbrains.buildServer.controllers.ActionMessages;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.priority.PriorityClass;
-import jetbrains.buildServer.serverSide.priority.PriorityClassImpl;
 import jetbrains.buildServer.serverSide.priority.PriorityClassManager;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.ModelAndView;
+
+import static jetbrains.buildServer.serverSide.priority.controllers.Util.getBuildTypeIds;
 
 /**
  * @author dmitry.neverov
@@ -87,7 +88,7 @@ public class DeletePriorityClassController extends BaseFormXmlController {
         if (moveToId != null) {
           PriorityClass moveTo = myPriorityClassManager.findPriorityClassById(moveToId);
           if (moveTo != null) {
-            Set<String> movedBuildTypes = ((PriorityClassImpl) pc).getBuildTypeIds();
+            Set<String> movedBuildTypes = getBuildTypeIds(pc);
             myPriorityClassManager.savePriorityClass(moveTo.addBuildTypes(movedBuildTypes));
           } else {
             ActionErrors errors = new ActionErrors();

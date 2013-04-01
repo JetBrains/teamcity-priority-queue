@@ -25,12 +25,13 @@ import javax.servlet.http.HttpServletResponse;
 import jetbrains.buildServer.controllers.ActionMessages;
 import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.priority.PriorityClass;
-import jetbrains.buildServer.serverSide.priority.PriorityClassImpl;
 import jetbrains.buildServer.serverSide.priority.PriorityClassManager;
 import jetbrains.buildServer.web.openapi.ControllerAction;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static jetbrains.buildServer.serverSide.priority.controllers.Util.getBuildTypeIds;
 
 /**
  * @author dmitry.neverov
@@ -57,7 +58,7 @@ public class DetachBuildTypesAction implements ControllerAction {
     PriorityClass priorityClass = myPriorityClassManager.findPriorityClassById(priorityClassId);
     if (priorityClass != null) {
       Set<String> buildTypesIdsForRemove = getBuildTypeIdsForDetach(request);
-      Set<String> updatedBuildTypeIds = ((PriorityClassImpl) priorityClass).getBuildTypeIds();
+      Set<String> updatedBuildTypeIds = getBuildTypeIds(priorityClass);
       boolean buildTypesChanged = updatedBuildTypeIds.removeAll(buildTypesIdsForRemove);
 
       if (buildTypesChanged) {

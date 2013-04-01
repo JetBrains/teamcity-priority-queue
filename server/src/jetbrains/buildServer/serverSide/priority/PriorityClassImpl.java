@@ -74,10 +74,10 @@ public class PriorityClassImpl implements PriorityClass, Comparable<PriorityClas
 
   @NotNull
   public List<SBuildType> getBuildTypes() {
-    return new ArrayList<SBuildType>(myProjectManager.findBuildTypes(myBuildTypeIds));
+    return new ArrayList<SBuildType>(myProjectManager.findBuildTypes(getBuildTypeIds()));
   }
 
-  public Set<String> getBuildTypeIds() {
+  Set<String> getBuildTypeIds() {
     return new HashSet<String>(myBuildTypeIds);
   }
 
