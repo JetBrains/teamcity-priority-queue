@@ -41,6 +41,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.util.Assert;
 
+import static java.util.Arrays.asList;
+
 /**
  * PriorityClassManager implementation.
  * Stores priorityClass in config file.
@@ -205,9 +207,7 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
           if (oldPriorityClass != null) {
             Set<String> builtTypeIds = ((PriorityClassImpl) oldPriorityClass).getBuildTypeIds();
             builtTypeIds.remove(btId);
-            PriorityClassImpl updatedOldPriorityClass = new PriorityClassImpl(myServer.getProjectManager(), oldPriorityClass.getId(),
-                                                                              oldPriorityClass.getName(), oldPriorityClass.getDescription(),
-                                                                              oldPriorityClass.getPriority(), builtTypeIds);
+            PriorityClassImpl updatedOldPriorityClass = (PriorityClassImpl) oldPriorityClass.removeBuildTypes(asList(btId));
             myPriorityClasses.put(updatedOldPriorityClass.getId(), updatedOldPriorityClass);
           }
           myBuildTypePriorityClasses.put(btId, priorityClass.getId());

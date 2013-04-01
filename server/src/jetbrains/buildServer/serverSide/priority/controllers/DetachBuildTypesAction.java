@@ -61,8 +61,7 @@ public class DetachBuildTypesAction implements ControllerAction {
       boolean buildTypesChanged = updatedBuildTypeIds.removeAll(buildTypesIdsForRemove);
 
       if (buildTypesChanged) {
-        PriorityClassImpl updatedPriorityClass = new PriorityClassImpl(myProjectManager, priorityClass.getId(), priorityClass.getName(),
-                priorityClass.getDescription(), priorityClass.getPriority(), updatedBuildTypeIds);
+        PriorityClass updatedPriorityClass = priorityClass.removeBuildTypes(buildTypesIdsForRemove);
         myPriorityClassManager.savePriorityClass(updatedPriorityClass);
 
         if (buildTypesIdsForRemove.size() == 1) {

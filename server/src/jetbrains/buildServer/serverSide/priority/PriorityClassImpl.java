@@ -89,6 +89,30 @@ public class PriorityClassImpl implements PriorityClass, Comparable<PriorityClas
     return false;
   }
 
+  @NotNull
+  public PriorityClass addBuildTypes(@NotNull final Collection<String> buildTypeIds) {
+    Set<String> newBuildTypeIds = new HashSet<String>(myBuildTypeIds);
+    newBuildTypeIds.addAll(buildTypeIds);
+    return new PriorityClassImpl(myProjectManager, myId, myName, myDescription, myPriority, newBuildTypeIds);
+  }
+
+  @NotNull
+  public PriorityClass removeBuildTypes(@NotNull final Collection<String> buildTypeIds) {
+    Set<String> newBuildTypeIds = new HashSet<String>(myBuildTypeIds);
+    newBuildTypeIds.removeAll(buildTypeIds);
+    return new PriorityClassImpl(myProjectManager, myId, myName, myDescription, myPriority, newBuildTypeIds);
+  }
+
+  @NotNull
+  public PriorityClass setPriority(final int priority) {
+    return new PriorityClassImpl(myProjectManager, myId, myName, myDescription, priority, myBuildTypeIds);
+  }
+
+  @NotNull
+  public PriorityClass update(@NotNull final String name, @NotNull final String description, final int priority, @NotNull final Collection<String> buildTypeIds) {
+    return new PriorityClassImpl(myProjectManager, myId, name, description, priority, buildTypeIds);
+  }
+
   @Override
   public boolean equals(Object obj) {
     return obj instanceof PriorityClassImpl && myId.equals(((PriorityClassImpl) obj).myId);

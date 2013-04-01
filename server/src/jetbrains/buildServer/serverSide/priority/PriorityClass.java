@@ -16,6 +16,7 @@
 
 package jetbrains.buildServer.serverSide.priority;
 
+import java.util.Collection;
 import java.util.List;
 import jetbrains.buildServer.serverSide.SBuildType;
 import org.jetbrains.annotations.NotNull;
@@ -72,4 +73,15 @@ public interface PriorityClass {
    */
   boolean isPersonal();
 
+  @NotNull
+  PriorityClass addBuildTypes(@NotNull Collection<String> buildTypeIds);
+
+  @NotNull
+  PriorityClass removeBuildTypes(@NotNull Collection<String> buildTypeIds);
+
+  @NotNull
+  PriorityClass setPriority(int priority);
+
+  @NotNull
+  PriorityClass update(@NotNull String name, @NotNull String description, int priority, @NotNull Collection<String> buildTypeIds);
 }

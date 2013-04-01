@@ -92,8 +92,7 @@ public class AttachBuildTypesController extends BaseFormXmlController {
           Set<String> oldBuildTypeIds = ((PriorityClassImpl) oldPriorityClass).getBuildTypeIds();
           newBuildTypeIds.addAll(oldBuildTypeIds);
 
-          PriorityClassImpl updatedPriorityClass = new PriorityClassImpl(myProjectManager, oldPriorityClass.getId(), oldPriorityClass.getName(),
-                  oldPriorityClass.getDescription(), oldPriorityClass.getPriority(), newBuildTypeIds);
+          PriorityClass updatedPriorityClass = oldPriorityClass.addBuildTypes(selectedConfigurations);
           myPriorityClassManager.savePriorityClass(updatedPriorityClass);
 
           ActionMessages messages = ActionMessages.getOrCreateMessages(request);

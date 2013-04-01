@@ -134,8 +134,7 @@ public class ReadConfigFileTest {
     PriorityClass duplicates = priorityClassManager.createPriorityClass("Duplicates", "", -2);
 
     PriorityClass personals = priorityClassManager.getPersonalPriorityClass();
-    PriorityClassImpl updatePersonals = new PriorityClassImpl(myProjectManager, personals.getId(), personals.getName(), personals.getDescription(),
-            5, ((PriorityClassImpl) personals).getBuildTypeIds());
+    PriorityClass updatePersonals = personals.setPriority(5);
     priorityClassManager.savePriorityClass(updatePersonals);
 
     //read invalid config

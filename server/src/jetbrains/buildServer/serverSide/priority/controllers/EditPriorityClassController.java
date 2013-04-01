@@ -11,7 +11,6 @@ import jetbrains.buildServer.controllers.FormUtil;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SBuildType;
 import jetbrains.buildServer.serverSide.priority.PriorityClass;
-import jetbrains.buildServer.serverSide.priority.PriorityClassImpl;
 import jetbrains.buildServer.serverSide.priority.PriorityClassManager;
 import jetbrains.buildServer.serverSide.priority.exceptions.*;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
@@ -81,13 +80,11 @@ public class EditPriorityClassController extends BaseFormXmlController {
         if (myPriorityClassManager.isDefaultPriorityClass(priorityClass)) {
           //do nothing
         } else if (myPriorityClassManager.isPersonalPriorityClass(priorityClass)) {
-          PriorityClassImpl updatedPersonal = new PriorityClassImpl(myServer.getProjectManager(), priorityClass.getId(), priorityClass.getName(),
-                  priorityClass.getDescription(), pb.getPriorityClassPriorityInt(), ((PriorityClassImpl) priorityClass).getBuildTypeIds());
+          PriorityClass updatedPersonal = priorityClass.setPriority(pb.getPriorityClassPriorityInt());
           myPriorityClassManager.savePriorityClass(updatedPersonal);
         } else {
           pb.validate();
-          PriorityClassImpl updatedPriorityClass = new PriorityClassImpl(myServer.getProjectManager(), priorityClass.getId(), pb.getPriorityClassName(),
-                  pb.getPriorityClassDescription(), pb.getPriorityClassPriorityInt(), ((PriorityClassImpl) priorityClass).getBuildTypeIds());
+          PriorityClass updatedPriorityClass = priorityClass.setPriority(pb.getPriorityClassPriorityInt());
           myPriorityClassManager.savePriorityClass(updatedPriorityClass);
         }
       } catch (DuplicatePriorityClassNameException e) {

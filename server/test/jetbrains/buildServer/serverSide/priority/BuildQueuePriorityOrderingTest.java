@@ -294,15 +294,13 @@ public class BuildQueuePriorityOrderingTest {
     assertOrder(myCurrentQueueItems, "bt1", "bt2", "bt3");//by default - default and personal class have same priorities
 
     PriorityClass personalPriorityClass = myPriorityClassManager.getPersonalPriorityClass();
-    PriorityClassImpl updatedPersonalClass = new PriorityClassImpl(myProjectManager, personalPriorityClass.getId(), personalPriorityClass.getName(),
-            personalPriorityClass.getDescription(), 1, ((PriorityClassImpl)personalPriorityClass).getBuildTypeIds());
+    PriorityClass updatedPersonalClass = personalPriorityClass.setPriority(1);
     myPriorityClassManager.savePriorityClass(updatedPersonalClass);
 
     myCurrentQueueItems = addBuilds(myCurrentQueueItems, createPersonalQueuedBuild(id2buildType.get("bt4"), 60));
     assertOrder(myCurrentQueueItems, "bt4", "bt1", "bt2", "bt3");
 
-    updatedPersonalClass = new PriorityClassImpl(myProjectManager, personalPriorityClass.getId(), personalPriorityClass.getName(),
-            personalPriorityClass.getDescription(), -1, ((PriorityClassImpl)personalPriorityClass).getBuildTypeIds());
+    updatedPersonalClass = updatedPersonalClass.setPriority(-1);
     myPriorityClassManager.savePriorityClass(updatedPersonalClass);
     myCurrentQueueItems = addBuilds(myCurrentQueueItems, createPersonalQueuedBuild(id2buildType.get("bt5"), 60));
     assertOrder(myCurrentQueueItems, "bt4", "bt1", "bt2", "bt3", "bt5");

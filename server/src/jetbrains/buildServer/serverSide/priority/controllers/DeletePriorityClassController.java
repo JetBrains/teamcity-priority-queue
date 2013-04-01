@@ -88,10 +88,7 @@ public class DeletePriorityClassController extends BaseFormXmlController {
           PriorityClass moveTo = myPriorityClassManager.findPriorityClassById(moveToId);
           if (moveTo != null) {
             Set<String> movedBuildTypes = ((PriorityClassImpl) pc).getBuildTypeIds();
-            Set<String> unionBuildTypes = ((PriorityClassImpl) moveTo).getBuildTypeIds();
-            unionBuildTypes.addAll(movedBuildTypes);
-            myPriorityClassManager.savePriorityClass(new PriorityClassImpl(myServer.getProjectManager(), moveTo.getId(), moveTo.getName(), moveTo.getDescription(),
-                    moveTo.getPriority(), unionBuildTypes));            
+            myPriorityClassManager.savePriorityClass(moveTo.addBuildTypes(movedBuildTypes));
           } else {
             ActionErrors errors = new ActionErrors();
             errors.addError("moveConfigurations", "Selected priority class is no longer exist");
