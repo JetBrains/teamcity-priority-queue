@@ -47,7 +47,7 @@ import static java.util.Arrays.asList;
  * PriorityClassManager implementation.
  * Stores priorityClass in config file.
  */
-public final class PriorityClassManagerImpl implements PriorityClassManager {
+public final class PriorityClassManagerImpl extends BuildServerAdapter implements PriorityClassManager {
 
   public static final String PRIORITY_CLASS_CONFIG_FILENAME = "build-queue-priorities.xml";
   private final static String PRIORITY_CLASS_ROOT_ELEMENT = "priority-classes";
@@ -67,7 +67,7 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
   private final Logger myLogger = Logger.getLogger(PriorityClassManagerImpl.class.getName());
 
   private final Map<String, PriorityClassImpl> myPriorityClasses = new HashMap<String, PriorityClassImpl>();
-  private final Map<String, String> myBuildTypePriorityClasses = new HashMap<String, String>();//buildType id -> priorityClass id
+  private final Map<String, String> myBuildTypePriorityClasses = new HashMap<String, String>();//external id -> priorityClass id
   private final AtomicInteger myPriorityClassIdSequence = new AtomicInteger(1);
   private final SBuildServer myServer;
   private FileWatcherFactory myFileWatcherFactory;
@@ -99,6 +99,24 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
     loadPriorityClasses();
 
     startFileWatching();
+  }
+
+  @Override
+  public void buildTypeExternalIdChanged(@NotNull final SBuildType buildType,
+                                         @NotNull final String oldExternalId,
+                                         @NotNull final String newExternalId) {
+    myLock.writeLock().lock();
+    try {
+      String priorityClassId = myBuildTypePriorityClasses.remove(oldExternalId);
+      if (priorityClassId != null) {
+        myBuildTypePriorityClasses.put(newExternalId, priorityClassId);
+        PriorityClassImpl pc = myPriorityClasses.get(priorityClassId);
+        PriorityClassImpl updated = (PriorityClassImpl) pc.updateExternalId(oldExternalId, newExternalId);
+        myPriorityClasses.put(priorityClassId, updated);
+      }
+    } finally {
+      myLock.writeLock().unlock();
+    }
   }
 
   @NotNull
@@ -140,7 +158,7 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
   public PriorityClass getBuildTypePriorityClass(@NotNull SBuildType buildType) {
     myLock.readLock().lock();
     try {
-      PriorityClass priorityClass = findBuildTypePriorityClass(buildType.getBuildTypeId());
+      PriorityClass priorityClass = findBuildTypePriorityClass(buildType.getExternalId());
       if (priorityClass != null) {
         return priorityClass;
       } else {
@@ -173,7 +191,7 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
       priorityClass = new PriorityClassImpl(myServer.getProjectManager(), id, name, description, priority, getBuildTypeIds(buildTypes));
       myPriorityClasses.put(priorityClass.getId(), priorityClass);
       for (SBuildType bt : priorityClass.getBuildTypes()) {
-        myBuildTypePriorityClasses.put(bt.getBuildTypeId(), priorityClass.getId());
+        myBuildTypePriorityClasses.put(bt.getExternalId(), priorityClass.getId());
       }
     } finally {
       myLock.writeLock().unlock();
@@ -196,16 +214,16 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
         }
         PriorityClassImpl oldPc = myPriorityClasses.get(priorityClass.getId());
         if (oldPc != null) {
-          Set<String> oldBuildTypeIds = oldPc.getBuildTypeIds();
-          oldBuildTypeIds.removeAll(((PriorityClassImpl) priorityClass).getBuildTypeIds());
+          Set<String> oldBuildTypeIds = oldPc.getExternalIds();
+          oldBuildTypeIds.removeAll(((PriorityClassImpl) priorityClass).getExternalIds());
           for (String btId : oldBuildTypeIds) {
             myBuildTypePriorityClasses.remove(btId);
           }
         }
-        for (String btId : ((PriorityClassImpl)priorityClass).getBuildTypeIds()) {
+        for (String btId : ((PriorityClassImpl)priorityClass).getExternalIds()) {
           PriorityClass oldPriorityClass = findBuildTypePriorityClass(btId);
           if (oldPriorityClass != null) {
-            Set<String> builtTypeIds = ((PriorityClassImpl) oldPriorityClass).getBuildTypeIds();
+            Set<String> builtTypeIds = ((PriorityClassImpl) oldPriorityClass).getExternalIds();
             builtTypeIds.remove(btId);
             PriorityClassImpl updatedOldPriorityClass = (PriorityClassImpl) oldPriorityClass.removeBuildTypes(asList(btId));
             myPriorityClasses.put(updatedOldPriorityClass.getId(), updatedOldPriorityClass);
@@ -227,7 +245,7 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
         PriorityClass removed = myPriorityClasses.remove(priorityClassId);
         if (removed != null) {
           for (SBuildType bt : removed.getBuildTypes()) {
-            myBuildTypePriorityClasses.remove(bt.getBuildTypeId());
+            myBuildTypePriorityClasses.remove(bt.getExternalId());
           }          
         }
       } finally {
@@ -337,9 +355,10 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
             }
 
             int priority = parsePriorityString(priorityClassElem.getAttributeValue(PRIORITY_ATTRIBUTE), id);
+            Set<String> externalIds = new BuildTypeElementVisitor(priorityClassElem).getBuildTypeIds();
             PriorityClassImpl priorityClass = new PriorityClassImpl(myServer.getProjectManager(), id, priorityClassElem.getAttributeValue(NAME_ATTRIBUTE),
                     priorityClassElem.getAttributeValue(DESCRIPTION_ATTRIBUTE), priority,
-                    new BuildTypeElementVisitor(priorityClassElem).getBuildTypeIds());
+                    externalIds);
             priorityClassMap.put(id, priorityClass);            
           }
         }
@@ -366,7 +385,7 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
       myPriorityClasses.clear();
       for (PriorityClassImpl priorityClass : priorityClassMap.values()) {
         myPriorityClasses.put(priorityClass.getId(), priorityClass);
-        for (String btId : priorityClass.getBuildTypeIds()) {
+        for (String btId : priorityClass.getExternalIds()) {
           myBuildTypePriorityClasses.put(btId, priorityClass.getId());
         }
       }
@@ -426,7 +445,7 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
               priorityClassElement.setAttribute(PRIORITY_ATTRIBUTE, String.valueOf(priorityClass.getPriority()));
               priorityClassElement.setAttribute(DESCRIPTION_ATTRIBUTE, priorityClass.getDescription());
 
-              for (String btId : priorityClass.getBuildTypeIds()) {
+              for (String btId : priorityClass.getExternalIds()) {
                 final Element buildTypeElement = new Element(BUILD_TYPE_ELEMENT);
                 buildTypeElement.setAttribute(BUILD_TYPE_ID_ATTRIBUTE, btId);
                 priorityClassElement.addContent(buildTypeElement);
@@ -460,8 +479,8 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
     }
   }
 
-  private PriorityClass findBuildTypePriorityClass(String btId) {
-    String priorityClassId = myBuildTypePriorityClasses.get(btId);
+  private PriorityClass findBuildTypePriorityClass(String externalId) {
+    String priorityClassId = myBuildTypePriorityClasses.get(externalId);
     if (priorityClassId != null) {
       return myPriorityClasses.get(priorityClassId);      
     } else {
@@ -560,7 +579,7 @@ public final class PriorityClassManagerImpl implements PriorityClassManager {
   private static Collection<String> getBuildTypeIds(Collection<SBuildType> buildTypes) {
     return CollectionsUtil.convertCollection(buildTypes, new Converter<String, SBuildType>() {
       public String createFrom(@NotNull final SBuildType source) {
-        return source.getBuildTypeId();
+        return source.getExternalId();
       }
     });
   }

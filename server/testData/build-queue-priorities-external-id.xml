@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE priority-classes SYSTEM "build-queue-priorities.dtd">
+
+<priority-classes>
+
+  <priority-class id="pc1" name="Inspections" priority="-1"
+                  description="Low priority inspections">
+    <build-type id="bt14ExternalId"/>
+    <build-type id="bt47ExternalId"/>
+  </priority-class>
+
+</priority-classes>

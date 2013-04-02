@@ -84,4 +84,7 @@ public interface PriorityClass {
 
   @NotNull
   PriorityClass update(@NotNull String name, @NotNull String description, int priority, @NotNull Collection<String> buildTypeIds);
+
+  @NotNull
+  PriorityClass updateExternalId(@NotNull String oldExternalId, @NotNull String newExternalId);
 }

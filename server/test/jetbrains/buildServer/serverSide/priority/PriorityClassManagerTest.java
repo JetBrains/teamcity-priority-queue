@@ -29,13 +29,18 @@ import jetbrains.buildServer.util.FileUtil;
 import org.apache.log4j.Level;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.jmock.States;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static java.util.Arrays.asList;
+import static jetbrains.buildServer.serverSide.priority.BuildTypeMatcher.buildType;
 import static jetbrains.buildServer.serverSide.priority.Util.*;
+import static jetbrains.buildServer.util.Util.map;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNotNull;
 
@@ -78,7 +83,6 @@ public class PriorityClassManagerTest {
       allowing(myQueue).getItems(); will(returnValue(Collections.<SQueuedBuild>emptyList()));
       allowing(eventDispatcher).addListener(with(any(BuildServerListener.class)));
       allowing(myProjectManager).getAllBuildTypes(); will(returnValue(Collections.<SBuildType>emptyList()));
-      allowing(myProjectManager).findBuildTypes(new HashSet<String>()); will(returnValue(Collections.<SBuildType>emptyList()));
     }});
 
     FileWatcherFactory fwf = new FileWatcherFactory(serverPaths);
@@ -185,22 +189,82 @@ public class PriorityClassManagerTest {
     }
     PriorityClass pc1 = myPriorityClassManager.createPriorityClass("pc1", "Priority class one", 5);
 
-    PriorityClass pc1Update1 = pc1.addBuildTypes(pc1buildTypes);
-    myPriorityClassManager.savePriorityClass(pc1Update1);
+    pc1 = pc1.addBuildTypes(pc1buildTypes);
+    myPriorityClassManager.savePriorityClass(pc1);
 
-    assertEquals(pc1Update1, myPriorityClassManager.getBuildTypePriorityClass(id2bt.get("bt1")));
-    assertEquals(pc1Update1, myPriorityClassManager.getBuildTypePriorityClass(id2bt.get("bt2")));
-    assertEquals(pc1Update1, myPriorityClassManager.getBuildTypePriorityClass(id2bt.get("bt3")));
+    assertEquals(pc1, myPriorityClassManager.getBuildTypePriorityClass(id2bt.get("bt1")));
+    assertEquals(pc1, myPriorityClassManager.getBuildTypePriorityClass(id2bt.get("bt2")));
+    assertEquals(pc1, myPriorityClassManager.getBuildTypePriorityClass(id2bt.get("bt3")));
 
-    PriorityClass pc1update2 = pc1Update1.removeBuildTypes(asList("bt1", "bt2"));
-    myPriorityClassManager.savePriorityClass(pc1update2);
+    pc1 = pc1.removeBuildTypes(asList("bt1", "bt2"));
+    myPriorityClassManager.savePriorityClass(pc1);
 
-    pc1update2 = myPriorityClassManager.findPriorityClassById(pc1.getId());
-    assertEquals(1, pc1update2.getBuildTypes().size());
+    pc1 = myPriorityClassManager.findPriorityClassById(pc1.getId());
+    assertEquals(1, pc1.getBuildTypes().size());
 
     PriorityClass defaultPriorityClass = myPriorityClassManager.getDefaultPriorityClass();
     assertEquals(defaultPriorityClass, myPriorityClassManager.getBuildTypePriorityClass(id2bt.get("bt1")));
     assertEquals(defaultPriorityClass, myPriorityClassManager.getBuildTypePriorityClass(id2bt.get("bt2")));
-    assertEquals(pc1update2, myPriorityClassManager.getBuildTypePriorityClass(id2bt.get("bt3")));
+    assertEquals(pc1, myPriorityClassManager.getBuildTypePriorityClass(id2bt.get("bt3")));
+
+    prepareBuildTypes(myContext, myProjectManager, map("bt4", "bt4External"));
+    SBuildType bt4 = myProjectManager.findBuildTypeByExternalId("bt4External");
+    pc1 = pc1.addBuildTypes(asList(bt4.getBuildTypeId()));
+    myPriorityClassManager.savePriorityClass(pc1);
+    assertEquals(pc1.getId(), myPriorityClassManager.getBuildTypePriorityClass(bt4).getId());
+
+    pc1 = pc1.removeBuildTypes(asList(bt4.getBuildTypeId()));
+    myPriorityClassManager.savePriorityClass(pc1);
+    assertEquals(myPriorityClassManager.getDefaultPriorityClass().getId(), myPriorityClassManager.getBuildTypePriorityClass(bt4).getId());
+  }
+
+
+  public void test_remove_priority_class() {
+    prepareBuildTypes(myContext, myProjectManager, map("bt1", "bt1External", "bt2", "bt2External"));
+    SBuildType bt1 = myProjectManager.findBuildTypeByExternalId("bt1External");
+    SBuildType bt2 = myProjectManager.findBuildTypeByExternalId("bt2External");
+    PriorityClass pc1 = myPriorityClassManager.createPriorityClass("pc1", "description", 5);
+    pc1 = pc1.addBuildTypes(asList(bt1.getBuildTypeId(), bt2.getBuildTypeId()));
+    myPriorityClassManager.savePriorityClass(pc1);
+
+    assertEquals(pc1.getId(), myPriorityClassManager.getBuildTypePriorityClass(bt1).getId());
+    assertEquals(pc1.getId(), myPriorityClassManager.getBuildTypePriorityClass(bt2).getId());
+
+    myPriorityClassManager.deletePriorityClass(pc1.getId());
+
+    assertEquals(myPriorityClassManager.getDefaultPriorityClass().getId(), myPriorityClassManager.getBuildTypePriorityClass(bt1).getId());
+    assertEquals(myPriorityClassManager.getDefaultPriorityClass().getId(), myPriorityClassManager.getBuildTypePriorityClass(bt2).getId());
+  }
+
+  public void should_support_external_id_rename() {
+    final States externalId = myContext.states("bt1-externalId-state").startsAs("oldId");
+
+    final SBuildType buildType = myContext.mock(SBuildType.class);
+    myContext.checking(new Expectations() {{
+      allowing(buildType).getBuildTypeId(); will(returnValue("bt1"));
+      allowing(buildType).getExternalId(); when(externalId.is("oldId")); will(returnValue("bt1External"));
+      allowing(buildType).getExternalId(); when(externalId.is("newId")); will(returnValue("bt1NewExternal"));
+      allowing(myProjectManager).findBuildTypeById("bt1"); will(returnValue(buildType));
+      allowing(myProjectManager).findBuildTypeByExternalId("bt1External"); when(externalId.is("oldId")); will(returnValue(buildType));
+      allowing(myProjectManager).findBuildTypeByExternalId("bt1External"); when(externalId.is("newId")); will(returnValue(null));
+      allowing(myProjectManager).findBuildTypeByExternalId("bt1NewExternal"); when(externalId.is("oldId")); will(returnValue(null));
+      allowing(myProjectManager).findBuildTypeByExternalId("bt1NewExternal"); when(externalId.is("newId")); will(returnValue(buildType));
+      allowing(myProjectManager).getAllBuildTypes(); will(returnValue(asList(buildType)));
+    }});
+
+    SBuildType bt1 = myProjectManager.findBuildTypeByExternalId("bt1External");
+
+    PriorityClass pc1 = myPriorityClassManager.createPriorityClass("pc1", "description", 5);
+    pc1 = pc1.addBuildTypes(asList(bt1.getBuildTypeId()));
+    myPriorityClassManager.savePriorityClass(pc1);
+
+    assertEquals(pc1.getId(), myPriorityClassManager.getBuildTypePriorityClass(bt1).getId());
+    assertThat(myPriorityClassManager.findPriorityClassById(pc1.getId()).getBuildTypes(), hasItem(buildType().withId("bt1")));
+
+    externalId.become("newId");
+    myPriorityClassManager.buildTypeExternalIdChanged(bt1, "bt1External", "bt1NewExternal");
+
+    assertEquals(pc1.getId(), myPriorityClassManager.getBuildTypePriorityClass(bt1).getId());
+    assertThat(myPriorityClassManager.findPriorityClassById(pc1.getId()).getBuildTypes(), hasItem(buildType().withId("bt1")));
   }
 }

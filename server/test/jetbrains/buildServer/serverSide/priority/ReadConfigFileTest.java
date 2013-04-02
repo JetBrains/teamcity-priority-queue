@@ -36,11 +36,13 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
+import static jetbrains.buildServer.serverSide.priority.BuildTypeMatcher.buildType;
 import static jetbrains.buildServer.serverSide.priority.Util.getTestDataDir;
 import static jetbrains.buildServer.serverSide.priority.Util.prepareBuildTypes;
 import static jetbrains.buildServer.util.CollectionsUtil.setOf;
+import static jetbrains.buildServer.util.Util.map;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.testng.AssertJUnit.*;
 
 /**
@@ -71,6 +73,15 @@ public class ReadConfigFileTest {
     myEventDispatcher = (EventDispatcher<BuildServerListener>) myContext.mock(EventDispatcher.class);
     myQueue = myContext.mock(BuildQueueEx.class);
     myProjectManager = myContext.mock(ProjectManager.class);
+
+    myContext.checking(new Expectations() {{
+      allowing(myServer).getQueue(); will(returnValue(myQueue));
+      allowing(myServer).getFullServerVersion(); will(returnValue("1.0"));
+      allowing(myServer).getProjectManager(); will(returnValue(myProjectManager));
+      allowing(myQueue).setOrderingStrategy(with(any(BuildQueueOrderingStrategy.class)));
+      allowing(myQueue).getItems(); will(returnValue(Collections.<Object>emptyList()));
+      allowing(myEventDispatcher).addListener(with(any(BuildServerListener.class)));
+    }});
   }
 
   @AfterMethod(alwaysRun = true)
@@ -179,13 +190,13 @@ public class ReadConfigFileTest {
   /** TW-13864 */
   public void test_removed_build_type() throws IOException {
     final States buildTypeState = myContext.states("bt6-state").startsAs("removed");
-    final SBuildType bt6 = Util.createBuildType(myContext, "bt6");
+    final SBuildType bt6 = Util.createBuildType(myContext, "bt6", "bt6");
 
     myContext.checking(new Expectations() {{
       allowing(myProjectManager).findBuildTypeById("bt6"); when(buildTypeState.is("removed")); will(returnValue(null));
+      allowing(myProjectManager).findBuildTypeByExternalId("bt6"); when(buildTypeState.is("removed")); will(returnValue(null));
       allowing(myProjectManager).findBuildTypeById("bt6"); when(buildTypeState.is("recovered")); will(returnValue(bt6));
-      allowing(myProjectManager).findBuildTypes(setOf(bt6.getBuildTypeId())); when(buildTypeState.is("removed")); will(returnValue(emptyList()));
-      allowing(myProjectManager).findBuildTypes(setOf(bt6.getBuildTypeId())); when(buildTypeState.is("recovered")); will(returnValue(asList(bt6)));
+      allowing(myProjectManager).findBuildTypeByExternalId("bt6"); when(buildTypeState.is("recovered")); will(returnValue(bt6));
     }});
     PriorityClassManager priorityClassManager = createPriorityClassManagerForConfig(new File(getTestDataDir(), "build-queue-priorities-removed-build-type.xml"));
 
@@ -209,6 +220,53 @@ public class ReadConfigFileTest {
   }
 
 
+  public void should_support_external_ids() throws Exception {
+    //prepare 2 build types with external ids != internal ids
+    prepareBuildTypes(myContext, myProjectManager, map("bt14", "bt14ExternalId", "bt47", "bt47ExternalId"));
+
+    //load config with external ids
+    FileUtil.copy(new File(getTestDataDir(), "build-queue-priorities-external-id.xml"),
+                  new File(getTestDataDir(), PriorityClassManagerImpl.PRIORITY_CLASS_CONFIG_FILENAME));
+    FileWatcherFactory fwf = new FileWatcherFactory(myServerPaths);
+    fwf.setCleanupManager(new Util.MockServerCleanupManager());
+    PriorityClassManagerImpl pcm = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf);
+    pcm.init();
+
+    SBuildType bt14 = myProjectManager.findBuildTypeByExternalId("bt14ExternalId");
+    SBuildType bt47 = myProjectManager.findBuildTypeByExternalId("bt47ExternalId");
+
+    //ensure build types have right priority classes
+    assertEquals("pc1", pcm.getBuildTypePriorityClass(bt14).getId());
+    assertEquals("pc1", pcm.getBuildTypePriorityClass(bt47).getId());
+    PriorityClass pc1 = pcm.findPriorityClassById("pc1");
+    assertThat(pc1.getBuildTypes(), hasItem(buildType().withId("bt14")));
+    assertThat(pc1.getBuildTypes(), hasItem(buildType().withId("bt47")));
+
+    //create priority class, add build types
+    prepareBuildTypes(myContext, myProjectManager, map("bt2", "bt2ExternalId", "bt3", "bt3ExternalId"));
+    SBuildType bt2 = myProjectManager.findBuildTypeByExternalId("bt2ExternalId");
+    SBuildType bt3 = myProjectManager.findBuildTypeByExternalId("bt3ExternalId");
+    pcm.createPriorityClass("pc2", "description", 10, setOf(bt2, bt3));
+
+    //reread config
+    pcm = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf);
+    pcm.init();
+
+    //ensure build types have right priority classes
+    assertEquals("pc1", pcm.getBuildTypePriorityClass(bt14).getId());
+    assertEquals("pc1", pcm.getBuildTypePriorityClass(bt47).getId());
+    pc1 = pcm.findPriorityClassById("pc1");
+    assertThat(pc1.getBuildTypes(), hasItem(buildType().withId("bt14")));
+    assertThat(pc1.getBuildTypes(), hasItem(buildType().withId("bt47")));
+
+    assertEquals("pc2", pcm.getBuildTypePriorityClass(bt2).getId());
+    assertEquals("pc2", pcm.getBuildTypePriorityClass(bt3).getId());
+    pc1 = pcm.findPriorityClassById("pc2");
+    assertThat(pc1.getBuildTypes(), hasItem(buildType().withId("bt2")));
+    assertThat(pc1.getBuildTypes(), hasItem(buildType().withId("bt3")));
+  }
+
+
   private PriorityClassManager createPriorityClassManagerForConfig(File prioritiesConfig) throws IOException {
     if (prioritiesConfig != null) {
       FileUtil.copy(prioritiesConfig, new File(getTestDataDir(), PriorityClassManagerImpl.PRIORITY_CLASS_CONFIG_FILENAME));
@@ -217,15 +275,6 @@ public class ReadConfigFileTest {
     }
 
     Map<String, SBuildType> id2buildType = prepareBuildTypes(myContext, myProjectManager, "bt14", "bt47", "bt1", "bt3", "bt5");
-
-    myContext.checking(new Expectations() {{
-      allowing(myServer).getQueue(); will(returnValue(myQueue));
-      allowing(myServer).getFullServerVersion(); will(returnValue("1.0"));
-      allowing(myServer).getProjectManager(); will(returnValue(myProjectManager));
-      allowing(myQueue).setOrderingStrategy(with(any(BuildQueueOrderingStrategy.class)));
-      allowing(myQueue).getItems(); will(returnValue(Collections.<Object>emptyList()));
-      allowing(myEventDispatcher).addListener(with(any(BuildServerListener.class)));
-    }});
 
     FileWatcherFactory fwf = new FileWatcherFactory(myServerPaths);
     fwf.setCleanupManager(new Util.MockServerCleanupManager());

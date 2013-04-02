@@ -34,14 +34,14 @@ public class PriorityClassImpl implements PriorityClass, Comparable<PriorityClas
   private final String myName;
   private final String myDescription;
   private final int myPriority;
-  private final Set<String> myBuildTypeIds;
+  private final Set<String> myExternalIds;
 
   public PriorityClassImpl(@NotNull ProjectManager projectManager,
                            @NotNull String id,
                            @NotNull String name,
                            @NotNull String description,
                            int priority,
-                           @NotNull Collection<String> buildTypeIds) throws InvalidPriorityClassNameException, InvalidPriorityClassDescriptionException {
+                           @NotNull Collection<String> externalIds) throws InvalidPriorityClassNameException, InvalidPriorityClassDescriptionException {
     checkNameIsCorrect(name);
     checkDescriptionIsCorrect(description);
     checkPriorityIsCorrect(priority);
@@ -50,7 +50,7 @@ public class PriorityClassImpl implements PriorityClass, Comparable<PriorityClas
     myName = name;
     myDescription = description;
     myPriority = priority;
-    myBuildTypeIds = new HashSet<String>(buildTypeIds);
+    myExternalIds = new HashSet<String>(externalIds);
   }
 
   @NotNull
@@ -74,11 +74,17 @@ public class PriorityClassImpl implements PriorityClass, Comparable<PriorityClas
 
   @NotNull
   public List<SBuildType> getBuildTypes() {
-    return new ArrayList<SBuildType>(myProjectManager.findBuildTypes(getBuildTypeIds()));
+    List<SBuildType> bts = new ArrayList<SBuildType>();
+    for (String externalId : getExternalIds()) {
+      SBuildType bt = myProjectManager.findBuildTypeByExternalId(externalId);
+      if (bt != null)
+        bts.add(bt);
+    }
+    return bts;
   }
 
-  Set<String> getBuildTypeIds() {
-    return new HashSet<String>(myBuildTypeIds);
+   Set<String> getExternalIds() {
+    return new HashSet<String>(myExternalIds);
   }
 
   public boolean isDefaultPriorityClass() {
@@ -91,26 +97,42 @@ public class PriorityClassImpl implements PriorityClass, Comparable<PriorityClas
 
   @NotNull
   public PriorityClass addBuildTypes(@NotNull final Collection<String> buildTypeIds) {
-    Set<String> newBuildTypeIds = new HashSet<String>(myBuildTypeIds);
-    newBuildTypeIds.addAll(buildTypeIds);
-    return new PriorityClassImpl(myProjectManager, myId, myName, myDescription, myPriority, newBuildTypeIds);
+    Set<String> newExternalIds = new HashSet<String>(myExternalIds);
+    for (String btId : buildTypeIds) {
+      SBuildType bt = myProjectManager.findBuildTypeById(btId);
+      if (bt != null)
+        newExternalIds.add(bt.getExternalId());
+    }
+    return new PriorityClassImpl(myProjectManager, myId, myName, myDescription, myPriority, newExternalIds);
   }
 
   @NotNull
   public PriorityClass removeBuildTypes(@NotNull final Collection<String> buildTypeIds) {
-    Set<String> newBuildTypeIds = new HashSet<String>(myBuildTypeIds);
-    newBuildTypeIds.removeAll(buildTypeIds);
-    return new PriorityClassImpl(myProjectManager, myId, myName, myDescription, myPriority, newBuildTypeIds);
+    Set<String> newExternalIds = new HashSet<String>(myExternalIds);
+    for (String btId : buildTypeIds) {
+      SBuildType bt = myProjectManager.findBuildTypeById(btId);
+      if (bt != null)
+        newExternalIds.remove(bt.getExternalId());
+    }
+    return new PriorityClassImpl(myProjectManager, myId, myName, myDescription, myPriority, newExternalIds);
   }
 
   @NotNull
   public PriorityClass setPriority(final int priority) {
-    return new PriorityClassImpl(myProjectManager, myId, myName, myDescription, priority, myBuildTypeIds);
+    return new PriorityClassImpl(myProjectManager, myId, myName, myDescription, priority, myExternalIds);
   }
 
   @NotNull
-  public PriorityClass update(@NotNull final String name, @NotNull final String description, final int priority, @NotNull final Collection<String> buildTypeIds) {
-    return new PriorityClassImpl(myProjectManager, myId, name, description, priority, buildTypeIds);
+  public PriorityClass update(@NotNull final String name, @NotNull final String description, final int priority, @NotNull final Collection<String> externalIds) {
+    return new PriorityClassImpl(myProjectManager, myId, name, description, priority, externalIds);
+  }
+
+  @NotNull
+  public PriorityClass updateExternalId(@NotNull final String oldExternalId, @NotNull final String newExternalId) {
+    Set<String> newExternalIds = new HashSet<String>(myExternalIds);
+    newExternalIds.remove(oldExternalId);
+    newExternalIds.add(newExternalId);
+    return new PriorityClassImpl(myProjectManager, myId, myName, myDescription, myPriority, newExternalIds);
   }
 
   @Override
