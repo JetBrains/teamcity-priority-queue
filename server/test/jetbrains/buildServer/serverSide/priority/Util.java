@@ -17,7 +17,9 @@
 package jetbrains.buildServer.serverSide.priority;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import jetbrains.buildServer.buildTriggers.scheduler.Time;
 import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SBuildType;
@@ -25,7 +27,6 @@ import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.serverSide.cleanup.CleanupCannotBeStartedException;
 import jetbrains.buildServer.serverSide.cleanup.CleanupProcessState;
 import jetbrains.buildServer.serverSide.cleanup.ServerCleanupManager;
-import jetbrains.buildServer.serverSide.impl.cleanup.DefaultCleanupSettings;
 import jetbrains.buildServer.users.SUser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -93,8 +94,6 @@ final class Util {
   }
 
   static class MockServerCleanupManager implements ServerCleanupManager {
-    @NotNull
-    public DefaultCleanupSettings getDefaultCleanupSettings() {throw new UnsupportedOperationException();}
     public void setCleanupStartTime(@Nullable final Time time) {throw new UnsupportedOperationException();}
 
     public void setMaxCleanupDuration(final int durationSecs) {}
