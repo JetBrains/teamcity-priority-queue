@@ -96,10 +96,18 @@ final class Util {
   static class MockServerCleanupManager implements ServerCleanupManager {
     public void setCleanupStartTime(@Nullable final Time time) {throw new UnsupportedOperationException();}
 
+    public void setCleanupEnabled(final boolean enabled) {
+    }
+
+    public boolean isCleanupEnabled() {
+      return false;
+    }
+
     public void setMaxCleanupDuration(final int durationSecs) {}
 
     public int getMaxCleanupDuration() { return 0; }
 
+    @NotNull
     public Time getCleanupStartTime() {throw new UnsupportedOperationException();}
     @NotNull
     public CleanupProcessState getCleanupState() {throw new UnsupportedOperationException();}
