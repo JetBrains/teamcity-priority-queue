@@ -23,6 +23,7 @@ import jetbrains.buildServer.TempFiles;
 import jetbrains.buildServer.TestLogger;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.*;
+import jetbrains.buildServer.serverSide.impl.CriticalErrorsImpl;
 import jetbrains.buildServer.serverSide.impl.FileWatcherFactory;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.FileUtil;
@@ -85,7 +86,7 @@ public class PriorityClassManagerTest {
       allowing(myProjectManager).getAllBuildTypes(); will(returnValue(Collections.<SBuildType>emptyList()));
     }});
 
-    FileWatcherFactory fwf = new FileWatcherFactory(serverPaths);
+    FileWatcherFactory fwf = new FileWatcherFactory(serverPaths, new CriticalErrorsImpl());
     fwf.setCleanupManager(new Util.MockServerCleanupManager());
     myPriorityClassManager = new PriorityClassManagerImpl(server, serverPaths, eventDispatcher, fwf);
     myStrategy = new BuildQueuePriorityOrdering(myQueue, myPriorityClassManager);
