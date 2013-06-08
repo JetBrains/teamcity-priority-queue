@@ -86,8 +86,9 @@ public class PriorityClassManagerTest {
       allowing(myProjectManager).getAllBuildTypes(); will(returnValue(Collections.<SBuildType>emptyList()));
     }});
 
-    FileWatcherFactory fwf = new FileWatcherFactory(serverPaths, new CriticalErrorsImpl());
+    FileWatcherFactory fwf = new FileWatcherFactory(serverPaths, new CriticalErrorsImpl(), eventDispatcher);
     fwf.setCleanupManager(new Util.MockServerCleanupManager());
+    fwf.serverStarted();
     myPriorityClassManager = new PriorityClassManagerImpl(server, serverPaths, eventDispatcher, fwf);
     myStrategy = new BuildQueuePriorityOrdering(myQueue, myPriorityClassManager);
     myListener = new ServerListener(eventDispatcher, myQueue, myStrategy, myPriorityClassManager);
