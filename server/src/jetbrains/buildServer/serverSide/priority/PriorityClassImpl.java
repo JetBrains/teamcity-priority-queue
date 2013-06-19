@@ -123,8 +123,8 @@ public class PriorityClassImpl implements PriorityClass, Comparable<PriorityClas
   }
 
   @NotNull
-  public PriorityClass update(@NotNull final String name, @NotNull final String description, final int priority, @NotNull final Collection<String> externalIds) {
-    return new PriorityClassImpl(myProjectManager, myId, name, description, priority, externalIds);
+  public PriorityClass update(@NotNull final String name, @NotNull final String description, final int priority) {
+    return new PriorityClassImpl(myProjectManager, myId, name, description, priority, getExternalIds());
   }
 
   @NotNull

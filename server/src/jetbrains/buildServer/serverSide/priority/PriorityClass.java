@@ -83,7 +83,7 @@ public interface PriorityClass {
   PriorityClass setPriority(int priority);
 
   @NotNull
-  PriorityClass update(@NotNull String name, @NotNull String description, int priority, @NotNull Collection<String> buildTypeIds);
+  PriorityClass update(@NotNull String name, @NotNull String description, int priority);
 
   @NotNull
   PriorityClass updateExternalId(@NotNull String oldExternalId, @NotNull String newExternalId);

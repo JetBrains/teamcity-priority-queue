@@ -84,7 +84,9 @@ public class EditPriorityClassController extends BaseFormXmlController {
           myPriorityClassManager.savePriorityClass(updatedPersonal);
         } else {
           pb.validate();
-          PriorityClass updatedPriorityClass = priorityClass.setPriority(pb.getPriorityClassPriorityInt());
+          PriorityClass updatedPriorityClass = priorityClass.update(pb.getPriorityClassName(),
+                                                                    pb.getPriorityClassDescription(),
+                                                                    pb.getPriorityClassPriorityInt());
           myPriorityClassManager.savePriorityClass(updatedPriorityClass);
         }
       } catch (DuplicatePriorityClassNameException e) {

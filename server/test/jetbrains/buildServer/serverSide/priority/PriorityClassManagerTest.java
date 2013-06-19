@@ -111,7 +111,7 @@ public class PriorityClassManagerTest {
     int defaultPriority = defaultPriorityClass.getPriority();
     List<SBuildType> defaultBuildTypes = defaultPriorityClass.getBuildTypes();
 
-    PriorityClass update = defaultPriorityClass.update("Usual Priority Class", "New description", 10, asList(createBuildType(myContext, "bt1").getBuildTypeId()));
+    PriorityClass update = defaultPriorityClass.update("Usual Priority Class", "New description", 10);
     myPriorityClassManager.savePriorityClass(update);
 
     defaultPriorityClass = myPriorityClassManager.getDefaultPriorityClass();
@@ -128,7 +128,7 @@ public class PriorityClassManagerTest {
     String defaultDescription = personalPriorityClass.getDescription();
     List<SBuildType> defaultBuildTypes = personalPriorityClass.getBuildTypes();
 
-    PriorityClass update = personalPriorityClass.update("Usual Priority Class", "New description", 10, asList(createBuildType(myContext, "bt1").getBuildTypeId()));
+    PriorityClass update = personalPriorityClass.update("Usual Priority Class", "New description", 10);
     myPriorityClassManager.savePriorityClass(update);
 
     personalPriorityClass = myPriorityClassManager.getPersonalPriorityClass();
