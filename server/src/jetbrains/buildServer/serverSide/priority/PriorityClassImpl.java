@@ -158,22 +158,22 @@ public class PriorityClassImpl implements PriorityClass, Comparable<PriorityClas
 
   public static void checkNameIsCorrect(@NotNull String name) {
     if (name.trim().length() == 0) {
-      throw new InvalidPriorityClassNameException("Name must be specified");
+      throw new InvalidPriorityClassNameException("The name must be specified");
     }
     if (name.trim().length() > 255) {
-      throw new InvalidPriorityClassNameException("Name is too long");
+      throw new InvalidPriorityClassNameException("The name is too long");
     }
   }
 
   public static void checkDescriptionIsCorrect(@NotNull String description) {
     if (description.length() > 2000) {
-      throw new InvalidPriorityClassDescriptionException("Description is too long");
+      throw new InvalidPriorityClassDescriptionException("The description is too long");
     }
   }
 
   public static void checkPriorityIsCorrect(int priority) {
     if (priority < -100 || priority > 100) {
-      throw new InvalidPriorityClassPriorityException("Priority should be in interval [-100..100]");
+      throw new InvalidPriorityClassPriorityException("The priority must be within [-100..100]");
     }
   }
 }
