@@ -458,7 +458,8 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
 
           FileUtil.saveDocument(document, myConfigFile);
         } catch (Exception e) {
-          myLogger.error(e);
+          myLogger.error("Error saving priority classes: "+ e.toString());
+          myLogger.debug(e.getMessage(), e);
         }
       }
     });
