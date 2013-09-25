@@ -113,10 +113,10 @@ public class AttachBuildTypesController extends BaseFormXmlController {
   private List<AttachConfigurationsBean.SBuildTypeWithPriority> findConfigurations(final PriorityClass priorityClass, final String searchString) {
     List<AttachConfigurationsBean.SBuildTypeWithPriority> result = new ArrayList<AttachConfigurationsBean.SBuildTypeWithPriority>();
     final Pattern pattern = Pattern.compile(".*\\b" + searchString + ".*", Pattern.CASE_INSENSITIVE); 
-    List<SBuildType> buildTypes = myProjectManager.getAllBuildTypes();
+    List<SBuildType> buildTypes = myProjectManager.getActiveBuildTypes();
     buildTypes.removeAll(priorityClass.getBuildTypes());
     for (SBuildType bt : buildTypes) {
-      if (pattern.matcher(bt.getProjectName() + " " + bt.getName()).matches()) {
+      if (pattern.matcher(bt.getFullName()).matches()) {
         PriorityClass pc = myPriorityClassManager.getBuildTypePriorityClass(bt);
         result.add(new AttachConfigurationsBean.SBuildTypeWithPriority(bt, pc));
       }
