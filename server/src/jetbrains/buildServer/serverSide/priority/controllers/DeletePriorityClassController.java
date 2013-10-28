@@ -42,8 +42,8 @@ import static jetbrains.buildServer.serverSide.priority.controllers.Util.getBuil
 public class DeletePriorityClassController extends BaseFormXmlController {
 
   private static final PriorityClassNameComparator PRIORITY_CLASS_NAME_COMPARATOR = new PriorityClassNameComparator();
-  private PriorityClassManager myPriorityClassManager;
-  private PluginDescriptor myPluginDescriptor;
+  private final PriorityClassManager myPriorityClassManager;
+  private final PluginDescriptor myPluginDescriptor;
 
   public DeletePriorityClassController(@NotNull final SBuildServer server,
                                        @NotNull final PriorityClassManager pClassManager,

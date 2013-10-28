@@ -32,8 +32,8 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class PriorityClassListController extends BaseController {
 
-  private PluginDescriptor myPluginDescriptor;
-  private PriorityClassManager myPriorityClassManager;
+  private final PluginDescriptor myPluginDescriptor;
+  private final PriorityClassManager myPriorityClassManager;
 
   public PriorityClassListController(@NotNull final PluginDescriptor pluginDescriptor,
                                      @NotNull final WebControllerManager manager,

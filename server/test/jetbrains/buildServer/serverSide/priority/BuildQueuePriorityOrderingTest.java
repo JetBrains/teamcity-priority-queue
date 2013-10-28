@@ -48,7 +48,7 @@ public class BuildQueuePriorityOrderingTest {
 
   private static final File PLUGIN_CONFIG_FILE = new File(getTestDataDir(), PriorityClassManagerImpl.PRIORITY_CLASS_CONFIG_FILENAME);
 
-  private TempFiles myTempFiles = new TempFiles();
+  private final TempFiles myTempFiles = new TempFiles();
   private Mockery myContext;
   private BuildQueue myQueue;
   private BuildQueuePriorityOrdering myStrategy;

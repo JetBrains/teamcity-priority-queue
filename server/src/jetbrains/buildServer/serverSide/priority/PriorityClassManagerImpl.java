@@ -70,10 +70,10 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
   private final Map<String, String> myBuildTypePriorityClasses = new HashMap<String, String>();//external id -> priorityClass id
   private final AtomicInteger myPriorityClassIdSequence = new AtomicInteger(1);
   private final SBuildServer myServer;
-  private FileWatcherFactory myFileWatcherFactory;
+  private final FileWatcherFactory myFileWatcherFactory;
   private FileWatcher myConfigFileWatcher;
   private int myUpdateConfigInterval;
-  private EventDispatcher<BuildServerListener> myServerDispatcher;
+  private final EventDispatcher<BuildServerListener> myServerDispatcher;
   private final ReentrantReadWriteLock myLock = new ReentrantReadWriteLock();
 
   public PriorityClassManagerImpl(@NotNull final SBuildServer server,

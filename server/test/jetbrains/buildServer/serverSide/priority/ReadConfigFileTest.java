@@ -52,7 +52,7 @@ import static org.testng.AssertJUnit.*;
 @Test
 public class ReadConfigFileTest {
 
-  private TempFiles myTempFiles = new TempFiles();
+  private final TempFiles myTempFiles = new TempFiles();
   private Mockery myContext;
   private SBuildServer myServer;
   private ServerPaths myServerPaths;

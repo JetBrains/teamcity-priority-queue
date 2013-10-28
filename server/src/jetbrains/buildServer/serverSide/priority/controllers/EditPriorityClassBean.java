@@ -34,7 +34,7 @@ public class EditPriorityClassBean {
   private String myPriorityClassId;
   private boolean myPersonal;
   private String myEditAction = "create";
-  private CameFromSupport myCameFromSupport = new CameFromSupport();
+  private final CameFromSupport myCameFromSupport = new CameFromSupport();
 
   EditPriorityClassBean() {
     myPriorityClassName = "";

@@ -31,7 +31,7 @@ public final class BuildQueuePriorityOrdering implements BuildQueueOrderingStrat
 
   private static final long DEFAULT_DURATION = 10 * 60;//10 minutes
 
-  private Logger myLogger = Logger.getLogger(BuildQueuePriorityOrdering.class.getName());
+  private final Logger myLogger = Logger.getLogger(BuildQueuePriorityOrdering.class.getName());
   //Next 3 maps use SQueuedBuild.getItemId() as keys, because SQueuedBuild doesn't implement equals and hashCode:
   private final Map<String, Double> myItemWeights = new HashMap<String, Double>();
   private final Map<String, Integer> myMovedItemsPriorities = new HashMap<String, Integer>();
