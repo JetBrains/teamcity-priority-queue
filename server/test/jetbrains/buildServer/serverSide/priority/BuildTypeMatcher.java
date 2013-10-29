@@ -20,9 +20,7 @@ class BuildTypeMatcher extends TypeSafeMatcher<SBuildType> {
 
   @Override
   public boolean matchesSafely(final SBuildType item) {
-    if (myBuildTypeId != null && !myBuildTypeId.equals(item.getBuildTypeId()))
-      return false;
-    return true;
+    return myBuildTypeId == null || myBuildTypeId.equals(item.getBuildTypeId());
   }
 
   public void describeTo(final Description description) {
