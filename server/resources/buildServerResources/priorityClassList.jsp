@@ -119,7 +119,7 @@
                   <span title="This priority class cannot be changed">N/A</span>
                 </c:when>
                 <c:otherwise>
-                  <a href="${editUrl}">edit</a>
+                  <a href="${editUrl}">Edit</a>
                 </c:otherwise>
               </c:choose>
             </td>
@@ -133,7 +133,7 @@
                   <span title="This priority class cannot be deleted">N/A</span>
                 </c:when>
                 <c:otherwise>
-                  <a href="#" onclick="BS.DeletePriorityClassDialog.showDeleteDialog('${pClass.id}', function() {BS.PriorityClassActions.refreshPriorityClassList()}); return false">delete</a>
+                  <a href="#" onclick="BS.DeletePriorityClassDialog.showDeleteDialog('${pClass.id}', function() {BS.PriorityClassActions.refreshPriorityClassList()}); return false">Delete</a>
                 </c:otherwise>
               </c:choose>
             </td>
