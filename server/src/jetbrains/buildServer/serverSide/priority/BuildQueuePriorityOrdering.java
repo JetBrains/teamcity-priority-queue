@@ -95,15 +95,15 @@ public final class BuildQueuePriorityOrdering implements BuildQueueOrderingStrat
         if (previousItem != null) {
           Double previousItemWeight = getItemWeight(previousItem.getItemId());
           Double nextItemWeight = getItemWeight(nextItem.getItemId());
-          myLogger.info(String.format("New item %s with weight %.2f inserted at position %d instead of %d, between items %s (weight %.2f) and %s (weight %.2f)",
+          myLogger.info(String.format(Locale.ENGLISH, "New item %s with weight %.2f inserted at position %d instead of %d, between items %s (weight %.2f) and %s (weight %.2f)",
                   item.toString(), weight, position, defaultPosition, previousItem, previousItemWeight, nextItem, nextItemWeight));
         } else {
           Double nextItemWeight = getItemWeight(nextItem.getItemId());
-          myLogger.info(String.format("New item %s with weight %.2f inserted at position %d instead of %d, before item %s (weight %.2f)",
+          myLogger.info(String.format(Locale.ENGLISH, "New item %s with weight %.2f inserted at position %d instead of %d, before item %s (weight %.2f)",
                   item.toString(), weight, position, defaultPosition, nextItem, nextItemWeight));
         }
       } else {
-        myLogger.info(String.format("New item %s with weight %.2f inserted at the default position %d in the end of the queue",
+        myLogger.info(String.format(Locale.ENGLISH, "New item %s with weight %.2f inserted at the default position %d in the end of the queue",
                   item.toString(), weight, position));
       }
     }
