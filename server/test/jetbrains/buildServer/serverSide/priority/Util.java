@@ -103,6 +103,10 @@ final class Util {
       return false;
     }
 
+    public boolean isCompactingDatabase() {
+      return false;
+    }
+
     public void setMaxCleanupDuration(final int durationSecs) {}
 
     public int getMaxCleanupDuration() { return 0; }
