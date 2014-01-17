@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2014 JetBrains s.r.o.
+ * Copyright 2000-2013 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -537,7 +537,7 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
         String buildTypeId = e.getAttributeValue(BUILD_TYPE_ID_ATTRIBUTE);
         if (buildTypeId != null && !"".equals(buildTypeId)) {
           if (myBuildTypeIds == null) {
-            myBuildTypeIds = new HashSet<String>();
+            myBuildTypeIds = new TreeSet<String>();
           }
           myBuildTypeIds.add(buildTypeId);
         }
@@ -550,7 +550,7 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
       if (myBuildTypeIds != null) {
         return myBuildTypeIds;
       } else {
-        return new HashSet<String>();
+        return new TreeSet<String>();
       }
     }
   }

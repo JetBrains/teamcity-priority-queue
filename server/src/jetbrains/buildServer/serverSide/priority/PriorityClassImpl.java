@@ -1,5 +1,5 @@
 /*
- * Copyright 2000-2014 JetBrains s.r.o.
+ * Copyright 2000-2013 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ public class PriorityClassImpl implements PriorityClass, Comparable<PriorityClas
     myName = name;
     myDescription = description;
     myPriority = priority;
-    myExternalIds = new HashSet<String>(externalIds);
+    myExternalIds = new TreeSet<String>(externalIds);
   }
 
   @NotNull
@@ -84,7 +84,7 @@ public class PriorityClassImpl implements PriorityClass, Comparable<PriorityClas
   }
 
    Set<String> getExternalIds() {
-    return new HashSet<String>(myExternalIds);
+    return new TreeSet<String>(myExternalIds);
   }
 
   public boolean isDefaultPriorityClass() {
