@@ -47,7 +47,6 @@
     <input type="hidden" name="priorityClassId" value="<c:out value='${priorityClassId}'/>"/>
 
     <div class="popupSaveButtonsBlock">
-      <forms:cancel onclick="BS.DeletePriorityClassDialog.close()"/>
       <c:choose>
         <c:when test="${showList}">
           <forms:submit label="Apply"/>
@@ -56,6 +55,7 @@
           <forms:submit label="Delete"/>
         </c:otherwise>
       </c:choose>
+      <forms:cancel onclick="BS.DeletePriorityClassDialog.close()"/>
       <forms:saving id="deletePriorityClassProgress"/>
     </div>
   </bs:modalDialog>

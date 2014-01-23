@@ -75,8 +75,8 @@
 
         <c:if test="${foundConfigurationsNum > 0}">
           <div class="popupSaveButtonsBlock">
-            <forms:cancel onclick="BS.AttachConfigurationsToClassDialog.close()"/>
             <forms:submit type="button" label="Add to class" onclick="BS.AttachConfigurationsToClassDialog.submit()"/>
+            <forms:cancel onclick="BS.AttachConfigurationsToClassDialog.close()"/>
             <forms:saving id="attachProgress"/>
           </div>
         </c:if>
