@@ -88,8 +88,8 @@
       <input type="hidden" id="priorityClassId" value="${priorityClassBean.priorityClassId}"/>
 
       <div class="priorityClassSaveButtonsBlock">
-        <forms:cancel cameFromSupport="${priorityClassBean.cameFromSupport}"/>
         <forms:submit type="submit" label="Save"/>
+        <forms:cancel cameFromSupport="${priorityClassBean.cameFromSupport}"/>
         <forms:saving id="editPriorityClassProgress"/>
       </div>
 

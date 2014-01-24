@@ -72,8 +72,8 @@
       <input type="hidden" id="afterCreateLocation" value="<c:url value='${teamcityPluginResourcesPath}editPriorityClass.html'/>"/>
 
       <div class="priorityClassSaveButtonsBlock">
-        <forms:cancel cameFromSupport="${priorityClassBean.cameFromSupport}"/>
         <forms:submit label="Create"/>
+        <forms:cancel cameFromSupport="${priorityClassBean.cameFromSupport}"/>
         <forms:saving id="createPriorityClassProgress"/>
       </div>
 
