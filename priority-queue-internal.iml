@@ -31,7 +31,7 @@
     <orderEntry type="library" name="Spring-Framework-3.0-web" level="project" />
     <orderEntry type="library" name="Spring-Framework-3.0" level="project" />
     <orderEntry type="module" module-name="web-openapi" />
-    <orderEntry type="module" module-name="test-api" scope="TEST" />
+    <orderEntry type="module" module-name="test-api" />
   </component>
 </module>
 
