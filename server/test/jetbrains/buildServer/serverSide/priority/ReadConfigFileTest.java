@@ -37,13 +37,13 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import static jetbrains.buildServer.matcher.IsCollectionContainingMatcher.hasItem;
 import static jetbrains.buildServer.serverSide.priority.BuildTypeMatcher.buildType;
 import static jetbrains.buildServer.serverSide.priority.Util.getTestDataDir;
 import static jetbrains.buildServer.serverSide.priority.Util.prepareBuildTypes;
 import static jetbrains.buildServer.util.CollectionsUtil.setOf;
 import static jetbrains.buildServer.util.Util.map;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
 import static org.testng.AssertJUnit.*;
 
 /**

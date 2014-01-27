@@ -37,11 +37,12 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static java.util.Arrays.asList;
+import static jetbrains.buildServer.matcher.IsCollectionContainingMatcher.hasItem;
 import static jetbrains.buildServer.serverSide.priority.BuildTypeMatcher.buildType;
-import static jetbrains.buildServer.serverSide.priority.Util.*;
+import static jetbrains.buildServer.serverSide.priority.Util.getTestDataDir;
+import static jetbrains.buildServer.serverSide.priority.Util.prepareBuildTypes;
 import static jetbrains.buildServer.util.Util.map;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNotNull;
 
