@@ -58,12 +58,11 @@
           </table>
 
           <c:if test="${canAddRemoveConfigurations}">
-            <div class="saveButtonsBlock">
-              <input class="btn" type="submit" name="detachBuildTypes" value="Remove from priority class"/>
+            <div class="saveButtonsBlock saveButtonsBlockRight">
               <forms:saving id="unassignInProgress" className="progressRingInline"/>
+              <input class="btn" type="submit" name="detachBuildTypes" value="Remove from priority class"/>
+              <input type="hidden" name="pClassId" value="${priorityClass.id}"/>
             </div>
-
-            <input type="hidden" name="pClassId" value="${priorityClass.id}"/>
           </c:if>
         </form>
       </c:if>
