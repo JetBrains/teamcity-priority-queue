@@ -183,7 +183,7 @@ public final class BuildQueuePriorityOrdering implements BuildQueueOrderingStrat
    * @param newQueueOrder new order of build queue
    */
   private void updateMovedItemsPriorities(List<SQueuedBuild> newQueueOrder) {
-    if (myLastResult.size() != newQueueOrder.size())
+    if (myLastResult.size() > newQueueOrder.size())
       myLogger.warn("Wrong queued builds, last result: " + myLastResult + ", new order: " + newQueueOrder);
     if (!myLastResult.isEmpty()) {
       for (int i = 0; i < myLastResult.size(); i++) {
