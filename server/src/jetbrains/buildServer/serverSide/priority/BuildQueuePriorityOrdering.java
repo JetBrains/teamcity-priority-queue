@@ -50,12 +50,9 @@ public final class BuildQueuePriorityOrdering implements BuildQueueOrderingStrat
     myWaitCoefficient = parseDouble(TeamCityProperties.getProperty("teamcity.buildqueue.waitWeight", "1.0"));
   }
 
-  /*
-   * This method is called under sync of BuildQueue
-   */
   @NotNull
-  public List<SQueuedBuild> addBuilds(@NotNull final List<SQueuedBuild> itemsToAdd,
-                                      @NotNull final List<SQueuedBuild> currentQueueItems) {
+  public synchronized List<SQueuedBuild> addBuilds(@NotNull final List<SQueuedBuild> itemsToAdd,
+                                                   @NotNull final List<SQueuedBuild> currentQueueItems) {
     try {
       clearDataOfRemovedItems(currentQueueItems);
       ensureHaveDataOnCurrentItems(currentQueueItems);
@@ -186,6 +183,8 @@ public final class BuildQueuePriorityOrdering implements BuildQueueOrderingStrat
    * @param newQueueOrder new order of build queue
    */
   private void updateMovedItemsPriorities(List<SQueuedBuild> newQueueOrder) {
+    if (myLastResult.size() != newQueueOrder.size())
+      myLogger.warn("Wrong queued builds, last result: " + myLastResult + ", new order: " + newQueueOrder);
     if (!myLastResult.isEmpty()) {
       for (int i = 0; i < myLastResult.size(); i++) {
         SQueuedBuild lastResultItem = myLastResult.get(i);
