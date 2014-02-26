@@ -43,7 +43,10 @@
 
   <jsp:attribute name="body_include">
     <bs:refreshable containerId="priorityClassList" pageUrl="${pageUrl}">
-      <p>The higher priority a configuration has - the higher place it gets when added to the Build Queue.</p>
+      <p>
+        The higher priority a configuration has - the higher place it gets when added to
+        the Build Queue<bs:help file="Ordering+Build+Queue#OrderingBuildQueue-ManagingBuildPriorities"/>
+      </p>
       <bs:messages key="priorityClassCreated"/>
       <bs:messages key="priorityClassDeleted"/>
       <bs:messages key="priorityClassNotFound"/>
