@@ -128,16 +128,16 @@ public final class BuildQueuePriorityOrdering implements BuildQueueOrderingStrat
    * contain only data for currentQueueItems.
    * @param currentQueueItems
    */
-  private void clearDataOfRemovedItems(List<SQueuedBuild> currentQueueItems) {
-    List<String> currentItemIds = CollectionsUtil.convertCollection(currentQueueItems, new Converter<String, SQueuedBuild>() {
+  private void clearDataOfRemovedItems(@NotNull List<SQueuedBuild> currentQueueItems) {
+    Set<String> currentItemIds = new HashSet<String>(CollectionsUtil.convertCollection(currentQueueItems, new Converter<String, SQueuedBuild>() {
       public String createFrom(@NotNull SQueuedBuild source) {
         return source.getItemId();
       }
-    });
+    }));
     myItemWeights.keySet().retainAll(currentItemIds);
     myMovedItemsPriorities.keySet().retainAll(currentItemIds);
-    myLastResult.retainAll(currentQueueItems);
     myPrioritiesOnTheInsertMoment.keySet().retainAll(currentItemIds);
+    myLastResult.retainAll(currentQueueItems);
   }
 
   //Should be called after clearDataOfRemovedItems()
