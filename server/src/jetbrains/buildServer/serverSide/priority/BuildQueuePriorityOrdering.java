@@ -67,7 +67,12 @@ public final class BuildQueuePriorityOrdering implements BuildQueueOrderingStrat
   }
 
   private void addNewItems(final List<SQueuedBuild> itemsToAdd, final List<SQueuedBuild> currentQueueItems) {
+    Set<String> buildIds = getIds(currentQueueItems);
     for (SQueuedBuild item: itemsToAdd) {
+      if (buildIds.contains(item.getItemId())) {
+        myLogger.info("The current queue items alredy contain the build " + item + ", don't add it to the priority order");
+        continue;
+      }
       int buildTypePriority = getCurrentBuildTypePriority(item);
       double weight = myPriorityCoefficient * buildTypePriority;
       int position = getNewItemPosition(weight, currentQueueItems);
@@ -129,15 +134,21 @@ public final class BuildQueuePriorityOrdering implements BuildQueueOrderingStrat
    * @param currentQueueItems
    */
   private void clearDataOfRemovedItems(@NotNull List<SQueuedBuild> currentQueueItems) {
-    Set<String> currentItemIds = new HashSet<String>(CollectionsUtil.convertCollection(currentQueueItems, new Converter<String, SQueuedBuild>() {
-      public String createFrom(@NotNull SQueuedBuild source) {
-        return source.getItemId();
-      }
-    }));
+    Set<String> currentItemIds = getIds(currentQueueItems);
     myItemWeights.keySet().retainAll(currentItemIds);
     myMovedItemsPriorities.keySet().retainAll(currentItemIds);
     myPrioritiesOnTheInsertMoment.keySet().retainAll(currentItemIds);
     myLastResult.retainAll(currentQueueItems);
+  }
+
+
+  @NotNull
+  private HashSet<String> getIds(@NotNull List<SQueuedBuild> currentQueueItems) {
+    return new HashSet<String>(CollectionsUtil.convertCollection(currentQueueItems, new Converter<String, SQueuedBuild>() {
+      public String createFrom(@NotNull SQueuedBuild source) {
+        return source.getItemId();
+      }
+    }));
   }
 
   //Should be called after clearDataOfRemovedItems()

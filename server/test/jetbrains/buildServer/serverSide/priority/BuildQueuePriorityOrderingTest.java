@@ -119,6 +119,21 @@ public class BuildQueuePriorityOrderingTest {
   }
 
 
+  public void order_should_not_contain_duplicates() {
+    Map<String, SBuildType> id2buildType = prepareBuildTypes(myContext, myProjectManager, "bt1", "bt2", "bt3");
+
+    addBuilds(myCurrentQueueItems, createQueuedBuild(id2buildType.get("bt1"), 60));
+    assertOrder(myCurrentQueueItems, "bt1");
+
+    //items to add contain elements from current items
+    myCurrentQueueItems = addBuilds(myCurrentQueueItems, myCurrentQueueItems.get(0), createQueuedBuild(id2buildType.get("bt2"), 60));
+    assertOrder(myCurrentQueueItems, "bt1", "bt2");
+
+    myCurrentQueueItems = addBuilds(myCurrentQueueItems, myCurrentQueueItems.get(0), myCurrentQueueItems.get(1), createQueuedBuild(id2buildType.get("bt3"), 60));
+    assertOrder(myCurrentQueueItems, "bt1", "bt2", "bt3");
+  }
+
+
   public void test_simple_priorities() throws IOException {
     Map<String, SBuildType> id2buildType = prepareBuildTypes(myContext, myProjectManager, "bt1", "bt2", "bt3", "bt4");
     readConfig("build-queue-priorities-simple.xml");
