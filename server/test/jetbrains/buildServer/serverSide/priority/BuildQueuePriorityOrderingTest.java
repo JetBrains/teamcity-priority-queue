@@ -175,14 +175,14 @@ public class BuildQueuePriorityOrderingTest {
             createQueuedBuild(id2buildType.get("bt3"), 60));
     assertOrder(myCurrentQueueItems, "bt1", "bt2", "bt3");
 
-    SQueuedBuild bt1 = myCurrentQueueItems.remove(0);
+    SQueuedBuild b1 = myCurrentQueueItems.remove(0);
 
     myCurrentQueueItems = addBuilds(myCurrentQueueItems,
             createQueuedBuild(id2buildType.get("bt4"), 60),
             createQueuedBuild(id2buildType.get("bt5"), 60));
     assertOrder(myCurrentQueueItems, "bt2", "bt3", "bt4", "bt5");
 
-    assertFalse(myStrategy.getCurrentPriorities().containsKey(bt1));
+    assertFalse(myStrategy.getCurrentPriorities().containsKey(b1.getItemId()));
   }
 
 
