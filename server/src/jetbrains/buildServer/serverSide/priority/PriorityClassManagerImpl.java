@@ -99,6 +99,7 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
     loadPriorityClasses();
 
     startFileWatching();
+    myServerDispatcher.addListener(this);
   }
 
   @Override
@@ -113,6 +114,7 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
         PriorityClassImpl pc = myPriorityClasses.get(priorityClassId);
         PriorityClassImpl updated = (PriorityClassImpl) pc.updateExternalId(oldExternalId, newExternalId);
         myPriorityClasses.put(priorityClassId, updated);
+        savePriorityClasses();
       }
     } finally {
       myLock.writeLock().unlock();
