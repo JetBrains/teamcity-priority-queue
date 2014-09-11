@@ -103,7 +103,7 @@ final class Util {
       return false;
     }
 
-    public boolean isCompactingDatabase() {
+    public boolean isRunningCriticalSection() {
       return false;
     }
 
