@@ -267,7 +267,11 @@ public final class BuildQueuePriorityOrdering implements BuildQueueOrderingStrat
     if (item.isPersonal()) {
       return myPriorityClassManager.getPersonalPriorityClass().getPriority();
     } else {
-      return myPriorityClassManager.getBuildTypePriorityClass(item.getBuildType()).getPriority();
+      try {
+        return myPriorityClassManager.getBuildTypePriorityClass(item.getBuildType()).getPriority();
+      } catch (BuildTypeNotFoundException e) {
+        return 0;
+      }
     }
   }
 
