@@ -90,7 +90,8 @@ final class Util {
   static ServerPaths getServerPaths(File rootDir) {
     File systemDir = new File(rootDir, "system");
     File backupDir = new File(rootDir, "backup");
-    return new ServerPaths(systemDir.getAbsolutePath(), getTestDataDir().getAbsolutePath(), backupDir.getAbsolutePath());
+    File importDir = new File(rootDir, "import");
+    return new ServerPaths(systemDir.getAbsolutePath(), getTestDataDir().getAbsolutePath(), backupDir.getAbsolutePath(), importDir.getAbsolutePath());
   }
 
   static class MockServerCleanupManager implements ServerCleanupManager {
