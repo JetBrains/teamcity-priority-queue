@@ -37,7 +37,7 @@ public class BuildQueuePageExtension extends SimplePageExtension {
   public BuildQueuePageExtension(@NotNull final PagePlaces pagePlaces,
                                  @NotNull final PluginDescriptor pluginDescriptor,
                                  @NotNull final SecurityContext securityContext) {
-    super(pagePlaces, PlaceId.ALL_PAGES_FOOTER, pluginDescriptor.getPluginName(), "queuePageExtension.jsp");
+    super(pagePlaces, PlaceId.BEFORE_CONTENT, pluginDescriptor.getPluginName(), "queuePageExtension.jsp");
     mySecurityContext = securityContext;
     register();
   }
@@ -45,7 +45,8 @@ public class BuildQueuePageExtension extends SimplePageExtension {
   @Override
   public boolean isAvailable(@NotNull HttpServletRequest request) {
     SUser authority = (SUser) mySecurityContext.getAuthorityHolder().getAssociatedUser();
-    return WebUtil.getPathWithoutAuthenticationType(request).startsWith("/queue.html") && authority != null && authority.isSystemAdministratorRoleGranted();
+    String uri = (String) request.getAttribute("javax.servlet.forward.request_uri");
+    return WebUtil.getPathWithoutAuthenticationType(WebUtil.getPathWithoutContext(request, uri)).startsWith("/queue.html") && authority != null && authority.isSystemAdministratorRoleGranted();
   }
 
   @Override
