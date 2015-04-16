@@ -17,6 +17,7 @@
 package jetbrains.buildServer.serverSide.priority;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -87,8 +88,11 @@ final class Util {
     return new File("server/testData");
   }
 
-  static ServerPaths getServerPaths(File rootDir) {
-    return new ServerPaths(rootDir);
+  static ServerPaths getServerPaths(File rootDir) throws IOException {
+    File systemDir = new File(rootDir, "system");
+    File backupDir = new File(rootDir, "backup");
+    File importDir = new File(rootDir, "import");
+    return new ServerPaths(systemDir.getAbsolutePath(), getTestDataDir().getAbsolutePath(), backupDir.getAbsolutePath(), importDir.getAbsolutePath());
   }
 
   static class MockServerCleanupManager implements ServerCleanupManager {
