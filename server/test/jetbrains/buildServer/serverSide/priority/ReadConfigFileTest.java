@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import jetbrains.buildServer.TempFiles;
+import jetbrains.buildServer.TestInternalProperties;
 import jetbrains.buildServer.TestLogger;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.*;
@@ -63,6 +64,8 @@ public class ReadConfigFileTest {
 
   @BeforeMethod(alwaysRun = true)
   public void setUp() throws IOException {
+    TestInternalProperties.init();
+
     new TestLogger().onSuiteStart();
     Loggers.SERVER.setLevel(Level.DEBUG);
 
