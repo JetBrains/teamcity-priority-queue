@@ -36,7 +36,6 @@ import jetbrains.buildServer.util.FileUtil;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.util.Assert;
@@ -331,9 +330,8 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
     int maxPriorityClassId = 0;
     Pattern idPattern = Pattern.compile("pc\\d+"); 
     try {
-      SAXBuilder builder = new SAXBuilder(false);
       if (myConfigFile.exists()) {
-        Document doc = builder.build(myConfigFile);
+        Document doc = FileUtil.parseDocument(myConfigFile, false).getDocument();
         Element rootElement = doc.getRootElement();
 
         List<Element> priorityClassElements = new PriorityClassElementVisitor(rootElement).getPriorityClassElements();
