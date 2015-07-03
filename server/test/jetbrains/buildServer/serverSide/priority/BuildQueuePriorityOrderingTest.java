@@ -28,6 +28,7 @@ import jetbrains.buildServer.serverSide.impl.CriticalErrorsImpl;
 import jetbrains.buildServer.serverSide.impl.FileWatcherFactory;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.FileUtil;
+import jetbrains.buildServer.util.TestFor;
 import org.apache.log4j.Level;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -358,6 +359,25 @@ public class BuildQueuePriorityOrderingTest {
     changedCurrentItems.add(qb1copy);
     myCurrentQueueItems = addBuilds(changedCurrentItems, createQueuedBuild(id2buildType.get("bt3"), 60));
     assertFalse(myCurrentQueueItems.isEmpty()); //it is empty in the case of errors
+  }
+
+
+  @TestFor(issues = "TW-41340")
+  public void NAN_weight() {
+    //builds ordered in a wrong way when they have zero duration and zero waitWeight
+    try {
+      //System.setProperty("teamcity.buildqueue.waitWeight", "0.0");
+      myStrategy = new BuildQueuePriorityOrdering(myQueue, myPriorityClassManager);
+      Map<String, SBuildType> id2buildType = prepareBuildTypes(myContext, myProjectManager, "bt1", "bt2");
+
+      addBuilds(myCurrentQueueItems, createQueuedBuild(id2buildType.get("bt1"), 0));
+      assertOrder(myCurrentQueueItems, "bt1");
+
+      myCurrentQueueItems = addBuilds(myCurrentQueueItems, createQueuedBuild(id2buildType.get("bt2"), 0));
+      assertOrder(myCurrentQueueItems, "bt1", "bt2");
+    } finally {
+      System.getProperties().remove("teamcity.buildqueue.waitWeight");
+    }
   }
 
 

@@ -216,7 +216,13 @@ public final class BuildQueuePriorityOrdering implements BuildQueueOrderingStrat
   private double getItemWeightAtTheMoment(SQueuedBuild item, Date moment) {
     double durationMillis = getDurationSeconds(item) * 1000.0;
     long waitMillis = moment.getTime() - item.getWhenQueued().getTime();
-    return myWaitCoefficient * waitMillis / durationMillis + myPriorityCoefficient * getEffectiveBuildTypePriority(item);
+    double waitPart = myWaitCoefficient * waitMillis / durationMillis;
+    double configPart = myPriorityCoefficient * getEffectiveBuildTypePriority(item);
+    if (Double.isNaN(waitPart)) {
+      return configPart;
+    } else {
+      return waitPart + configPart;
+    }
   }
 
   /**
@@ -231,7 +237,7 @@ public final class BuildQueuePriorityOrdering implements BuildQueueOrderingStrat
     if (timeInterval == null) return DEFAULT_DURATION;
     Long duration = timeInterval.getDurationSeconds();
     if (duration == null) return DEFAULT_DURATION;
-    return duration;
+    return duration == 0 ? 1 : duration;
   }
 
   /**
