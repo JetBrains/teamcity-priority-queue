@@ -413,12 +413,12 @@ public class BuildQueuePriorityOrderingTest {
     return createQueuedBuild(buildType, createBuildEstimates(createTimeInterval(durationSec)), whenQueued, false);
   }
 
-  private SQueuedBuild createQueuedBuild(final SBuildType buildType,
+  private QueuedBuildEx createQueuedBuild(final SBuildType buildType,
                                          final BuildEstimates buildEstimates,
                                          final Date whenQueued,
                                          final boolean personal,
                                          final String... itemId) {
-    final SQueuedBuild qb = myContext.mock(SQueuedBuild.class, "SQueuedBuild" + myQueuedBuildSeq++);
+    final QueuedBuildEx qb = myContext.mock(QueuedBuildEx.class, "SQueuedBuild" + myQueuedBuildSeq++);
     myContext.checking(new Expectations() {{
       allowing(qb).getBuildTypeId(); will(returnValue(buildType.getBuildTypeId()));
       allowing(qb).getBuildEstimates(); will(returnValue(buildEstimates));
