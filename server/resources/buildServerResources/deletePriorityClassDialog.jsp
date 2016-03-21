@@ -24,10 +24,10 @@
     <c:choose>
       <c:when test="${showList}">
         <div class="moveToPriorityClassContainer">
-          <div class="grayNote">
+          <bs:smallNote>
             The selected priority class contains ${configurationCount} configuration<bs:s val="${configurationCount}"/>.
             Please choose another priority class for these configurations.
-          </div>
+          </bs:smallNote>
           <br/>
           <label for="moveToPriorityClassSelect" style="width:9em">Priority Class:</label>
           <select name="moveTo" class="priorityClassDropDown" id="moveToPriorityClassSelect">
