@@ -210,7 +210,6 @@ public class ReadConfigFileTest {
 
     //emulate server restart (reread config):
     FileWatcherFactory fwf = new FileWatcherFactory(myServerPaths, new CriticalErrorsImpl(myServerPaths), myEventDispatcher);
-    fwf.setCleanupManager(new Util.MockServerCleanupManager());
     fwf.serverStarted();
     priorityClassManager = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf);
     ((PriorityClassManagerImpl) priorityClassManager).init();
@@ -233,7 +232,6 @@ public class ReadConfigFileTest {
     FileUtil.copy(new File(getTestDataDir(), "build-queue-priorities-external-id.xml"),
                   new File(getTestDataDir(), PriorityClassManagerImpl.PRIORITY_CLASS_CONFIG_FILENAME));
     FileWatcherFactory fwf = new FileWatcherFactory(myServerPaths, new CriticalErrorsImpl(myServerPaths), myEventDispatcher);
-    fwf.setCleanupManager(new Util.MockServerCleanupManager());
     PriorityClassManagerImpl pcm = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf);
     pcm.init();
 
@@ -282,7 +280,6 @@ public class ReadConfigFileTest {
     Map<String, SBuildType> id2buildType = prepareBuildTypes(myContext, myProjectManager, "bt14", "bt47", "bt1", "bt3", "bt5");
 
     FileWatcherFactory fwf = new FileWatcherFactory(myServerPaths, new CriticalErrorsImpl(myServerPaths), myEventDispatcher);
-    fwf.setCleanupManager(new Util.MockServerCleanupManager());
     PriorityClassManagerImpl priorityClassManager = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf);
     BuildQueuePriorityOrdering strategy = new BuildQueuePriorityOrdering(myQueue, priorityClassManager);
     ServerListener listener = new ServerListener(myEventDispatcher, myQueue, strategy, priorityClassManager);

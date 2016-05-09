@@ -91,7 +91,6 @@ public class PriorityClassManagerTest {
     }});
 
     FileWatcherFactory fwf = new FileWatcherFactory(serverPaths, new CriticalErrorsImpl(serverPaths), eventDispatcher);
-    fwf.setCleanupManager(new Util.MockServerCleanupManager());
     fwf.serverStarted();
     myPriorityClassManager = new PriorityClassManagerImpl(server, serverPaths, eventDispatcher, fwf);
     myStrategy = new BuildQueuePriorityOrdering(myQueue, myPriorityClassManager);
