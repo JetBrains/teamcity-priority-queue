@@ -34,6 +34,7 @@ import jetbrains.buildServer.util.Converter;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.FileUtil;
 import org.apache.log4j.Logger;
+import org.jdom.Content;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -448,9 +449,9 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
               for (String btId : priorityClass.getExternalIds()) {
                 final Element buildTypeElement = new Element(BUILD_TYPE_ELEMENT);
                 buildTypeElement.setAttribute(BUILD_TYPE_ID_ATTRIBUTE, btId);
-                priorityClassElement.addContent(buildTypeElement);
+                priorityClassElement.addContent((Content) buildTypeElement);
               }
-              rootElement.addContent(priorityClassElement);
+              rootElement.addContent((Content) priorityClassElement);
             }
           } finally {
             myLock.readLock().unlock();

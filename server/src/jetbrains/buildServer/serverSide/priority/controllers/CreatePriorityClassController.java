@@ -27,6 +27,7 @@ import jetbrains.buildServer.serverSide.priority.PriorityClassManager;
 import jetbrains.buildServer.serverSide.priority.exceptions.*;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
+import org.jdom.Content;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.ModelAndView;
@@ -75,7 +76,7 @@ public class CreatePriorityClassController extends BaseFormXmlController {
       ActionMessages.getOrCreateMessages(request).addMessage("priorityClassCreated", "Priority Class \"{0}\" has been created, now you can add configurations.",
               priorityClass.getName());
       Element priorityClassId = new Element("priorityClass");
-      xmlResponse.addContent(priorityClassId);
+      xmlResponse.addContent((Content) priorityClassId);
       priorityClassId.setAttribute("id", priorityClass.getId());
     } catch (InvalidPriorityClassNameException e) {
       errors.addError("priorityClassName", e.getMessage());
