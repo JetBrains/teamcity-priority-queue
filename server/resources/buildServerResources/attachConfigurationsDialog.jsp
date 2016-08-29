@@ -43,9 +43,8 @@
           Found <strong>${foundConfigurationsNum}</strong> configuration<bs:s val="${foundConfigurationsNum}"/>.
           <c:if test="${attachConfigurationsBean.showFoundConfigurationsNote}">Configurations already included int this class are not shown.</c:if>
         </p>
-        <div class="configurationListContainer custom-scroll">
-          <c:if test="${foundConfigurationsNum > 0}">
-            <table class="configurationList">
+        <div class="configurationListContainer custom-scroll"><c:if test="${foundConfigurationsNum > 0}"
+            ><table class="configurationList">
               <tr>
                 <th class="checkbox">
                   <forms:checkbox name="selectAll"
@@ -67,8 +66,8 @@
                 </tr>
               </c:forEach>
             </table>
-          </c:if>
-        </div>
+          </c:if
+        ></div>
 
         <input type="hidden" name="pClassId" value="${attachConfigurationsBean.priorityClass.id}"/>
         <input type="hidden" name="submitAction" value=""/>

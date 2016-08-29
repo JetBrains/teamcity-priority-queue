@@ -91,6 +91,10 @@ table.priorityClassBuildTypesTable td {
   min-height: 5em;
 }
 
+.configurationListContainer:empty {
+  display: none;
+}
+
 .configurationListContainer table.configurationList {
   border-collapse: collapse;
   width: 100%;
@@ -121,4 +125,9 @@ table.priorityClassBuildTypesTable td {
 
 select.priorityClassDropDown {
   width: 15em;
+}
+
+#unassignBuildTypesForm .add-build-configurations {
+  float: left;
+  margin-left: 0;
 }

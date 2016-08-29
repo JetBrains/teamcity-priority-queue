@@ -27,9 +27,13 @@
       <bs:messages key="buildTypesAssigned"/>
 
       <c:set var="canAddRemoveConfigurations" value="true"/>
+      <c:set var="addButton"><c:if test="${canAddRemoveConfigurations}">
+        <forms:addButton onclick="BS.AttachConfigurationsToClassDialog.showAttachDialog('${priorityClass.id}'); return false" additionalClasses="add-build-configurations">Add configurations</forms:addButton>
+      </c:if></c:set>
 
       <c:if test="${configurationsNum == 0}">
         <p class="note">There are no configurations added to this priority class.</p>
+        <p>${addButton}</p>
       </c:if>
       <c:if test="${configurationsNum > 0}">
         <c:url var="action" value="${teamcityPluginResourcesPath}action.html?detachBuildTypes=true"/>
@@ -59,18 +63,13 @@
 
           <c:if test="${canAddRemoveConfigurations}">
             <div class="saveButtonsBlock saveButtonsBlockRight">
+              ${addButton}
               <forms:saving id="unassignInProgress" className="progressRingInline"/>
               <input class="btn" type="submit" name="detachBuildTypes" value="Remove from priority class"/>
               <input type="hidden" name="pClassId" value="${priorityClass.id}"/>
             </div>
           </c:if>
         </form>
-      </c:if>
-
-      <c:if test="${canAddRemoveConfigurations}">
-        <p>
-          <forms:addButton onclick="BS.AttachConfigurationsToClassDialog.showAttachDialog('${priorityClass.id}'); return false">Add configurations</forms:addButton>
-        </p>
         <jsp:include page="${teamcityPluginResourcesPath}attachConfigurationsDialog.html"/>
       </c:if>
     </c:otherwise>
