@@ -70,8 +70,8 @@
             </div>
           </c:if>
         </form>
-        <jsp:include page="${teamcityPluginResourcesPath}attachConfigurationsDialog.html"/>
       </c:if>
+      <jsp:include page="${teamcityPluginResourcesPath}attachConfigurationsDialog.html"/>
     </c:otherwise>
   </c:choose>
 </bs:refreshable>
