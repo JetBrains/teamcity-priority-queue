@@ -29,10 +29,7 @@ import jetbrains.buildServer.serverSide.priority.exceptions.DuplicatePriorityCla
 import jetbrains.buildServer.serverSide.priority.exceptions.InvalidPriorityClassDescriptionException;
 import jetbrains.buildServer.serverSide.priority.exceptions.InvalidPriorityClassNameException;
 import jetbrains.buildServer.serverSide.priority.exceptions.PriorityClassException;
-import jetbrains.buildServer.util.CollectionsUtil;
-import jetbrains.buildServer.util.Converter;
-import jetbrains.buildServer.util.EventDispatcher;
-import jetbrains.buildServer.util.FileUtil;
+import jetbrains.buildServer.util.*;
 import org.apache.log4j.Logger;
 import org.jdom.Content;
 import org.jdom.Document;
@@ -457,7 +454,7 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
             myLock.readLock().unlock();
           }
 
-          FileUtil.saveDocument(document, myConfigFile);
+          FilePersisterUtil.saveDocument(document, myConfigFile);
         } catch (Exception e) {
           myLogger.error("Error saving priority classes: "+ e.toString());
           myLogger.debug(e.getMessage(), e);
