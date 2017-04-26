@@ -222,10 +222,11 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
         for (String btId : ((PriorityClassImpl)priorityClass).getExternalIds()) {
           PriorityClass oldPriorityClass = findBuildTypePriorityClass(btId);
           if (oldPriorityClass != null) {
-            Set<String> builtTypeIds = ((PriorityClassImpl) oldPriorityClass).getExternalIds();
-            builtTypeIds.remove(btId);
-            PriorityClassImpl updatedOldPriorityClass = (PriorityClassImpl) oldPriorityClass.removeBuildTypes(asList(btId));
-            myPriorityClasses.put(updatedOldPriorityClass.getId(), updatedOldPriorityClass);
+            SBuildType buildType = myServer.getProjectManager().findBuildTypeByExternalId(btId);
+            if (buildType != null) {
+              PriorityClassImpl updatedOldPriorityClass = (PriorityClassImpl) oldPriorityClass.removeBuildTypes(asList(buildType.getBuildTypeId()));
+              myPriorityClasses.put(updatedOldPriorityClass.getId(), updatedOldPriorityClass);
+            }
           }
           myBuildTypePriorityClasses.put(btId, priorityClass.getId());
         }
