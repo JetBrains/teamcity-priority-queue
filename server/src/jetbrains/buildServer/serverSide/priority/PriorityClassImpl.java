@@ -114,6 +114,18 @@ public class PriorityClassImpl implements PriorityClass, Comparable<PriorityClas
       if (bt != null)
         newExternalIds.remove(bt.getExternalId());
     }
+
+    //It is possible to miss the extId changed event (e.g. when configuration is changed on disk).
+    //In this case collection of our extIds contains an alias of a buildType extId, we need to remove it.
+    Set<String> intIds = new HashSet<>(buildTypeIds);
+    Set<String> aliasesToRemove = new HashSet<>();
+    for (String extId : newExternalIds) {
+      SBuildType bt = myProjectManager.findBuildTypeByExternalId(extId);
+      if (bt != null && intIds.contains(bt.getBuildTypeId()))
+        aliasesToRemove.add(extId);
+    }
+    newExternalIds.removeAll(aliasesToRemove);
+
     return new PriorityClassImpl(myProjectManager, myId, myName, myDescription, myPriority, newExternalIds);
   }
 
