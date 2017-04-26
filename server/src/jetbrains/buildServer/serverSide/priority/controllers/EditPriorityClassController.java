@@ -24,6 +24,7 @@ import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.ActionMessages;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
 import jetbrains.buildServer.controllers.FormUtil;
+import jetbrains.buildServer.serverSide.BuildTypeComparator;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SBuildType;
 import jetbrains.buildServer.serverSide.priority.PriorityClass;
@@ -74,7 +75,7 @@ public class EditPriorityClassController extends BaseFormXmlController {
     mv.getModel().put("priorityClassBean", bean);
     mv.getModel().put("priorityClass", priorityClass);
     List<SBuildType> sortedBuildTypes = priorityClass.getBuildTypes();
-    Collections.sort(sortedBuildTypes);
+    Collections.sort(sortedBuildTypes, new BuildTypeComparator());
     mv.getModel().put("sortedBuildTypes", sortedBuildTypes);
 
     return mv;
