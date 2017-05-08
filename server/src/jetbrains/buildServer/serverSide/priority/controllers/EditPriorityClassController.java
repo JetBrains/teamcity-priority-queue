@@ -75,7 +75,7 @@ public class EditPriorityClassController extends BaseFormXmlController {
     mv.getModel().put("priorityClassBean", bean);
     mv.getModel().put("priorityClass", priorityClass);
     List<SBuildType> sortedBuildTypes = priorityClass.getBuildTypes();
-    Collections.sort(sortedBuildTypes, new BuildTypeComparator());
+    Collections.sort(sortedBuildTypes, new PriorityQueueBuildTypeComparator());
     mv.getModel().put("sortedBuildTypes", sortedBuildTypes);
 
     return mv;

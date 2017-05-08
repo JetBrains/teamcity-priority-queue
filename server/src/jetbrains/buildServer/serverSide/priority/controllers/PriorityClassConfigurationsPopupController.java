@@ -55,7 +55,7 @@ public class PriorityClassConfigurationsPopupController extends BasePopupControl
       if (priorityClass != null) {
         ModelAndView mv = new ModelAndView(myPluginDescriptor.getPluginResourcesPath("priorityClassConfigurationsPopup.jsp"));
         List<SBuildType> buildTypes = new ArrayList<SBuildType>(priorityClass.getBuildTypes());
-        Collections.sort(buildTypes, new BuildTypeComparator());
+        Collections.sort(buildTypes, new PriorityQueueBuildTypeComparator());
         List<SBuildType> buildTypesToShow = buildTypes.subList(0, Math.min(buildTypes.size(), MAX_CONFIGURATIONS_TO_SHOW));
         mv.getModel().put("priorityClass", priorityClass);
         mv.getModel().put("buildTypeList", buildTypesToShow);
