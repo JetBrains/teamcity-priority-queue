@@ -22,6 +22,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import jetbrains.buildServer.controllers.BasePopupController;
+import jetbrains.buildServer.serverSide.BuildTypeComparator;
 import jetbrains.buildServer.serverSide.SBuildType;
 import jetbrains.buildServer.serverSide.priority.PriorityClass;
 import jetbrains.buildServer.serverSide.priority.PriorityClassManager;
@@ -54,8 +55,8 @@ public class PriorityClassConfigurationsPopupController extends BasePopupControl
       if (priorityClass != null) {
         ModelAndView mv = new ModelAndView(myPluginDescriptor.getPluginResourcesPath("priorityClassConfigurationsPopup.jsp"));
         List<SBuildType> buildTypes = new ArrayList<SBuildType>(priorityClass.getBuildTypes());
+        Collections.sort(buildTypes, new BuildTypeComparator());
         List<SBuildType> buildTypesToShow = buildTypes.subList(0, Math.min(buildTypes.size(), MAX_CONFIGURATIONS_TO_SHOW));
-        Collections.sort(buildTypesToShow);
         mv.getModel().put("priorityClass", priorityClass);
         mv.getModel().put("buildTypeList", buildTypesToShow);
         return mv;
