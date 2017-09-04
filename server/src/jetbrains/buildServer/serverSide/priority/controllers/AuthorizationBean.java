@@ -21,6 +21,7 @@ import jetbrains.buildServer.controllers.AuthorizationInterceptor;
 import jetbrains.buildServer.controllers.RequestPermissionsChecker;
 import jetbrains.buildServer.serverSide.auth.AccessDeniedException;
 import jetbrains.buildServer.serverSide.auth.AuthorityHolder;
+import jetbrains.buildServer.serverSide.auth.Permission;
 import jetbrains.buildServer.users.SUser;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,17 +30,17 @@ import org.jetbrains.annotations.NotNull;
  */
 public class AuthorizationBean {
 
-  private final RequestPermissionsChecker buildQueuePermissionChecker = new RequestPermissionsChecker() {
-    public void checkPermissions(@NotNull AuthorityHolder authorityHolder, @NotNull HttpServletRequest request) throws AccessDeniedException {
-      SUser user = ((SUser) authorityHolder.getAssociatedUser());
-      if (!user.isSystemAdministratorRoleGranted()) {
-        String message = "Only system administrator can access Build Queue Priorities";
-        throw new AccessDeniedException(authorityHolder, message);
-      }
-    }
-  };
-
   public AuthorizationBean(@NotNull AuthorizationInterceptor authInterceptor) {
+    final RequestPermissionsChecker permissionsChecker = new RequestPermissionsChecker() {
+      public void checkPermissions(@NotNull AuthorityHolder authorityHolder, @NotNull HttpServletRequest request) throws AccessDeniedException {
+        SUser user = ((SUser)authorityHolder.getAssociatedUser());
+        if (user != null && !user.isPermissionGrantedGlobally(Permission.CHANGE_SERVER_SETTINGS)) {
+          String message = "You do not have enough permissions to access build queue priorities page";
+          throw new AccessDeniedException(authorityHolder, message);
+        }
+      }
+    };
+
     String[] paths = new String[] {
             "/plugins/priority-queue/attachConfigurationsDialog.html",
             "/plugins/priority-queue/deletePriorityClassDialog.html",
@@ -50,7 +51,7 @@ public class AuthorizationBean {
             "/plugins/priority-queue/createPriorityClass.html",
             "/plugins/priority-queue/editPriorityClass.html"};
     for (String path : paths) {
-      authInterceptor.addPathBasedPermissionsChecker(path, buildQueuePermissionChecker);
+      authInterceptor.addPathBasedPermissionsChecker(path, permissionsChecker);
     }
   }
 

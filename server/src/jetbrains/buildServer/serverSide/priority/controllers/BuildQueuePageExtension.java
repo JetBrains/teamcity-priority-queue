@@ -18,6 +18,7 @@ package jetbrains.buildServer.serverSide.priority.controllers;
 
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import jetbrains.buildServer.serverSide.auth.Permission;
 import jetbrains.buildServer.serverSide.auth.SecurityContext;
 import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.web.openapi.PagePlaces;
@@ -46,7 +47,7 @@ public class BuildQueuePageExtension extends SimplePageExtension {
   public boolean isAvailable(@NotNull HttpServletRequest request) {
     SUser authority = (SUser) mySecurityContext.getAuthorityHolder().getAssociatedUser();
     return WebUtil.getPathWithoutAuthenticationType(WebUtil.getPathWithoutContext(request, WebUtil.getOriginalRequestUrl(request))).startsWith("/queue.html")
-            && authority != null && authority.isSystemAdministratorRoleGranted();
+            && authority != null && authority.isPermissionGrantedGlobally(Permission.CHANGE_SERVER_SETTINGS);
   }
 
   @Override
