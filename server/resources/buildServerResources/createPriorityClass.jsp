@@ -42,7 +42,7 @@
 
       <table class="runnerFormTable">
         <tr>
-          <th><label for="priorityClassName">Name: <l:star/></label></th>
+          <th><label for="priorityClassName">Name:<l:star/></label></th>
           <td>
             <forms:textField name="priorityClassName" id="priorityClassName" value="${priorityClassBean.priorityClassName}" className="longField"
                              maxlength="255"/>
@@ -51,7 +51,7 @@
         </tr>
 
         <tr>
-          <th><label for="priorityClassPriority">Priority: <l:star/></label></th>
+          <th><label for="priorityClassPriority">Priority:<l:star/></label></th>
           <td>
             <forms:textField name="priorityClassPriority" id="priorityClassPriority" value="${priorityClassBean.priorityClassPriority}" style="width:5em"
                              maxlength="4"/>&nbsp;<span class="grayNote">Integer in interval [-100..100]</span>
