@@ -46,7 +46,6 @@ public class ServerListener extends BuildServerAdapter {
   @Override
   public void serverStartup() {
     myPriorityClassManager.init();
-    myStrategy.addBuilds(myQueue.getItems(), new ArrayList<SQueuedBuild>());
     myQueue.setOrderingStrategy(myStrategy);
   }
 
