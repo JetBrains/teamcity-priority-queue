@@ -81,7 +81,7 @@ final class Util {
   }
 
   static File getTestDataDir() {
-    File f = new File("bundled-plugins/priority-queue/server/testData");
+    File f = new File("external-repos/priority-queue/server/testData");
     if (f.isDirectory()) {
       return f;
     }
