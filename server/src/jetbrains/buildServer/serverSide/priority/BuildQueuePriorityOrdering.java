@@ -66,6 +66,29 @@ public final class BuildQueuePriorityOrdering implements BuildQueueOrderingStrat
     }
   }
 
+  @Override
+  public synchronized void restoreQueue(@NotNull final List<SQueuedBuild> queuedBuilds) {
+    try {
+      myItemWeights.clear();
+      myMovedItemsPriorities.clear();
+      myPrioritiesOnTheInsertMoment.clear();
+      myLastResult.clear();
+
+      final List<SQueuedBuild> result = new ArrayList<>();
+      for (SQueuedBuild item: queuedBuilds) {
+        int buildTypePriority = getCurrentBuildTypePriority(item);
+        double weight = myPriorityCoefficient * buildTypePriority;
+        int position = getNewItemPosition(weight, result);
+        result.add(position, item);
+        myItemWeights.put(item.getItemId(), weight);
+        myPrioritiesOnTheInsertMoment.put(item.getItemId(), buildTypePriority);
+      }
+      myLastResult = new ArrayList<SQueuedBuild>(result);
+    } catch (Throwable t) {
+      myLogger.error("Error while compute new queue order", t);
+    }
+  }
+
   private void addNewItems(final List<SQueuedBuild> itemsToAdd, final List<SQueuedBuild> currentQueueItems) {
     Set<String> buildIds = getIds(currentQueueItems);
     for (SQueuedBuild item: itemsToAdd) {
