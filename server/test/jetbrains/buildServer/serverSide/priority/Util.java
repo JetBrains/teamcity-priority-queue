@@ -126,5 +126,10 @@ final class Util {
       runnable.run();
       return true;
     }
+
+    @Override
+    public boolean isIgnoreDeletedEntities() {
+      return false;
+    }
   }
 }
