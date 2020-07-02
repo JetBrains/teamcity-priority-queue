@@ -95,41 +95,4 @@ final class Util {
     return new ServerPaths(systemDir.getAbsolutePath(), getTestDataDir().getAbsolutePath(), backupDir.getAbsolutePath(), importDir.getAbsolutePath());
   }
 
-  static class MockServerCleanupManager implements ServerCleanupManager {
-    public void setCleanupStartTime(@Nullable final Time time) {throw new UnsupportedOperationException();}
-
-    public void setCleanupEnabled(final boolean enabled) {
-    }
-
-    public boolean isCleanupEnabled() {
-      return false;
-    }
-
-    public boolean isRunningCriticalSection() {
-      return false;
-    }
-
-    public void setMaxCleanupDuration(final int durationSecs) {}
-
-    public int getMaxCleanupDuration() { return 0; }
-
-    @NotNull
-    public Time getCleanupStartTime() {throw new UnsupportedOperationException();}
-    @NotNull
-    public CleanupProcessState getCleanupState() {throw new UnsupportedOperationException();}
-    public void startCleanup() throws CleanupCannotBeStartedException {throw new UnsupportedOperationException();}
-
-    public void stopCleanup(@Nullable final SUser userPerformingAction) {}
-
-    public boolean isCleanupCanBeStarted() {throw new UnsupportedOperationException();}
-    public boolean executeWithInactiveCleanup(@NotNull final Runnable runnable, final boolean waitTillCleanupFinished) {
-      runnable.run();
-      return true;
-    }
-
-    @Override
-    public boolean isIgnoreDeletedEntities() {
-      return false;
-    }
-  }
 }
