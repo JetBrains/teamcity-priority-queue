@@ -110,7 +110,6 @@ public class BuildQueuePriorityOrderingTest {
       }
     };
     BackgroundPersisterImpl backgroundPersister = new BackgroundPersisterImpl(backgroundPersisterOptions);
-    backgroundPersister.init();
     FileWatcherFactory fwf = new FileWatcherFactory(serverPaths, new CriticalErrorsImpl(serverPaths), eventDispatcher);
     myPriorityClassManager = new PriorityClassManagerImpl(server, serverPaths, eventDispatcher, fwf, backgroundPersister);
     myStrategy = new BuildQueuePriorityOrdering(myQueue, myPriorityClassManager);
