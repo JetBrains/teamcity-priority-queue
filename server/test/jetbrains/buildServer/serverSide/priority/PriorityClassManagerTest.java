@@ -26,6 +26,9 @@ import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.serverSide.impl.CriticalErrorsImpl;
 import jetbrains.buildServer.serverSide.impl.FileWatcherFactory;
+import jetbrains.buildServer.serverSide.impl.projects.BackgroundPersisterImpl;
+import jetbrains.buildServer.serverSide.impl.projects.BackgroundPersisterOptions;
+import jetbrains.buildServer.serverSide.impl.projects.BackgroundPersisterOptionsImpl;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.FileUtil;
 import org.apache.log4j.Level;
@@ -90,9 +93,25 @@ public class PriorityClassManagerTest {
       allowing(myProjectManager).getAllBuildTypes(); will(returnValue(Collections.<SBuildType>emptyList()));
     }});
 
+    BackgroundPersisterOptions backgroundPersisterOptions = new BackgroundPersisterOptionsImpl() {
+      @Override
+      public int getSaveQueueCapacity() {
+        return 10;
+      }
+      @Override
+      public long getSaveQueuePollingIntervalMillis() {
+        return 10;
+      }
+      @Override
+      public long getShutdownWaitThresholdMillis() {
+        return 10;
+      }
+    };
+    BackgroundPersisterImpl backgroundPersister = new BackgroundPersisterImpl(backgroundPersisterOptions);
+    backgroundPersister.init();
     FileWatcherFactory fwf = new FileWatcherFactory(serverPaths, new CriticalErrorsImpl(serverPaths), eventDispatcher);
     fwf.serverStarted();
-    myPriorityClassManager = new PriorityClassManagerImpl(server, serverPaths, eventDispatcher, fwf);
+    myPriorityClassManager = new PriorityClassManagerImpl(server, serverPaths, eventDispatcher, fwf, backgroundPersister);
     myStrategy = new BuildQueuePriorityOrdering(myQueue, myPriorityClassManager);
     myListener = new ServerListener(eventDispatcher, myQueue, myStrategy, myPriorityClassManager);
     myListener.serverStartup();

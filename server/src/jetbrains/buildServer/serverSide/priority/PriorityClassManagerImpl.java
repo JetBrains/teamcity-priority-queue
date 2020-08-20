@@ -25,6 +25,7 @@ import jetbrains.buildServer.configuration.ChangeListener;
 import jetbrains.buildServer.configuration.FileWatcher;
 import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.serverSide.impl.FileWatcherFactory;
+import jetbrains.buildServer.serverSide.impl.projects.BackgroundPersister;
 import jetbrains.buildServer.serverSide.priority.exceptions.DuplicatePriorityClassNameException;
 import jetbrains.buildServer.serverSide.priority.exceptions.InvalidPriorityClassDescriptionException;
 import jetbrains.buildServer.serverSide.priority.exceptions.InvalidPriorityClassNameException;
@@ -68,6 +69,7 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
   private final AtomicInteger myPriorityClassIdSequence = new AtomicInteger(1);
   private final SBuildServer myServer;
   private final FileWatcherFactory myFileWatcherFactory;
+  private final BackgroundPersister myBackgroundPersister;
   private FileWatcher myConfigFileWatcher;
   private int myUpdateConfigInterval;
   private final EventDispatcher<BuildServerListener> myServerDispatcher;
@@ -76,11 +78,13 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
   public PriorityClassManagerImpl(@NotNull final SBuildServer server,
                                   @NotNull final ServerPaths serverPaths,
                                   @NotNull final EventDispatcher<BuildServerListener> serverDispatcher,
-                                  @NotNull final FileWatcherFactory fileWatcherFactory) {
+                                  @NotNull final FileWatcherFactory fileWatcherFactory,
+                                  @NotNull final BackgroundPersister backgroundPersister) {
     myServer = server;
     myConfigFile = new File(serverPaths.getConfigDir(), PRIORITY_CLASS_CONFIG_FILENAME);
     myServerDispatcher = serverDispatcher;
     myFileWatcherFactory = fileWatcherFactory;
+    myBackgroundPersister = backgroundPersister;
     myPersonalPriorityClass = new PersonalPriorityClass(0);
   }
 
@@ -426,43 +430,40 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
   }
 
   private void savePriorityClasses() {
-    myConfigFileWatcher.runActionWithDisabledObserver(new Runnable() {
-      public void run() {
-        try {
-          Document document = new Document();
-          final Element rootElement = new Element(PRIORITY_CLASS_ROOT_ELEMENT);
-          document.setRootElement(rootElement);
+    Document document = new Document();
+    Element rootElement = new Element(PRIORITY_CLASS_ROOT_ELEMENT);
+    document.setRootElement(rootElement);
 
-          myLock.readLock().lock();
-          try {
-            for (PriorityClassImpl priorityClass : myPriorityClasses.values()) {
-              if (isDefaultPriorityClass(priorityClass)) continue;
+    myLock.readLock().lock();
+    try {
+      for (PriorityClassImpl priorityClass : myPriorityClasses.values()) {
+        if (isDefaultPriorityClass(priorityClass)) continue;
 
-              Element priorityClassElement = new Element(PRIORITY_CLASS_ELEMENT);
-              priorityClassElement.setAttribute(ID_ATTRIBUTE, priorityClass.getId());
-              priorityClassElement.setAttribute(NAME_ATTRIBUTE, priorityClass.getName());
-              priorityClassElement.setAttribute(PRIORITY_ATTRIBUTE, String.valueOf(priorityClass.getPriority()));
-              priorityClassElement.setAttribute(DESCRIPTION_ATTRIBUTE, priorityClass.getDescription());
+        Element priorityClassElement = new Element(PRIORITY_CLASS_ELEMENT);
+        priorityClassElement.setAttribute(ID_ATTRIBUTE, priorityClass.getId());
+        priorityClassElement.setAttribute(NAME_ATTRIBUTE, priorityClass.getName());
+        priorityClassElement.setAttribute(PRIORITY_ATTRIBUTE, String.valueOf(priorityClass.getPriority()));
+        priorityClassElement.setAttribute(DESCRIPTION_ATTRIBUTE, priorityClass.getDescription());
 
-              for (String btId : priorityClass.getExternalIds()) {
-                final Element buildTypeElement = new Element(BUILD_TYPE_ELEMENT);
-                buildTypeElement.setAttribute(BUILD_TYPE_ID_ATTRIBUTE, btId);
-                priorityClassElement.addContent((Content) buildTypeElement);
-              }
-              rootElement.addContent((Content) priorityClassElement);
-            }
-          } finally {
-            myLock.readLock().unlock();
-          }
-
-          FilePersisterUtil.saveDocument(document, myConfigFile);
-        } catch (Exception e) {
-          myLogger.error("Error saving priority classes: "+ e.toString());
-          myLogger.debug(e.getMessage(), e);
+        for (String btId : priorityClass.getExternalIds()) {
+          final Element buildTypeElement = new Element(BUILD_TYPE_ELEMENT);
+          buildTypeElement.setAttribute(BUILD_TYPE_ID_ATTRIBUTE, btId);
+          priorityClassElement.addContent((Content)buildTypeElement);
         }
+        rootElement.addContent((Content)priorityClassElement);
+      }
+    } finally {
+      myLock.readLock().unlock();
+    }
+
+    myBackgroundPersister.executeFSOperation("Persist priority classes", myConfigFileWatcher, () -> {
+      try {
+        FilePersisterUtil.saveDocument(document, myConfigFile);
+      } catch (Exception e) {
+        myLogger.error("Error saving priority classes: " + e);
+        myLogger.debug(e.getMessage(), e);
       }
     });
-
   }
 
   private final class DefaultPriorityClass extends PriorityClassImpl {

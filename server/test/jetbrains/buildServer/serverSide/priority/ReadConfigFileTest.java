@@ -26,9 +26,13 @@ import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.serverSide.impl.CriticalErrorsImpl;
 import jetbrains.buildServer.serverSide.impl.FileWatcherFactory;
+import jetbrains.buildServer.serverSide.impl.projects.BackgroundPersisterImpl;
+import jetbrains.buildServer.serverSide.impl.projects.BackgroundPersisterOptions;
+import jetbrains.buildServer.serverSide.impl.projects.BackgroundPersisterOptionsImpl;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.FileUtil;
 import org.apache.log4j.Level;
+import org.jetbrains.annotations.Nullable;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.States;
@@ -61,6 +65,20 @@ public class ReadConfigFileTest {
   private BuildQueueEx myQueue;
   private ProjectManager myProjectManager;
 
+  private final BackgroundPersisterOptions myBackgroundPersisterOptions = new BackgroundPersisterOptionsImpl() {
+    @Override
+    public int getSaveQueueCapacity() {
+      return 10;
+    }
+    @Override
+    public long getSaveQueuePollingIntervalMillis() {
+      return 10;
+    }
+    @Override
+    public long getShutdownWaitThresholdMillis() {
+      return 10;
+    }
+  };
 
   @BeforeMethod(alwaysRun = true)
   public void setUp() throws IOException {
@@ -202,7 +220,8 @@ public class ReadConfigFileTest {
       allowing(myProjectManager).findBuildTypeById("bt6"); when(buildTypeState.is("recovered")); will(returnValue(bt6));
       allowing(myProjectManager).findBuildTypeByExternalId("bt6"); when(buildTypeState.is("recovered")); will(returnValue(bt6));
     }});
-    PriorityClassManager priorityClassManager = createPriorityClassManagerForConfig(new File(getTestDataDir(), "build-queue-priorities-removed-build-type.xml"));
+    File prioritiesConfig = new File(getTestDataDir(), "build-queue-priorities-removed-build-type.xml");
+    PriorityClassManager priorityClassManager = createPriorityClassManagerForConfig(prioritiesConfig);
 
     assertEquals(3, priorityClassManager.getAllPriorityClasses().size()); //no priority class is lost
 
@@ -211,7 +230,9 @@ public class ReadConfigFileTest {
     //emulate server restart (reread config):
     FileWatcherFactory fwf = new FileWatcherFactory(myServerPaths, new CriticalErrorsImpl(myServerPaths), myEventDispatcher);
     fwf.serverStarted();
-    priorityClassManager = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf);
+    BackgroundPersisterImpl backgroundPersister = new BackgroundPersisterImpl(myBackgroundPersisterOptions);
+    backgroundPersister.init();
+    priorityClassManager = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf, backgroundPersister);
     ((PriorityClassManagerImpl) priorityClassManager).init();
 
     buildTypeState.become("recovered");
@@ -232,7 +253,9 @@ public class ReadConfigFileTest {
     FileUtil.copy(new File(getTestDataDir(), "build-queue-priorities-external-id.xml"),
                   new File(getTestDataDir(), PriorityClassManagerImpl.PRIORITY_CLASS_CONFIG_FILENAME));
     FileWatcherFactory fwf = new FileWatcherFactory(myServerPaths, new CriticalErrorsImpl(myServerPaths), myEventDispatcher);
-    PriorityClassManagerImpl pcm = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf);
+    BackgroundPersisterImpl backgroundPersister = new BackgroundPersisterImpl(myBackgroundPersisterOptions);
+    backgroundPersister.init();
+    PriorityClassManagerImpl pcm = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf, backgroundPersister);
     pcm.init();
 
     SBuildType bt14 = myProjectManager.findBuildTypeByExternalId("bt14ExternalId");
@@ -252,7 +275,7 @@ public class ReadConfigFileTest {
     pcm.createPriorityClass("pc2", "description", 10, setOf(bt2, bt3));
 
     //reread config
-    pcm = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf);
+    pcm = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf, backgroundPersister);
     pcm.init();
 
     //ensure build types have right priority classes
@@ -270,7 +293,7 @@ public class ReadConfigFileTest {
   }
 
 
-  private PriorityClassManager createPriorityClassManagerForConfig(File prioritiesConfig) throws IOException {
+  private PriorityClassManager createPriorityClassManagerForConfig(@Nullable File prioritiesConfig) throws IOException {
     if (prioritiesConfig != null) {
       FileUtil.copy(prioritiesConfig, new File(getTestDataDir(), PriorityClassManagerImpl.PRIORITY_CLASS_CONFIG_FILENAME));
     } else {
@@ -280,7 +303,9 @@ public class ReadConfigFileTest {
     Map<String, SBuildType> id2buildType = prepareBuildTypes(myContext, myProjectManager, "bt14", "bt47", "bt1", "bt3", "bt5");
 
     FileWatcherFactory fwf = new FileWatcherFactory(myServerPaths, new CriticalErrorsImpl(myServerPaths), myEventDispatcher);
-    PriorityClassManagerImpl priorityClassManager = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf);
+    BackgroundPersisterImpl backgroundPersister = new BackgroundPersisterImpl(myBackgroundPersisterOptions);
+    backgroundPersister.init();
+    PriorityClassManagerImpl priorityClassManager = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf, backgroundPersister);
     BuildQueuePriorityOrdering strategy = new BuildQueuePriorityOrdering(myQueue, priorityClassManager);
     ServerListener listener = new ServerListener(myEventDispatcher, myQueue, strategy, priorityClassManager);
     listener.serverStartup();
