@@ -144,10 +144,9 @@ BS.DeletePriorityClassDialog = OO.extend(BS.AbstractModalDialog, {
   },
 
   showDeleteDialog: function(priorityClassId, afterFinish) {
-    var that = BS.DeletePriorityClassDialog;    
-    this.afterFinish = afterFinish;    
+    var that = BS.DeletePriorityClassDialog;
+    this.afterFinish = afterFinish;
     this.getRefreshableContainer().refresh(null, "priorityClassId=" + encodeURIComponent(priorityClassId), function() {
-      that.updateDialog();      
       that.showCentered();
     });
   }
@@ -172,7 +171,7 @@ BS.DeletePriorityClassForm = OO.extend(BS.AbstractWebForm, {
       }
     }, true));
     return false;
-  }  
+  }
 });
 
 
@@ -247,7 +246,7 @@ BS.AttachConfigurationsToClassDialog = OO.extend(BS.AbstractWebForm, OO.extend(B
       if (checkbox.checked) {
         BS.AttachConfigurationsToClassDialog.nonDefaultMovedCount++;
       } else {
-        BS.AttachConfigurationsToClassDialog.nonDefaultMovedCount--;        
+        BS.AttachConfigurationsToClassDialog.nonDefaultMovedCount--;
       }
     }
   },
@@ -279,7 +278,6 @@ BS.AttachConfigurationsToClassDialog = OO.extend(BS.AbstractWebForm, OO.extend(B
     $('configurationListRefreshable').refresh(null, parameters, function() {
       findProgress.hide();
       that.recenterDialog();
-      that.updateDialog();
       that.focusFirstElement();
     });
     return false;
