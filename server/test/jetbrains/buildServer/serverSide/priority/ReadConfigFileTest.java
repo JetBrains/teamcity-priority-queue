@@ -231,6 +231,7 @@ public class ReadConfigFileTest {
     FileWatcherFactory fwf = new FileWatcherFactory(myServerPaths, new CriticalErrorsImpl(myServerPaths), myEventDispatcher);
     fwf.serverStarted();
     BackgroundPersisterImpl backgroundPersister = new BackgroundPersisterImpl(myBackgroundPersisterOptions);
+    backgroundPersister.initForTests();
     priorityClassManager = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf, backgroundPersister);
     ((PriorityClassManagerImpl) priorityClassManager).init();
 
@@ -253,6 +254,7 @@ public class ReadConfigFileTest {
                   new File(getTestDataDir(), PriorityClassManagerImpl.PRIORITY_CLASS_CONFIG_FILENAME));
     FileWatcherFactory fwf = new FileWatcherFactory(myServerPaths, new CriticalErrorsImpl(myServerPaths), myEventDispatcher);
     BackgroundPersisterImpl backgroundPersister = new BackgroundPersisterImpl(myBackgroundPersisterOptions);
+    backgroundPersister.initForTests();
     PriorityClassManagerImpl pcm = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf, backgroundPersister);
     pcm.init();
 
@@ -302,6 +304,7 @@ public class ReadConfigFileTest {
 
     FileWatcherFactory fwf = new FileWatcherFactory(myServerPaths, new CriticalErrorsImpl(myServerPaths), myEventDispatcher);
     BackgroundPersisterImpl backgroundPersister = new BackgroundPersisterImpl(myBackgroundPersisterOptions);
+    backgroundPersister.initForTests();
     PriorityClassManagerImpl priorityClassManager = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf, backgroundPersister);
     BuildQueuePriorityOrdering strategy = new BuildQueuePriorityOrdering(myQueue, priorityClassManager);
     ServerListener listener = new ServerListener(myEventDispatcher, myQueue, strategy, priorityClassManager);
