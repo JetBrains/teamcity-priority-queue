@@ -456,7 +456,7 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
       myLock.readLock().unlock();
     }
 
-    myBackgroundPersister.executeFSOperation("Persist priority classes", myConfigFileWatcher, () -> {
+    myConfigFileWatcher.runActionWithDisabledObserver(() -> {
       try {
         FilePersisterUtil.saveDocument(document, myConfigFile);
       } catch (Exception e) {
