@@ -95,7 +95,7 @@ public class BuildQueuePriorityOrderingTest {
       allowing(eventDispatcher).addListener(with(any(BuildServerListener.class)));
     }});
 
-    BackgroundPersisterOptions backgroundPersisterOptions = new BackgroundPersisterOptionsImpl() {
+    BackgroundPersisterOptions backgroundPersisterOptions = new BackgroundPersisterOptionsImpl(serverPaths) {
       @Override
       public int getSaveQueueCapacity() {
         return 10;

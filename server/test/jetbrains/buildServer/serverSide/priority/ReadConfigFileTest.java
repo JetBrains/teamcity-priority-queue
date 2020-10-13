@@ -65,20 +65,7 @@ public class ReadConfigFileTest {
   private BuildQueueEx myQueue;
   private ProjectManager myProjectManager;
 
-  private final BackgroundPersisterOptions myBackgroundPersisterOptions = new BackgroundPersisterOptionsImpl() {
-    @Override
-    public int getSaveQueueCapacity() {
-      return 10;
-    }
-    @Override
-    public long getSaveQueuePollingIntervalMillis() {
-      return 10;
-    }
-    @Override
-    public long getShutdownWaitThresholdMillis() {
-      return 10;
-    }
-  };
+  private BackgroundPersisterOptions myBackgroundPersisterOptions;
 
   @BeforeMethod(alwaysRun = true)
   public void setUp() throws IOException {
@@ -104,6 +91,21 @@ public class ReadConfigFileTest {
       allowing(myQueue).getItems(); will(returnValue(Collections.<Object>emptyList()));
       allowing(myEventDispatcher).addListener(with(any(BuildServerListener.class)));
     }});
+
+    myBackgroundPersisterOptions = new BackgroundPersisterOptionsImpl(myServerPaths) {
+      @Override
+      public int getSaveQueueCapacity() {
+        return 10;
+      }
+      @Override
+      public long getSaveQueuePollingIntervalMillis() {
+        return 10;
+      }
+      @Override
+      public long getShutdownWaitThresholdMillis() {
+        return 10;
+      }
+    };
   }
 
   @AfterMethod(alwaysRun = true)

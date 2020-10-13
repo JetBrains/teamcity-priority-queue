@@ -93,7 +93,7 @@ public class PriorityClassManagerTest {
       allowing(myProjectManager).getAllBuildTypes(); will(returnValue(Collections.<SBuildType>emptyList()));
     }});
 
-    BackgroundPersisterOptions backgroundPersisterOptions = new BackgroundPersisterOptionsImpl() {
+    BackgroundPersisterOptions backgroundPersisterOptions = new BackgroundPersisterOptionsImpl(serverPaths) {
       @Override
       public int getSaveQueueCapacity() {
         return 10;
