@@ -69,7 +69,6 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
   private final AtomicInteger myPriorityClassIdSequence = new AtomicInteger(1);
   private final SBuildServer myServer;
   private final FileWatcherFactory myFileWatcherFactory;
-  private final BackgroundPersister myBackgroundPersister;
   private FileWatcher myConfigFileWatcher;
   private int myUpdateConfigInterval;
   private final EventDispatcher<BuildServerListener> myServerDispatcher;
@@ -78,13 +77,11 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
   public PriorityClassManagerImpl(@NotNull final SBuildServer server,
                                   @NotNull final ServerPaths serverPaths,
                                   @NotNull final EventDispatcher<BuildServerListener> serverDispatcher,
-                                  @NotNull final FileWatcherFactory fileWatcherFactory,
-                                  @NotNull final BackgroundPersister backgroundPersister) {
+                                  @NotNull final FileWatcherFactory fileWatcherFactory) {
     myServer = server;
     myConfigFile = new File(serverPaths.getConfigDir(), PRIORITY_CLASS_CONFIG_FILENAME);
     myServerDispatcher = serverDispatcher;
     myFileWatcherFactory = fileWatcherFactory;
-    myBackgroundPersister = backgroundPersister;
     myPersonalPriorityClass = new PersonalPriorityClass(0);
   }
 

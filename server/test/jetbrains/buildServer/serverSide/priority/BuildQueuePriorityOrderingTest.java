@@ -95,27 +95,11 @@ public class BuildQueuePriorityOrderingTest {
       allowing(eventDispatcher).addListener(with(any(BuildServerListener.class)));
     }});
 
-    BackgroundPersisterOptions backgroundPersisterOptions = new BackgroundPersisterOptionsImpl(serverPaths) {
-      @Override
-      public int getSaveQueueCapacity() {
-        return 10;
-      }
-      @Override
-      public long getSaveQueuePollingIntervalMillis() {
-        return 10;
-      }
-      @Override
-      public long getShutdownWaitThresholdMillis() {
-        return 10;
-      }
-    };
-    BackgroundPersisterImpl backgroundPersister = new BackgroundPersisterImpl(backgroundPersisterOptions);
-    backgroundPersister.initForTests();
     FileWatcherFactory fwf = new FileWatcherFactory(serverPaths, new CriticalErrorsImpl(serverPaths), eventDispatcher);
-    myPriorityClassManager = new PriorityClassManagerImpl(server, serverPaths, eventDispatcher, fwf, backgroundPersister);
+    myPriorityClassManager = new PriorityClassManagerImpl(server, serverPaths, eventDispatcher, fwf);
     myStrategy = new BuildQueuePriorityOrdering(myQueue, myPriorityClassManager);
     myPriorityClassManager.init();
-    myCurrentQueueItems = new ArrayList<SQueuedBuild>();
+    myCurrentQueueItems = new ArrayList<>();
   }
 
 

@@ -65,8 +65,6 @@ public class ReadConfigFileTest {
   private BuildQueueEx myQueue;
   private ProjectManager myProjectManager;
 
-  private BackgroundPersisterOptions myBackgroundPersisterOptions;
-
   @BeforeMethod(alwaysRun = true)
   public void setUp() throws IOException {
     TestInternalProperties.init();
@@ -91,21 +89,6 @@ public class ReadConfigFileTest {
       allowing(myQueue).getItems(); will(returnValue(Collections.<Object>emptyList()));
       allowing(myEventDispatcher).addListener(with(any(BuildServerListener.class)));
     }});
-
-    myBackgroundPersisterOptions = new BackgroundPersisterOptionsImpl(myServerPaths) {
-      @Override
-      public int getSaveQueueCapacity() {
-        return 10;
-      }
-      @Override
-      public long getSaveQueuePollingIntervalMillis() {
-        return 10;
-      }
-      @Override
-      public long getShutdownWaitThresholdMillis() {
-        return 10;
-      }
-    };
   }
 
   @AfterMethod(alwaysRun = true)
@@ -232,9 +215,7 @@ public class ReadConfigFileTest {
     //emulate server restart (reread config):
     FileWatcherFactory fwf = new FileWatcherFactory(myServerPaths, new CriticalErrorsImpl(myServerPaths), myEventDispatcher);
     fwf.serverStarted();
-    BackgroundPersisterImpl backgroundPersister = new BackgroundPersisterImpl(myBackgroundPersisterOptions);
-    backgroundPersister.initForTests();
-    priorityClassManager = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf, backgroundPersister);
+    priorityClassManager = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf);
     ((PriorityClassManagerImpl) priorityClassManager).init();
 
     buildTypeState.become("recovered");
@@ -255,9 +236,7 @@ public class ReadConfigFileTest {
     FileUtil.copy(new File(getTestDataDir(), "build-queue-priorities-external-id.xml"),
                   new File(getTestDataDir(), PriorityClassManagerImpl.PRIORITY_CLASS_CONFIG_FILENAME));
     FileWatcherFactory fwf = new FileWatcherFactory(myServerPaths, new CriticalErrorsImpl(myServerPaths), myEventDispatcher);
-    BackgroundPersisterImpl backgroundPersister = new BackgroundPersisterImpl(myBackgroundPersisterOptions);
-    backgroundPersister.initForTests();
-    PriorityClassManagerImpl pcm = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf, backgroundPersister);
+    PriorityClassManagerImpl pcm = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf);
     pcm.init();
 
     SBuildType bt14 = myProjectManager.findBuildTypeByExternalId("bt14ExternalId");
@@ -277,7 +256,7 @@ public class ReadConfigFileTest {
     pcm.createPriorityClass("pc2", "description", 10, setOf(bt2, bt3));
 
     //reread config
-    pcm = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf, backgroundPersister);
+    pcm = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf);
     pcm.init();
 
     //ensure build types have right priority classes
@@ -305,9 +284,7 @@ public class ReadConfigFileTest {
     Map<String, SBuildType> id2buildType = prepareBuildTypes(myContext, myProjectManager, "bt14", "bt47", "bt1", "bt3", "bt5");
 
     FileWatcherFactory fwf = new FileWatcherFactory(myServerPaths, new CriticalErrorsImpl(myServerPaths), myEventDispatcher);
-    BackgroundPersisterImpl backgroundPersister = new BackgroundPersisterImpl(myBackgroundPersisterOptions);
-    backgroundPersister.initForTests();
-    PriorityClassManagerImpl priorityClassManager = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf, backgroundPersister);
+    PriorityClassManagerImpl priorityClassManager = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf);
     BuildQueuePriorityOrdering strategy = new BuildQueuePriorityOrdering(myQueue, priorityClassManager);
     ServerListener listener = new ServerListener(myEventDispatcher, myQueue, strategy, priorityClassManager);
     listener.serverStartup();

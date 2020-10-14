@@ -93,25 +93,9 @@ public class PriorityClassManagerTest {
       allowing(myProjectManager).getAllBuildTypes(); will(returnValue(Collections.<SBuildType>emptyList()));
     }});
 
-    BackgroundPersisterOptions backgroundPersisterOptions = new BackgroundPersisterOptionsImpl(serverPaths) {
-      @Override
-      public int getSaveQueueCapacity() {
-        return 10;
-      }
-      @Override
-      public long getSaveQueuePollingIntervalMillis() {
-        return 10;
-      }
-      @Override
-      public long getShutdownWaitThresholdMillis() {
-        return 10;
-      }
-    };
-    BackgroundPersisterImpl backgroundPersister = new BackgroundPersisterImpl(backgroundPersisterOptions);
-    backgroundPersister.initForTests();
     FileWatcherFactory fwf = new FileWatcherFactory(serverPaths, new CriticalErrorsImpl(serverPaths), eventDispatcher);
     fwf.serverStarted();
-    myPriorityClassManager = new PriorityClassManagerImpl(server, serverPaths, eventDispatcher, fwf, backgroundPersister);
+    myPriorityClassManager = new PriorityClassManagerImpl(server, serverPaths, eventDispatcher, fwf);
     myStrategy = new BuildQueuePriorityOrdering(myQueue, myPriorityClassManager);
     myListener = new ServerListener(eventDispatcher, myQueue, myStrategy, myPriorityClassManager);
     myListener.serverStartup();
