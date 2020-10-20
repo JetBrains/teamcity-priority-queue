@@ -95,7 +95,8 @@ public class BuildQueuePriorityOrderingTest {
       allowing(eventDispatcher).addListener(with(any(BuildServerListener.class)));
     }});
 
-    FileWatcherFactory fwf = new FileWatcherFactory(serverPaths, new CriticalErrorsImpl(serverPaths), eventDispatcher);
+    FileWatcherFactory fwf = new FileWatcherFactory(serverPaths, new CriticalErrorsImpl(serverPaths));
+    fwf.setEventDispatcher(eventDispatcher);
     myPriorityClassManager = new PriorityClassManagerImpl(server, serverPaths, eventDispatcher, fwf);
     myStrategy = new BuildQueuePriorityOrdering(myQueue, myPriorityClassManager);
     myPriorityClassManager.init();
