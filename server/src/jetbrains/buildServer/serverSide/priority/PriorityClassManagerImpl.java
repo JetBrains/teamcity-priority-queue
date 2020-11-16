@@ -25,7 +25,6 @@ import jetbrains.buildServer.configuration.ChangeListener;
 import jetbrains.buildServer.configuration.FileWatcher;
 import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.serverSide.impl.FileWatcherFactory;
-import jetbrains.buildServer.serverSide.impl.persisting.BackgroundPersister;
 import jetbrains.buildServer.serverSide.priority.exceptions.DuplicatePriorityClassNameException;
 import jetbrains.buildServer.serverSide.priority.exceptions.InvalidPriorityClassDescriptionException;
 import jetbrains.buildServer.serverSide.priority.exceptions.InvalidPriorityClassNameException;
@@ -295,7 +294,7 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
   }
 
   private void startFileWatching() {
-    myConfigFileWatcher = myFileWatcherFactory.createSingleFilesWatcher(myConfigFile, myUpdateConfigInterval);
+    myConfigFileWatcher = myFileWatcherFactory.createFileWatcher(myConfigFile, myUpdateConfigInterval);
     myConfigFileWatcher.registerListener(new ChangeListener() {
       public void changeOccured(final String requestor) {
         if (!myConfigFile.isFile()) {
