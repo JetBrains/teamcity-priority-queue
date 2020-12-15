@@ -76,7 +76,7 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
   private final EventDispatcher<BuildServerListener> myServerDispatcher;
   private final ReentrantReadWriteLock myLock = new ReentrantReadWriteLock();
 
-  private final Pattern myPriorityClassIdPattern = Pattern.compile("pc\\d+");
+  private final Pattern myIdPattern = Pattern.compile("pc\\d+");
 
   public PriorityClassManagerImpl(@NotNull final SBuildServer server,
                                   @NotNull final ServerPaths serverPaths,
@@ -210,7 +210,7 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
   private int getNextSequenceId() {
     return myPriorityClasses.values().stream()
                             .map(PriorityClassImpl::getId)
-                            .filter(id -> myPriorityClassIdPattern.matcher(id).matches())
+                            .filter(id -> myIdPattern.matcher(id).matches())
                             .map(id -> Integer.parseInt(id.substring(2)))
                             .max(Comparator.naturalOrder())
                             .orElse(0) + 1;
@@ -455,8 +455,10 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
 
     myLock.readLock().lock();
     try {
-      for (PriorityClassImpl priorityClass : myPriorityClasses.values()) {
-        if (isDefaultPriorityClass(priorityClass)) continue;
+      myPriorityClasses.values().stream()
+                       .sorted(Comparator.comparing(pc -> myIdPattern.matcher(pc.getId()).matches() ? Integer.parseInt(pc.getId().substring(2)) : 0))
+                       .forEach(priorityClass -> {
+        if (isDefaultPriorityClass(priorityClass)) return;
 
         Element priorityClassElement = new Element(PRIORITY_CLASS_ELEMENT);
         priorityClassElement.setAttribute(ID_ATTRIBUTE, priorityClass.getId());
@@ -470,7 +472,7 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
           priorityClassElement.addContent((Content)buildTypeElement);
         }
         rootElement.addContent((Content)priorityClassElement);
-      }
+      });
     } finally {
       myLock.readLock().unlock();
     }
