@@ -19,7 +19,6 @@ package jetbrains.buildServer.serverSide.priority;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Pattern;
 import jetbrains.buildServer.configuration.FileWatcher;
@@ -69,7 +68,6 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
 
   private final Map<String, PriorityClassImpl> myPriorityClasses = new HashMap<>();
   private final Map<String, String> myBuildTypePriorityClasses = new HashMap<>();//external id -> priorityClass id
-  private final AtomicInteger myPriorityClassIdSequence = new AtomicInteger(1);
   private final SBuildServer myServer;
   private final FileWatcherFactory myFileWatcherFactory;
   private final SettingsPersister mySettingsPersister;
@@ -77,6 +75,8 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
   private int myUpdateConfigInterval;
   private final EventDispatcher<BuildServerListener> myServerDispatcher;
   private final ReentrantReadWriteLock myLock = new ReentrantReadWriteLock();
+
+  private final Pattern myPriorityClassIdPattern = Pattern.compile("pc\\d+");
 
   public PriorityClassManagerImpl(@NotNull final SBuildServer server,
                                   @NotNull final ServerPaths serverPaths,
@@ -187,8 +187,6 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
   public PriorityClass createPriorityClass(@NotNull final String name, @NotNull final String description, int priority,
                                            @NotNull Set<SBuildType> buildTypes)
     throws InvalidPriorityClassNameException, InvalidPriorityClassDescriptionException, DuplicatePriorityClassNameException {
-    String id = "pc" + myPriorityClassIdSequence.incrementAndGet();
-
     final PriorityClassImpl priorityClass;
     myLock.writeLock().lock();
     try {
@@ -196,8 +194,9 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
       if (sameNamePriorityClass != null) {
         throw new DuplicatePriorityClassNameException("The priority class name '" + name + "' already exists");
       }
+      String id = "pc" + getNextSequenceId();
       priorityClass = new PriorityClassImpl(myServer.getProjectManager(), id, name, description, priority, getBuildTypeIds(buildTypes));
-      myPriorityClasses.put(priorityClass.getId(), priorityClass); // !!! перетираем
+      myPriorityClasses.put(priorityClass.getId(), priorityClass);
       for (SBuildType bt : priorityClass.getBuildTypes()) {
         myBuildTypePriorityClasses.put(bt.getExternalId(), priorityClass.getId());
       }
@@ -206,6 +205,15 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
     }
     savePriorityClasses();
     return priorityClass;
+  }
+
+  private int getNextSequenceId() {
+    return myPriorityClasses.values().stream()
+                            .map(PriorityClassImpl::getId)
+                            .filter(id -> myPriorityClassIdPattern.matcher(id).matches())
+                            .map(id -> Integer.parseInt(id.substring(2)))
+                            .max(Comparator.naturalOrder())
+                            .orElse(0) + 1;
   }
 
   @Override
@@ -335,7 +343,6 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
   void loadPriorityClasses() {
     myLogger.info("Loading priority classes from the configuration file: " + myConfigFile.getAbsolutePath());
     final Map<String, PriorityClassImpl> priorityClassMap = new HashMap<>();
-    int maxPriorityClassId = 0;
     Pattern idPattern = Pattern.compile("pc\\d+");
     try {
       if (myConfigFile.exists()) {
@@ -354,10 +361,6 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
             priorityClassMap.put(personalPriorityClass.getId(), personalPriorityClass);
             //TODO: if name, description or buidltypes are changed - WARN
           } else {
-            if (idPattern.matcher(id).matches()) {
-              maxPriorityClassId = Integer.parseInt(id.substring(2));
-            }
-
             if (priorityClassMap.containsKey(id)) {
               throw new RuntimeException("Failed to load " + myConfigFile.getName() + ". Duplicate priority class identificator found: " + id);
             }
@@ -402,7 +405,6 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
           myPriorityClasses.put(predefinedPriorityClass.getId(), predefinedPriorityClass);
         }
       }
-      myPriorityClassIdSequence.set(maxPriorityClassId);
     } finally {
       myLock.writeLock().unlock();
     }
