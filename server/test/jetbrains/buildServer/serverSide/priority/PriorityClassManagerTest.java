@@ -22,13 +22,16 @@ import java.util.*;
 import jetbrains.buildServer.TempFiles;
 import jetbrains.buildServer.TestInternalProperties;
 import jetbrains.buildServer.TestLogger;
+import jetbrains.buildServer.configuration.FileWatcher;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.serverSide.impl.CriticalErrorsImpl;
 import jetbrains.buildServer.serverSide.impl.FileWatcherFactory;
+import jetbrains.buildServer.serverSide.impl.persisting.SettingsPersister;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.FileUtil;
 import org.apache.log4j.Level;
+import org.jdom.Document;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.States;
@@ -78,6 +81,7 @@ public class PriorityClassManagerTest {
     final EventDispatcher<BuildServerListener> eventDispatcher = (EventDispatcher<BuildServerListener>) myContext.mock(EventDispatcher.class);
     myQueue = myContext.mock(BuildQueueEx.class);
     myProjectManager = myContext.mock(ProjectManager.class);
+    SettingsPersister settingsPersister = myContext.mock(SettingsPersister.class);
     Loggers.SERVER.setLevel(Level.DEBUG);
 
     myContext.checking(new Expectations() {{
@@ -88,12 +92,13 @@ public class PriorityClassManagerTest {
       allowing(myQueue).getItems(); will(returnValue(Collections.<SQueuedBuild>emptyList()));
       allowing(eventDispatcher).addListener(with(any(BuildServerListener.class)));
       allowing(myProjectManager).getAllBuildTypes(); will(returnValue(Collections.<SBuildType>emptyList()));
+      allowing(settingsPersister).scheduleSaveDocument(with(any(String.class)), with(any(FileWatcher.class)), with(any(Document.class)));
     }});
 
     FileWatcherFactory fwf = new FileWatcherFactory(serverPaths, new CriticalErrorsImpl(serverPaths));
     fwf.setEventDispatcher(eventDispatcher);
     fwf.serverStarted();
-    myPriorityClassManager = new PriorityClassManagerImpl(server, serverPaths, eventDispatcher, fwf);
+    myPriorityClassManager = new PriorityClassManagerImpl(server, serverPaths, eventDispatcher, fwf, settingsPersister);
     myStrategy = new BuildQueuePriorityOrdering(myQueue, myPriorityClassManager);
     myListener = new ServerListener(eventDispatcher, myQueue, myStrategy, myPriorityClassManager);
     myListener.serverStartup();

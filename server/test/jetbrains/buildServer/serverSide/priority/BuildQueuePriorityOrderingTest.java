@@ -22,14 +22,17 @@ import java.util.*;
 import jetbrains.buildServer.TempFiles;
 import jetbrains.buildServer.TestInternalProperties;
 import jetbrains.buildServer.TestLogger;
+import jetbrains.buildServer.configuration.FileWatcher;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.serverSide.impl.CriticalErrorsImpl;
 import jetbrains.buildServer.serverSide.impl.FileWatcherFactory;
+import jetbrains.buildServer.serverSide.impl.persisting.SettingsPersister;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.FileUtil;
 import jetbrains.buildServer.util.TestFor;
 import org.apache.log4j.Level;
+import org.jdom.Document;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -75,10 +78,10 @@ public class BuildQueuePriorityOrderingTest {
     }};
     final SBuildServer server = myContext.mock(SBuildServer.class);
     final ServerPaths serverPaths = Util.getServerPaths(myTempFiles.createTempDir());
-    final EventDispatcher<BuildServerListener> eventDispatcher =
-            (EventDispatcher<BuildServerListener>) myContext.mock(EventDispatcher.class);
+    final EventDispatcher<BuildServerListener> eventDispatcher = (EventDispatcher<BuildServerListener>) myContext.mock(EventDispatcher.class);
     myQueue = myContext.mock(BuildQueueEx.class);
     myProjectManager = myContext.mock(ProjectManager.class);
+    SettingsPersister settingsPersister = myContext.mock(SettingsPersister.class);
     Loggers.SERVER.setLevel(Level.DEBUG);
 
     Map<String, SBuildType> id2buildType = prepareBuildTypes(myContext, myProjectManager, "bt0");
@@ -90,11 +93,12 @@ public class BuildQueuePriorityOrderingTest {
       allowing(server).getProjectManager(); will(returnValue(myProjectManager));
       allowing(myQueue).getItems(); will(returnValue(Collections.singletonList(myBt0)));
       allowing(eventDispatcher).addListener(with(any(BuildServerListener.class)));
+      allowing(settingsPersister).scheduleSaveDocument(with(any(String.class)), with(any(FileWatcher.class)), with(any(Document.class)));
     }});
 
     FileWatcherFactory fwf = new FileWatcherFactory(serverPaths, new CriticalErrorsImpl(serverPaths));
     fwf.setEventDispatcher(eventDispatcher);
-    myPriorityClassManager = new PriorityClassManagerImpl(server, serverPaths, eventDispatcher, fwf);
+    myPriorityClassManager = new PriorityClassManagerImpl(server, serverPaths, eventDispatcher, fwf, settingsPersister);
     myStrategy = new BuildQueuePriorityOrdering(myQueue, myPriorityClassManager);
     myPriorityClassManager.init();
     myCurrentQueueItems = new ArrayList<>();

@@ -22,17 +22,23 @@ import java.util.*;
 import jetbrains.buildServer.TempFiles;
 import jetbrains.buildServer.TestInternalProperties;
 import jetbrains.buildServer.TestLogger;
+import jetbrains.buildServer.configuration.FileWatcher;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.serverSide.impl.CriticalErrorsImpl;
 import jetbrains.buildServer.serverSide.impl.FileWatcherFactory;
+import jetbrains.buildServer.serverSide.impl.persisting.SettingsPersister;
 import jetbrains.buildServer.util.EventDispatcher;
+import jetbrains.buildServer.util.FilePersisterUtil;
 import jetbrains.buildServer.util.FileUtil;
 import org.apache.log4j.Level;
+import org.jdom.Document;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.States;
+import org.jmock.lib.action.ReturnValueAction;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -41,6 +47,7 @@ import org.testng.annotations.Test;
 
 import static jetbrains.buildServer.matcher.IsCollectionContainingMatcher.hasItem;
 import static jetbrains.buildServer.serverSide.priority.BuildTypeMatcher.buildType;
+import static jetbrains.buildServer.serverSide.priority.PriorityClassManagerImpl.PRIORITY_CLASS_CONFIG_FILENAME;
 import static jetbrains.buildServer.serverSide.priority.Util.getTestDataDir;
 import static jetbrains.buildServer.serverSide.priority.Util.prepareBuildTypes;
 import static jetbrains.buildServer.util.CollectionsUtil.setOf;
@@ -61,6 +68,7 @@ public class ReadConfigFileTest {
   private EventDispatcher<BuildServerListener> myEventDispatcher;
   private BuildQueueEx myQueue;
   private ProjectManager myProjectManager;
+  private SettingsPersister mySettingsPersister;
 
   @BeforeMethod(alwaysRun = true)
   public void setUp() throws IOException {
@@ -77,6 +85,7 @@ public class ReadConfigFileTest {
     myEventDispatcher = (EventDispatcher<BuildServerListener>) myContext.mock(EventDispatcher.class);
     myQueue = myContext.mock(BuildQueueEx.class);
     myProjectManager = myContext.mock(ProjectManager.class);
+    mySettingsPersister = myContext.mock(SettingsPersister.class);
 
     myContext.checking(new Expectations() {{
       allowing(myServer).getQueue(); will(returnValue(myQueue));
@@ -85,12 +94,14 @@ public class ReadConfigFileTest {
       allowing(myQueue).setOrderingStrategy(with(any(BuildQueueOrderingStrategy.class)));
       allowing(myQueue).getItems(); will(returnValue(Collections.<Object>emptyList()));
       allowing(myEventDispatcher).addListener(with(any(BuildServerListener.class)));
+
+      allowing(mySettingsPersister).scheduleSaveDocument(with(aNonNull(String.class)), with(aNonNull(FileWatcher.class)), with(aNonNull(Document.class)));
     }});
   }
 
   @AfterMethod(alwaysRun = true)
   public void tearDown() throws InterruptedException {
-    FileUtil.delete(new File(getTestDataDir(), PriorityClassManagerImpl.PRIORITY_CLASS_CONFIG_FILENAME));
+    FileUtil.delete(new File(getTestDataDir(), PRIORITY_CLASS_CONFIG_FILENAME));
     myTempFiles.cleanup();
   }
 
@@ -157,7 +168,7 @@ public class ReadConfigFileTest {
 
     //read invalid config
     FileUtil.copy(new File(getTestDataDir(), "build-queue-priorities-invalid.xml"),
-            new File(getTestDataDir(), PriorityClassManagerImpl.PRIORITY_CLASS_CONFIG_FILENAME));
+            new File(getTestDataDir(), PRIORITY_CLASS_CONFIG_FILENAME));
     ((PriorityClassManagerImpl)priorityClassManager).loadPriorityClasses();
 
     inspections = priorityClassManager.findPriorityClassByName("Inspections");
@@ -180,7 +191,7 @@ public class ReadConfigFileTest {
     List<SBuildType> personalBuildTypes = personal.getBuildTypes();
 
     FileUtil.copy(new File(getTestDataDir(), "build-queue-priorities-with-personal.xml"),
-                  new File(getTestDataDir(), PriorityClassManagerImpl.PRIORITY_CLASS_CONFIG_FILENAME));
+                  new File(getTestDataDir(), PRIORITY_CLASS_CONFIG_FILENAME));
     ((PriorityClassManagerImpl)priorityClassManager).loadPriorityClasses();
 
     personal = priorityClassManager.getPersonalPriorityClass();
@@ -213,7 +224,7 @@ public class ReadConfigFileTest {
     FileWatcherFactory fwf = new FileWatcherFactory(myServerPaths, new CriticalErrorsImpl(myServerPaths));
     fwf.setEventDispatcher(myEventDispatcher);
     fwf.serverStarted();
-    priorityClassManager = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf);
+    priorityClassManager = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf, mySettingsPersister);
     ((PriorityClassManagerImpl) priorityClassManager).init();
 
     buildTypeState.become("recovered");
@@ -232,10 +243,10 @@ public class ReadConfigFileTest {
 
     //load config with external ids
     FileUtil.copy(new File(getTestDataDir(), "build-queue-priorities-external-id.xml"),
-                  new File(getTestDataDir(), PriorityClassManagerImpl.PRIORITY_CLASS_CONFIG_FILENAME));
+                  new File(getTestDataDir(), PRIORITY_CLASS_CONFIG_FILENAME));
     FileWatcherFactory fwf = new FileWatcherFactory(myServerPaths, new CriticalErrorsImpl(myServerPaths));
     fwf.setEventDispatcher(myEventDispatcher);
-    PriorityClassManagerImpl pcm = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf);
+    PriorityClassManagerImpl pcm = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf, mySettingsPersister);
     pcm.init();
 
     SBuildType bt14 = myProjectManager.findBuildTypeByExternalId("bt14ExternalId");
@@ -254,8 +265,11 @@ public class ReadConfigFileTest {
     SBuildType bt3 = myProjectManager.findBuildTypeByExternalId("bt3ExternalId");
     pcm.createPriorityClass("pc2", "description", 10, setOf(bt2, bt3));
 
+    // Nikolai: I don't know how to emulate in the test a save via the settings queue, so do the save directly
+    FilePersisterUtil.saveDocument(pcm.getDocument(), new File(myServerPaths.getConfigDir(), PRIORITY_CLASS_CONFIG_FILENAME));
+
     //reread config
-    pcm = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf);
+    pcm = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf, mySettingsPersister);
     pcm.init();
 
     //ensure build types have right priority classes
@@ -275,16 +289,16 @@ public class ReadConfigFileTest {
 
   private PriorityClassManager createPriorityClassManagerForConfig(@Nullable File prioritiesConfig) throws IOException {
     if (prioritiesConfig != null) {
-      FileUtil.copy(prioritiesConfig, new File(getTestDataDir(), PriorityClassManagerImpl.PRIORITY_CLASS_CONFIG_FILENAME));
+      FileUtil.copy(prioritiesConfig, new File(getTestDataDir(), PRIORITY_CLASS_CONFIG_FILENAME));
     } else {
-      FileUtil.delete(new File(getTestDataDir(), PriorityClassManagerImpl.PRIORITY_CLASS_CONFIG_FILENAME));
+      FileUtil.delete(new File(getTestDataDir(), PRIORITY_CLASS_CONFIG_FILENAME));
     }
 
     Map<String, SBuildType> id2buildType = prepareBuildTypes(myContext, myProjectManager, "bt14", "bt47", "bt1", "bt3", "bt5");
 
     FileWatcherFactory fwf = new FileWatcherFactory(myServerPaths, new CriticalErrorsImpl(myServerPaths));
     fwf.setEventDispatcher(myEventDispatcher);
-    PriorityClassManagerImpl priorityClassManager = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf);
+    PriorityClassManagerImpl priorityClassManager = new PriorityClassManagerImpl(myServer, myServerPaths, myEventDispatcher, fwf, mySettingsPersister);
     BuildQueuePriorityOrdering strategy = new BuildQueuePriorityOrdering(myQueue, priorityClassManager);
     ServerListener listener = new ServerListener(myEventDispatcher, myQueue, strategy, priorityClassManager);
     listener.serverStartup();
