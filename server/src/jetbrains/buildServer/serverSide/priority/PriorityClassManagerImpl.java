@@ -328,7 +328,7 @@ public final class PriorityClassManagerImpl extends BuildServerAdapter implement
       }
 
       @Override
-      public void beforeBuildTypeDeleted(@NotNull final String buildTypeId) {
+      public void beforeBuildTypesDeleted() {
         savePriorityClasses();
       }
     });
