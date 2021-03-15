@@ -41,13 +41,23 @@ public class BuildQueuePageExtension extends SimplePageExtension {
     super(pagePlaces, PlaceId.BEFORE_CONTENT, pluginDescriptor.getPluginName(), "queuePageExtension.jsp");
     mySecurityContext = securityContext;
     register();
+    new SimplePageExtension(pagePlaces, new PlaceId("SAKURA_QUEUE_ACTIONS"), pluginDescriptor.getPluginName(), "sakuraQueuePageExtension.jsp") {
+      @Override
+      public boolean isAvailable(@NotNull final HttpServletRequest request) {
+        return isEnoughPermissions();
+      }
+    }.register();
+  }
+
+  private boolean isEnoughPermissions() {
+    SUser authority = (SUser) mySecurityContext.getAuthorityHolder().getAssociatedUser();
+    return authority != null && authority.isPermissionGrantedGlobally(Permission.CHANGE_SERVER_SETTINGS);
   }
 
   @Override
   public boolean isAvailable(@NotNull HttpServletRequest request) {
-    SUser authority = (SUser) mySecurityContext.getAuthorityHolder().getAssociatedUser();
     return WebUtil.getPathWithoutAuthenticationType(WebUtil.getPathWithoutContext(request, WebUtil.getOriginalRequestUrl(request))).startsWith("/queue.html")
-            && authority != null && authority.isPermissionGrantedGlobally(Permission.CHANGE_SERVER_SETTINGS);
+            && isEnoughPermissions();
   }
 
   @Override
