@@ -53,6 +53,8 @@ public final class BuildQueuePriorityOrdering implements BuildQueueOrderingStrat
   @NotNull
   public synchronized List<SQueuedBuild> addBuilds(@NotNull final List<SQueuedBuild> itemsToAdd,
                                                    @NotNull final List<SQueuedBuild> currentQueueItems) {
+    if (!TeamCityProperties.getBooleanOrTrue("teamcity.buildQueue.priorityOrdering.enabled")) return Collections.emptyList();
+
     try {
       clearDataOfRemovedItems(currentQueueItems);
       ensureHaveDataOnCurrentItems(currentQueueItems);
@@ -89,7 +91,7 @@ public final class BuildQueuePriorityOrdering implements BuildQueueOrderingStrat
     }
   }
 
-  private void addNewItems(final List<SQueuedBuild> itemsToAdd, final List<SQueuedBuild> currentQueueItems) {
+  private void addNewItems(@NotNull final List<SQueuedBuild> itemsToAdd, @NotNull final List<SQueuedBuild> currentQueueItems) {
     Set<String> buildIds = getIds(currentQueueItems);
     for (SQueuedBuild item: itemsToAdd) {
       if (buildIds.contains(item.getItemId())) {
