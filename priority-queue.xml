@@ -111,7 +111,7 @@
   </path>
 
   <path id="library.log4j.classpath">
-    <pathelement location="${basedir}/lib/log4j-1.2.12.jar"/>
+    <pathelement location="${basedir}/lib/tc-log4j.jar"/>
   </path>
 
   <path id="library.teamcity_closed_api_common.classpath">
