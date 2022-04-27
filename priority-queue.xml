@@ -111,9 +111,9 @@
   </path>
 
   <path id="library.log4j.classpath">
-    <pathelement location="${basedir}/lib/log4j-1.2-api-2.17.0.jar"/>
-    <pathelement location="${basedir}/lib/log4j-api-2.17.0.jar"/>
-    <pathelement location="${basedir}/lib/log4j-core-2.17.0.jar"/>
+    <pathelement location="${basedir}/lib/log4j-1.2-api-2.17.2.jar"/>
+    <pathelement location="${basedir}/lib/log4j-api-2.17.2.jar"/>
+    <pathelement location="${basedir}/lib/log4j-core-2.17.2.jar"/>
   </path>
 
   <path id="library.teamcity_closed_api_common.classpath">
