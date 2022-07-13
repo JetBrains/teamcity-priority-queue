@@ -17,9 +17,8 @@
 package jetbrains.buildServer.serverSide.priority;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import jetbrains.buildServer.serverSide.*;
-import jetbrains.buildServer.util.CollectionsUtil;
-import jetbrains.buildServer.util.Converter;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -163,17 +162,20 @@ public final class BuildQueuePriorityOrdering implements BuildQueueOrderingStrat
     myItemWeights.keySet().retainAll(currentItemIds);
     myMovedItemsPriorities.keySet().retainAll(currentItemIds);
     myPrioritiesOnTheInsertMoment.keySet().retainAll(currentItemIds);
-    myLastResult.retainAll(currentQueueItems);
+
+    List<SQueuedBuild> newResult = new ArrayList<>();
+    for (SQueuedBuild qb: myLastResult) {
+      if (currentItemIds.contains(qb.getItemId())) {
+        newResult.add(qb);
+      }
+    }
+    myLastResult = newResult;
   }
 
 
   @NotNull
-  private HashSet<String> getIds(@NotNull List<SQueuedBuild> currentQueueItems) {
-    return new HashSet<String>(CollectionsUtil.convertCollection(currentQueueItems, new Converter<String, SQueuedBuild>() {
-      public String createFrom(@NotNull SQueuedBuild source) {
-        return source.getItemId();
-      }
-    }));
+  private Set<String> getIds(@NotNull List<SQueuedBuild> currentQueueItems) {
+    return currentQueueItems.stream().map(i -> i.getItemId()).collect(Collectors.toSet());
   }
 
   //Should be called after clearDataOfRemovedItems()
