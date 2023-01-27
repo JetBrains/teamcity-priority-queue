@@ -45,7 +45,7 @@ table.priorityClassTable {
 }
 
 .priorityClassTable td.editConfigurations {
-  border-left: solid 1px #e3e9ef;
+  border-left: solid 1px var(--ring-line-color, #dfe5eb);
 }
 
 .priorityClassGeneralSettings {
@@ -69,12 +69,12 @@ table.priorityClassTable {
 #pClassBuildTypesContainer table.priorityClassBuildTypesTable th {
   text-align: left;
   padding: 2px 2px 2px 4px;
-  background-color: #f7f9fa;
-  border-bottom: 1px solid #dfe5eb;
+  background-color: var(--ring-sidebar-background-color, #f7f9fa);
+  border-bottom: 1px solid var(--ring-line-color, #dfe5eb);
 }
 
 table.priorityClassBuildTypesTable td {
-  border-bottom: 1px solid #dfe5eb;
+  border-bottom: 1px solid var(--ring-line-color, #dfe5eb);
   padding: 1px 1px 1px 4px;
 }
 
@@ -102,7 +102,7 @@ table.priorityClassBuildTypesTable td {
 
 .configurationListContainer table.configurationList th {
   background-color: #909090;
-  color: white;
+  color: var(--ring-content-background-color, #fff);
   padding: 2px;
   text-align: left;
 }
