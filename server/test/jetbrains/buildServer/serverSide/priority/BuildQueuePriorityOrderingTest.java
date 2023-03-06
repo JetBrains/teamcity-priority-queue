@@ -79,7 +79,7 @@ public class BuildQueuePriorityOrderingTest {
     final SBuildServer server = myContext.mock(SBuildServer.class);
     final ServerPaths serverPaths = Util.getServerPaths(myTempFiles.createTempDir());
     final EventDispatcher<BuildServerListener> eventDispatcher = (EventDispatcher<BuildServerListener>) myContext.mock(EventDispatcher.class);
-    myQueue = myContext.mock(BuildQueueEx.class);
+    myQueue = myContext.mock(BuildQueue.class);
     myProjectManager = myContext.mock(ProjectManager.class);
     SettingsPersister settingsPersister = myContext.mock(SettingsPersister.class);
     Loggers.SERVER.setLevel(Level.DEBUG);
