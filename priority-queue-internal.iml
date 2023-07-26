@@ -23,6 +23,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="server" />
+    <orderEntry type="module" module-name="server-core" />
     <orderEntry type="module" module-name="server-openapi" />
     <orderEntry type="module" module-name="server-openapi-vcs" />
     <orderEntry type="module" module-name="server-common-api" />
@@ -38,6 +39,7 @@
     <orderEntry type="module" module-name="web-openapi" />
     <orderEntry type="module" module-name="test-api" scope="TEST" />
     <orderEntry type="module" module-name="web" />
+    <orderEntry type="module" module-name="web-core" />
     <orderEntry type="module" module-name="server-model" />
     <orderEntry type="module" module-name="idea-obsolete-openapi" />
     <orderEntry type="module" module-name="utils" />
